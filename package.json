@@ -1,0 +1,5 @@
+{
+  "name": "nile-food",
+  "private": true,
+  "description": "Root package.json for Nixpacks Node.js detection"
+}

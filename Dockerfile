@@ -2,10 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY server/package*.json ./server/
-RUN cd server && npm install
+COPY server/package*.json server/
+RUN npm install --prefix server --omit=dev
 
-COPY server/ ./server/
+COPY server/ server/
 
 EXPOSE 5001
 

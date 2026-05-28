@@ -51,14 +51,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 1000,
   message: { success: false, message: 'Too many requests, please try again later' }
 });
 app.use('/api/', globalLimiter);
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 50,
   message: { success: false, message: 'Too many login attempts, please try again later' }
 });
 app.use('/api/auth/login', authLimiter);

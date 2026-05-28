@@ -39,7 +39,7 @@ export const ORDER_TYPE = {
   TAKEAWAY: 'takeaway'
 };
 
-export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_SECRET = process.env.JWT_SECRET || 'nile-food-default-secret-key';
 export const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 
 export const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nilefood';

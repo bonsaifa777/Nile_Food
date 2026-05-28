@@ -2,9 +2,9 @@ import express from 'express';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Table from '../models/Table.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES, ORDER_STATUS, SOCKET_EVENTS } from '../../shared/constants.js';
+import { ROLES, ORDER_STATUS, SOCKET_EVENTS } from '../shared/constants.js';
 
 const router = express.Router();
 

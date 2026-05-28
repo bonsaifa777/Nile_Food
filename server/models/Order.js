@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, PAYMENT_METHOD } from '../../shared/constants.js';
+import { ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, PAYMENT_METHOD } from '../shared/constants.js';
 
 const orderItemSchema = new mongoose.Schema({
   food: { type: mongoose.Schema.Types.ObjectId, ref: 'Food', required: true },

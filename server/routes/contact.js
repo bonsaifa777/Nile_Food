@@ -2,9 +2,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import ContactMessage from '../models/ContactMessage.js';
 import User from '../models/User.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, optionalAuth, authorize } from '../middleware/auth.js';
-import { ROLES } from '../../shared/constants.js';
+import { ROLES } from '../shared/constants.js';
 
 const router = express.Router();
 

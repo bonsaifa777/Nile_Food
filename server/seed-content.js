@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Content from './models/Content.js';
 import Listing from './models/Listing.js';
-import { MONGODB_URI } from '../shared/constants.js';
+import { MONGODB_URI } from './shared/constants.js';
 
 const contentData = [
   {

@@ -5,9 +5,9 @@ import Category from '../models/Category.js';
 import Order from '../models/Order.js';
 import Table from '../models/Table.js';
 import Coupon from '../models/Coupon.js';
-import { apiResponse, hashPassword, generateToken, comparePassword } from '../../shared/utils.js';
+import { apiResponse, hashPassword, generateToken, comparePassword } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES, ORDER_STATUS } from '../../shared/constants.js';
+import { ROLES, ORDER_STATUS } from '../shared/constants.js';
 
 const router = express.Router();
 

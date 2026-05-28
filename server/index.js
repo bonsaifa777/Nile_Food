@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
-import { MONGODB_URI } from '../shared/constants.js';
+import { MONGODB_URI } from './shared/constants.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import foodRoutes from './routes/food.js';

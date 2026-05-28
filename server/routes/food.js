@@ -1,9 +1,9 @@
 import express from 'express';
 import Food from '../models/Food.js';
 import Order from '../models/Order.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, optionalAuth, authorize } from '../middleware/auth.js';
-import { ROLES } from '../../shared/constants.js';
+import { ROLES } from '../shared/constants.js';
 
 const router = express.Router();
 

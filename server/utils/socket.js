@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, SOCKET_EVENTS } from '../../shared/constants.js';
+import { JWT_SECRET, SOCKET_EVENTS } from '../shared/constants.js';
 
 export const setupSocket = (io) => {
   io.use((socket, next) => {

@@ -1,8 +1,8 @@
 import express from 'express';
 import Reservation from '../models/Reservation.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES } from '../../shared/constants.js';
+import { ROLES } from '../shared/constants.js';
 import upload from '../middleware/upload.js';
 import mongoose from 'mongoose';
 

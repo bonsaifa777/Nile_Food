@@ -4,8 +4,8 @@ import User from './models/User.js';
 import Category from './models/Category.js';
 import Food from './models/Food.js';
 import Table from './models/Table.js';
-import { hashPassword } from '../shared/utils.js';
-import { ROLES } from '../shared/constants.js';
+import { hashPassword } from './shared/utils.js';
+import { ROLES } from './shared/constants.js';
 
 dotenv.config();
 

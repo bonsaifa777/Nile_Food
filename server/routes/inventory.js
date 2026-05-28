@@ -1,8 +1,8 @@
 import express from 'express';
 import Inventory from '../models/Inventory.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES } from '../../shared/constants.js';
+import { ROLES } from '../shared/constants.js';
 
 const router = express.Router();
 

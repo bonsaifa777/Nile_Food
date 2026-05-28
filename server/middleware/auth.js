@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../../shared/constants.js';
+import { JWT_SECRET } from '../shared/constants.js';
 import User from '../models/User.js';
 
 export const authenticate = async (req, res, next) => {

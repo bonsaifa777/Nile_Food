@@ -1,7 +1,7 @@
 import express from 'express';
 import User from '../models/User.js';
-import { hashPassword, comparePassword, generateToken, apiResponse } from '../../shared/utils.js';
-import { ROLES } from '../../shared/constants.js';
+import { hashPassword, comparePassword, generateToken, apiResponse } from '../shared/utils.js';
+import { ROLES } from '../shared/constants.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();

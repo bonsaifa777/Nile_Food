@@ -1,9 +1,9 @@
 import express from 'express';
 import Table from '../models/Table.js';
 import QRCode from 'qrcode';
-import { apiResponse, generateTableQRCode } from '../../shared/utils.js';
+import { apiResponse, generateTableQRCode } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES } from '../../shared/constants.js';
+import { ROLES } from '../shared/constants.js';
 
 const router = express.Router();
 

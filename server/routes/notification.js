@@ -1,5 +1,5 @@
 import express from 'express';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();

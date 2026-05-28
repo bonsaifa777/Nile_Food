@@ -5,8 +5,8 @@ import Table from '../models/Table.js';
 import User from '../models/User.js';
 import Coupon from '../models/Coupon.js';
 import Settings from '../models/Settings.js';
-import { apiResponse, generateOrderId } from '../../shared/utils.js';
-import { ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, SOCKET_EVENTS } from '../../shared/constants.js';
+import { apiResponse, generateOrderId } from '../shared/utils.js';
+import { ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, SOCKET_EVENTS } from '../shared/constants.js';
 import { authenticate, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();

@@ -1,8 +1,8 @@
 import express from 'express';
 import Order from '../models/Order.js';
-import { apiResponse } from '../../shared/utils.js';
+import { apiResponse } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES, PAYMENT_STATUS, CHAPA_SECRET_KEY, CHAPA_BASE_URL } from '../../shared/constants.js';
+import { ROLES, PAYMENT_STATUS, CHAPA_SECRET_KEY, CHAPA_BASE_URL } from '../shared/constants.js';
 import fetch from 'node-fetch';
 import crypto from 'crypto';
 

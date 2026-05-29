@@ -122,34 +122,40 @@ export class DataService {
   static apiConnected = false;
   static deliveryApiConnected = false;
 
+  static hasToken() {
+    return !!localStorage.getItem('adminToken');
+  }
+
   static async init() {
-    // Kitchen orders
-    try {
-      const { fetchKitchenOrders } = await import('./kitchenApi');
-      const apiOrders = await fetchKitchenOrders();
-      if (apiOrders) {
-        this.apiConnected = true;
-        save(ORDERS_KEY, apiOrders);
-        this.setupApiPolling();
+    // Only fetch from API if authenticated
+    if (this.hasToken()) {
+      // Kitchen orders
+      try {
+        const { fetchKitchenOrders } = await import('./kitchenApi');
+        const apiOrders = await fetchKitchenOrders();
+        if (apiOrders) {
+          this.apiConnected = true;
+          save(ORDERS_KEY, apiOrders);
+          this.setupApiPolling();
+        }
+      } catch {
+        this.apiConnected = false;
       }
-    } catch {
-      this.apiConnected = false;
+      // Delivery orders
+      try {
+        const { fetchDeliveryOrders } = await import('./deliveryApi');
+        const apiDeliveries = await fetchDeliveryOrders();
+        if (apiDeliveries) {
+          this.deliveryApiConnected = true;
+          save(DELIVERIES_KEY, apiDeliveries);
+          this.setupDeliveryPolling();
+        }
+      } catch {
+        this.deliveryApiConnected = false;
+      }
     }
     if (!localStorage.getItem(STORAGE_PREFIX + ORDERS_KEY)) {
       save(ORDERS_KEY, []);
-    }
-
-    // Delivery orders
-    try {
-      const { fetchDeliveryOrders } = await import('./deliveryApi');
-      const apiDeliveries = await fetchDeliveryOrders();
-      if (apiDeliveries) {
-        this.deliveryApiConnected = true;
-        save(DELIVERIES_KEY, apiDeliveries);
-        this.setupDeliveryPolling();
-      }
-    } catch {
-      this.deliveryApiConnected = false;
     }
     if (!localStorage.getItem(STORAGE_PREFIX + DELIVERIES_KEY)) {
       save(DELIVERIES_KEY, []);
@@ -180,6 +186,7 @@ export class DataService {
   static setupApiPolling() {
     if (apiPollTimer) clearInterval(apiPollTimer);
     apiPollTimer = setInterval(async () => {
+      if (!this.hasToken()) return;
       try {
         const { fetchKitchenOrders } = await import('./kitchenApi');
         const apiOrders = await fetchKitchenOrders();
@@ -194,6 +201,7 @@ export class DataService {
   }
 
   static async syncFromApi() {
+    if (!this.hasToken()) return;
     try {
       const { fetchKitchenOrders } = await import('./kitchenApi');
       const apiOrders = await fetchKitchenOrders();
@@ -220,6 +228,7 @@ export class DataService {
   static setupDeliveryPolling() {
     if (deliveryPollTimer) clearInterval(deliveryPollTimer);
     deliveryPollTimer = setInterval(async () => {
+      if (!this.hasToken()) return;
       try {
         const { fetchDeliveryOrders } = await import('./deliveryApi');
         const apiDeliveries = await fetchDeliveryOrders();
@@ -241,6 +250,7 @@ export class DataService {
   }
 
   static async syncDeliveriesFromApi() {
+    if (!this.hasToken()) return;
     try {
       const { fetchDeliveryOrders } = await import('./deliveryApi');
       const apiDeliveries = await fetchDeliveryOrders();

@@ -6,13 +6,13 @@ let socket = null;
 let prevOrderCount = 0;
 
 export function connectKitchenSocket(token) {
+  // Socket.IO WebSocket not supported on Vercel serverless
+  if (!import.meta.env.DEV) return null;
+
   if (socket?.connected) return socket;
 
   try {
-    const isDev = import.meta.env.DEV;
-    const serverUrl = isDev ? 'http://localhost:5001' : window.location.origin;
-
-    socket = io(serverUrl, {
+    socket = io('http://localhost:5001', {
       auth: { token },
       transports: ['websocket', 'polling'],
     });

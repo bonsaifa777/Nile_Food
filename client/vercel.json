@@ -7,7 +7,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://nilefood-api.up.railway.app/api/$1"
+      "destination": "/api"
     },
     {
       "source": "/(.*)",

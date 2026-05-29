@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiBell, FiSearch, FiMoon, FiSun, FiX, FiShoppingBag, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
-import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { DataService } from '../services/dataService';
@@ -59,36 +58,40 @@ export default function Topbar({ toggleSidebar, sidebarOpen }) {
   }, [notifications]);
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-    const isDev = import.meta.env.DEV;
-    const serverUrl = isDev ? 'http://localhost:5001' : window.location.origin;
-    const socket = io(serverUrl, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-    });
+    if (!import.meta.env.DEV) return;
 
-    socket.on('new_order', (order) => {
-      addNotif(`New order ${order?.orderId || ''} received`, 'new_order');
-      DataService.addNotification(`New order ${order?.orderId || ''} received`, 'order', true);
-      playNotificationSound();
-    });
+    let socket;
+    (async () => {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+      const { io } = await import('socket.io-client');
+      socket = io('http://localhost:5001', {
+        auth: { token },
+        transports: ['websocket', 'polling'],
+      });
 
-    socket.on('notification', (notif) => {
-      addNotif(notif.message || 'Order update received', notif.type || 'order_status');
-      DataService.addNotification(notif.message || 'Order update received', 'order', true);
-      playNotificationSound();
-    });
+      socket.on('new_order', (order) => {
+        addNotif(`New order ${order?.orderId || ''} received`, 'new_order');
+        DataService.addNotification(`New order ${order?.orderId || ''} received`, 'order', true);
+        playNotificationSound();
+      });
 
-    socket.on('order_update', (order) => {
-      if (order?.orderId) {
-        addNotif(`Order #${order.orderId} updated`, 'order_update');
-        DataService.addNotification(`Order #${order.orderId} updated`, 'order', true);
-      }
-      playNotificationSound();
-    });
+      socket.on('notification', (notif) => {
+        addNotif(notif.message || 'Order update received', notif.type || 'order_status');
+        DataService.addNotification(notif.message || 'Order update received', 'order', true);
+        playNotificationSound();
+      });
 
-    return () => socket.disconnect();
+      socket.on('order_update', (order) => {
+        if (order?.orderId) {
+          addNotif(`Order #${order.orderId} updated`, 'order_update');
+          DataService.addNotification(`Order #${order.orderId} updated`, 'order', true);
+        }
+        playNotificationSound();
+      });
+    })();
+
+    return () => socket?.disconnect();
   }, []);
 
   const addNotif = useCallback((message, type) => {

@@ -145,7 +145,7 @@ router.post('/', optionalAuth, async (req, res) => {
     if (loyaltyPointsUsed) loyaltyPointsEarned = Math.max(0, loyaltyPointsEarned - loyaltyPointsUsed);
 
     const order = new Order({
-      orderId: generateOrderId(),
+      orderId: await generateOrderId(),
       user: req.user?._id,
       guestName,
       guestPhone,

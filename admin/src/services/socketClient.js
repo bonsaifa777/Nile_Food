@@ -6,13 +6,13 @@ let socket = null;
 let prevOrderCount = 0;
 
 export function connectKitchenSocket(token) {
-  // Socket.IO WebSocket not supported on Vercel serverless
-  if (!import.meta.env.DEV) return null;
+  // Socket.IO WebSocket not supported on Vercel serverless (skip in production unless LAN mode)
+  if (!import.meta.env.DEV && !import.meta.env.VITE_LAN_MODE) return null;
 
   if (socket?.connected) return socket;
 
   try {
-    socket = io('http://localhost:5001', {
+    socket = io(import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin, {
       auth: { token },
       transports: ['websocket', 'polling'],
     });
@@ -45,10 +45,12 @@ export function connectKitchenSocket(token) {
       const exists = orders.findIndex(o => o.id === order.orderId || o.id === order._id || o.id === order.id);
       if (exists >= 0) {
         const mappedStatus = {
-          confirmed: 'pending',
+          pending: 'pending',
+          confirmed: 'confirmed',
           preparing: 'preparing',
           ready: 'ready',
-          delivered: 'served'
+          delivered: 'delivered',
+          on_the_way: 'on_the_way'
         }[order.status] || order.status;
         orders[exists].status = mappedStatus;
         DataService.saveOrders(orders);
@@ -65,8 +67,12 @@ export function connectKitchenSocket(token) {
       DataService.addNotification('Real-time connection lost', 'system');
     });
 
-    socket.on('connect_error', () => {});
-  } catch {}
+    socket.on('connect_error', (err) => {
+      console.warn('[KitchenSocket] Connection error:', err.message);
+    });
+  } catch (e) {
+    console.warn('[KitchenSocket] Setup failed:', e?.message);
+  }
 
   return socket;
 }

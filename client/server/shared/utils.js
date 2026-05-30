@@ -39,10 +39,7 @@ export const apiResponse = (success, message, data = null, statusCode = 200) => 
 };
 
 export const generateOrderId = () => {
-  const prefix = 'NF';
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `${prefix}-${timestamp}-${random}`;
+  return String(Math.floor(Math.random() * 900) + 100);
 };
 
 export const calculateDeliveryFee = (distance, baseFee = 50, perKm = 10) => {

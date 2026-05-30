@@ -3,10 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiBell, FiClock, FiGrid, FiCheckCircle, FiTruck, FiAlertTriangle, FiArrowUp, FiArrowDown, FiCheck, FiPackage } from 'react-icons/fi';
 import OrderCard from './OrderCard';
 
-const statusFlow = ['pending', 'preparing', 'ready', 'served', 'on_the_way', 'delivered', 'delivery-pickup'];
+const statusFlow = ['pending', 'confirmed', 'preparing', 'ready', 'served', 'on_the_way', 'delivered', 'delivery-pickup'];
 
 const columnConfig = [
   { key: 'pending', label: 'Pending', icon: FiClock, color: '#f59e0b' },
+  { key: 'confirmed', label: 'Confirmed', icon: FiCheck, color: '#3b82f6' },
   { key: 'preparing', label: 'Preparing', icon: FiGrid, color: '#f97316' },
   { key: 'ready', label: 'Ready', icon: FiCheckCircle, color: '#10b981' },
   { key: 'served', label: 'Served', icon: FiPackage, color: '#06b6d4' },

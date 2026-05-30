@@ -58,14 +58,14 @@ export default function Topbar({ toggleSidebar, sidebarOpen }) {
   }, [notifications]);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!import.meta.env.DEV && !import.meta.env.VITE_LAN_MODE) return;
 
     let socket;
     (async () => {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
       const { io } = await import('socket.io-client');
-      socket = io('http://localhost:5001', {
+      socket = io(import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin, {
         auth: { token },
         transports: ['websocket', 'polling'],
       });

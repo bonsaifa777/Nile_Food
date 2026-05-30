@@ -5,6 +5,7 @@ import { FiShoppingCart, FiSearch, FiUser, FiMenu, FiX, FiSun, FiMoon, FiMapPin 
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import NotificationBell from './NotificationBell';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -47,6 +48,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
+          <NotificationBell />
           <button
             onClick={toggleDarkMode}
             className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/20 flex items-center justify-center text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all duration-200"

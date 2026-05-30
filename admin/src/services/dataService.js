@@ -136,9 +136,12 @@ export class DataService {
         if (apiOrders) {
           this.apiConnected = true;
           save(ORDERS_KEY, apiOrders);
+          EventBus.emit(Events.ORDER_UPDATED, apiOrders);
+          this.recalcMetrics();
           this.setupApiPolling();
         }
-      } catch {
+      } catch (e) {
+        console.warn('[DataService] Kitchen init fetch failed:', e?.message);
         this.apiConnected = false;
       }
       // Delivery orders
@@ -150,7 +153,8 @@ export class DataService {
           save(DELIVERIES_KEY, apiDeliveries);
           this.setupDeliveryPolling();
         }
-      } catch {
+      } catch (e) {
+        console.warn('[DataService] Delivery init fetch failed:', e?.message);
         this.deliveryApiConnected = false;
       }
     }
@@ -196,7 +200,9 @@ export class DataService {
           EventBus.emit(Events.ORDER_UPDATED, apiOrders);
           this.recalcMetrics();
         }
-      } catch {}
+      } catch (e) {
+        console.warn('[DataService] Polling fetch failed:', e?.message);
+      }
     }, 15000);
   }
 
@@ -214,7 +220,9 @@ export class DataService {
         EventBus.emit(Events.ORDER_UPDATED, apiOrders);
         this.recalcMetrics();
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[DataService] syncFromApi failed:', e?.message);
+    }
   }
 
   static stopApiPolling() {
@@ -237,7 +245,9 @@ export class DataService {
           save(DELIVERIES_KEY, apiDeliveries);
           EventBus.emit(Events.DELIVERY_UPDATED, apiDeliveries);
         }
-      } catch {}
+        } catch (e) {
+          console.warn('[DataService] Delivery polling failed:', e?.message);
+        }
     }, 15000);
   }
 

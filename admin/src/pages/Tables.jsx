@@ -2,7 +2,34 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit2, FiTrash2, FiUsers, FiGrid, FiLayout } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiUsers, FiGrid, FiLayout, FiHome } from 'react-icons/fi';
+
+const categoryConfig = {
+  regular: {
+    label: 'Regular Table',
+    icon: FiGrid,
+    color: 'from-emerald-500 to-teal-500',
+    lightBg: 'bg-emerald-50 dark:bg-emerald-950/30',
+    border: 'border-emerald-200 dark:border-emerald-800/30',
+    textColor: 'text-emerald-700 dark:text-emerald-300',
+  },
+  vip: {
+    label: 'VIP Class',
+    icon: FiHome,
+    color: 'from-amber-500 to-orange-500',
+    lightBg: 'bg-amber-50 dark:bg-amber-950/30',
+    border: 'border-amber-200 dark:border-amber-800/30',
+    textColor: 'text-amber-700 dark:text-amber-300',
+  },
+  room: {
+    label: 'Room',
+    icon: FiLayout,
+    color: 'from-indigo-500 to-purple-500',
+    lightBg: 'bg-indigo-50 dark:bg-indigo-950/30',
+    border: 'border-indigo-200 dark:border-indigo-800/30',
+    textColor: 'text-indigo-700 dark:text-indigo-300',
+  },
+};
 
 const statusConfig = {
   available: {
@@ -39,6 +66,7 @@ export default function Tables() {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     tableNumber: '',
+    category: 'regular',
     capacity: 4,
     status: 'available'
   });
@@ -62,7 +90,6 @@ export default function Tables() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    
     try {
       if (editingTable) {
         await axios.put(`/api/tables/${editingTable._id}`, formData);
@@ -71,10 +98,9 @@ export default function Tables() {
         await axios.post('/api/tables', formData);
         toast.success('Table created');
       }
-      
       setShowModal(false);
       setEditingTable(null);
-      setFormData({ tableNumber: '', capacity: 4, status: 'available' });
+      setFormData({ tableNumber: '', category: 'regular', capacity: 4, status: 'available' });
       fetchTables();
     } catch (error) {
       toast.error('Failed to save table');
@@ -85,7 +111,6 @@ export default function Tables() {
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this table?')) return;
-    
     try {
       await axios.delete(`/api/tables/${id}`);
       toast.success('Table deleted');
@@ -99,6 +124,7 @@ export default function Tables() {
     setEditingTable(table);
     setFormData({
       tableNumber: table.tableNumber,
+      category: table.category || 'regular',
       capacity: table.capacity,
       status: table.status
     });
@@ -110,31 +136,38 @@ export default function Tables() {
     window.open(qrUrl, '_blank');
   };
 
+  const grouped = tables.reduce((acc, table) => {
+    const cat = table.category || 'regular';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(table);
+    return acc;
+  }, {});
+
+  const categoryOrder = ['regular', 'vip', 'room'];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Tables
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tables</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5">
             <FiLayout size={14} className="text-indigo-500" />
-            Manage dining tables for QR ordering
+            Manage dining tables, VIP sections, and rooms
           </p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => { setEditingTable(null); setShowModal(true); }}
+          onClick={() => { setEditingTable(null); setFormData({ tableNumber: '', category: 'regular', capacity: 4, status: 'available' }); setShowModal(true); }}
           className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/25"
         >
           <FiPlus size={18} /> Add Table
         </motion.button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {loading ? (
-          Array.from({ length: 8 }).map((_, i) => (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="rounded-2xl p-6 bg-gray-100 dark:bg-gray-800 animate-pulse border border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div className="w-16 h-16 rounded-xl bg-gray-200 dark:bg-gray-700" />
@@ -147,98 +180,128 @@ export default function Tables() {
                 <div className="w-9 h-9 rounded-lg bg-gray-200 dark:bg-gray-700" />
               </div>
             </div>
-          ))
-        ) : tables.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="col-span-full flex flex-col items-center justify-center py-20 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
+          ))}
+        </div>
+      ) : tables.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-20 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700"
+        >
+          <div className="w-16 h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mb-4">
+            <FiLayout className="text-indigo-600 dark:text-indigo-400" size={24} />
+          </div>
+          <p className="text-gray-700 dark:text-gray-300 text-lg mb-2">No tables found</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Add your first table to enable QR ordering</p>
+          <button
+            onClick={() => { setEditingTable(null); setFormData({ tableNumber: '', category: 'regular', capacity: 4, status: 'available' }); setShowModal(true); }}
+            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/25"
           >
-            <div className="w-16 h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mb-4">
-              <FiLayout className="text-indigo-600 dark:text-indigo-400" size={24} />
-            </div>
-            <p className="text-gray-700 dark:text-gray-300 text-lg mb-2">No tables found</p>
-            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">Add your first table to enable QR ordering</p>
-            <button
-              onClick={() => { setEditingTable(null); setShowModal(true); }}
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/25"
-            >
-              <FiPlus size={16} /> Add Your First Table
-            </button>
-          </motion.div>
-        ) : (
-          <AnimatePresence>
-            {tables.map((table, i) => {
-              const config = statusConfig[table.status] || statusConfig.available;
-              return (
-                <motion.div
-                  key={table._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className={`relative overflow-hidden rounded-2xl p-5 bg-white dark:bg-gray-800 border-2 ${config.border} hover:shadow-xl transition-all duration-300`}
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient} opacity-50 pointer-events-none`} />
-
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className={`w-16 h-16 rounded-xl ${config.iconBg} flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm`}>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">#{table.tableNumber}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${config.accent}`} />
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${config.badge}`}>
-                          {statusConfig[table.status]?.label || table.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 mb-5">
-                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                          <FiUsers size={15} className="text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <span className="text-sm font-medium">
-                          <span className="text-gray-900 dark:text-white">{table.capacity}</span>{' '}
-                          <span className="text-gray-500 dark:text-gray-400">seats</span>
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => generateQR(table._id)}
-                        className="flex-1 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
-                      >
-                        <FiGrid size={15} /> QR Code
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => openEdit(table)}
-                        className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
-                      >
-                        <FiEdit2 size={15} />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleDelete(table._id)}
-                        className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-indigo-100 dark:bg-gray-700 dark:hover:bg-indigo-900/30 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
-                      >
-                        <FiTrash2 size={15} />
-                      </motion.button>
-                    </div>
+            <FiPlus size={16} /> Add Your First Table
+          </button>
+        </motion.div>
+      ) : (
+        <div className="space-y-8">
+          {categoryOrder.map(cat => {
+            const catTables = grouped[cat];
+            if (!catTables || catTables.length === 0) return null;
+            const config = categoryConfig[cat];
+            const Icon = config.icon;
+            return (
+              <div key={cat}>
+                <div className={`flex items-center gap-3 mb-4 px-1`}>
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${config.color} flex items-center justify-center shadow-sm`}>
+                    <Icon size={18} className="text-white" />
                   </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        )}
-      </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">{config.label}</h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{catTables.length} {catTables.length === 1 ? 'table' : 'tables'}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <AnimatePresence>
+                    {catTables.map((table, i) => {
+                      const sConfig = statusConfig[table.status] || statusConfig.available;
+                      return (
+                        <motion.div
+                          key={table._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                          className={`relative overflow-hidden rounded-2xl p-5 bg-white dark:bg-gray-800 border-2 ${sConfig.border} hover:shadow-xl transition-all duration-300`}
+                        >
+                          <div className={`absolute inset-0 bg-gradient-to-br ${sConfig.gradient} opacity-50 pointer-events-none`} />
+                          <div className="relative">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className={`w-16 h-16 rounded-xl ${sConfig.iconBg} flex items-center justify-center border border-gray-200 dark:border-gray-700 shadow-sm`}>
+                                <span className="text-2xl font-bold text-gray-900 dark:text-white">#{table.tableNumber}</span>
+                              </div>
+                              <div className="flex flex-col items-end gap-1.5">
+                                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${config.lightBg} ${config.textColor} border ${config.border}`}>
+                                  {config.label}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-2 h-2 rounded-full ${sConfig.accent}`} />
+                                  <span className={`px-3 py-1 rounded-full text-xs font-medium border ${sConfig.badge}`}>
+                                    {statusConfig[table.status]?.label || table.status}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4 mb-5">
+                              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                                <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                  <FiUsers size={15} className="text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                                <span className="text-sm font-medium">
+                                  <span className="text-gray-900 dark:text-white">{table.capacity}</span>{' '}
+                                  <span className="text-gray-500 dark:text-gray-400">seats</span>
+                                </span>
+                              </div>
+                              {table.floor && table.floor !== '1' && (
+                                <div className="flex items-center gap-1 text-xs text-gray-400">
+                                  <FiLayout size={12} /> Floor {table.floor}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => generateQR(table._id)}
+                                className="flex-1 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/40 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-700/50 text-indigo-700 dark:text-indigo-300 text-sm font-medium flex items-center justify-center gap-1.5 transition-all"
+                              >
+                                <FiGrid size={15} /> QR Code
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => openEdit(table)}
+                                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+                              >
+                                <FiEdit2 size={15} />
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleDelete(table._id)}
+                                className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-indigo-100 dark:bg-gray-700 dark:hover:bg-indigo-900/30 border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+                              >
+                                <FiTrash2 size={15} />
+                              </motion.button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <AnimatePresence>
         {showModal && (
@@ -270,23 +333,36 @@ export default function Tables() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full rounded-xl px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
+                  >
+                    <option value="regular">Regular Table</option>
+                    <option value="vip">VIP Class</option>
+                    <option value="room">Room</option>
+                  </select>
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Table Number</label>
                   <input
                     type="text"
                     value={formData.tableNumber}
                     onChange={(e) => setFormData({ ...formData, tableNumber: e.target.value })}
                     className="w-full rounded-xl px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="e.g., 1, 2A, VIP-1"
+                    placeholder={formData.category === 'regular' ? 'e.g., T1, T2' : formData.category === 'vip' ? 'e.g., V1, V2' : 'e.g., 101, 201'}
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Capacity</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Capacity (seats)</label>
                   <input
                     type="number"
                     value={formData.capacity}
-                    onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
                     className="w-full rounded-xl px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none"
                     min={1}
                     required
@@ -303,6 +379,7 @@ export default function Tables() {
                     <option value="available">Available</option>
                     <option value="occupied">Occupied</option>
                     <option value="reserved">Reserved</option>
+                    <option value="maintenance">Maintenance</option>
                   </select>
                 </div>
 

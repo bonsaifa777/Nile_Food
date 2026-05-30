@@ -38,6 +38,7 @@ const AdminNavigation = lazy(() => import('./pages/AdminNavigation'));
 const AdminBookings = lazy(() => import('./pages/AdminBookings'));
 const AdminRooms = lazy(() => import('./pages/AdminRooms'));
 const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
+const Kiosk = lazy(() => import('./pages/Kiosk'));
 
 function DashboardRedirect() {
   const { user } = useAuth();
@@ -86,6 +87,8 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/offers" element={<Offers />} />
+        <Route path="/kiosk" element={<Kiosk />} />
+        <Route path="/tablet" element={<Kiosk />} />
         
         <Route path="/dashboard" element={<DashboardRedirect />} />
         <Route 

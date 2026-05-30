@@ -188,16 +188,25 @@ const foods = [
 ];
 
 const tables = [
-  { tableNumber: '1', capacity: 2 },
-  { tableNumber: '2', capacity: 2 },
-  { tableNumber: '3', capacity: 4 },
-  { tableNumber: '4', capacity: 4 },
-  { tableNumber: '5', capacity: 6 },
-  { tableNumber: '6', capacity: 4 },
-  { tableNumber: '7', capacity: 6 },
-  { tableNumber: '8', capacity: 8 },
-  { tableNumber: 'VIP1', capacity: 10 },
-  { tableNumber: 'VIP2', capacity: 12 }
+  { tableNumber: 'T1', category: 'regular', capacity: 2 },
+  { tableNumber: 'T2', category: 'regular', capacity: 2 },
+  { tableNumber: 'T3', category: 'regular', capacity: 4 },
+  { tableNumber: 'T4', category: 'regular', capacity: 4 },
+  { tableNumber: 'T5', category: 'regular', capacity: 6 },
+  { tableNumber: 'T6', category: 'regular', capacity: 4 },
+  { tableNumber: 'T7', category: 'regular', capacity: 6 },
+  { tableNumber: 'T8', category: 'regular', capacity: 8 },
+  { tableNumber: 'V1', category: 'vip', capacity: 10 },
+  { tableNumber: 'V2', category: 'vip', capacity: 12 },
+  { tableNumber: '101', category: 'room', capacity: 2, floor: '1' },
+  { tableNumber: '102', category: 'room', capacity: 2, floor: '1' },
+  { tableNumber: '103', category: 'room', capacity: 4, floor: '1' },
+  { tableNumber: '201', category: 'room', capacity: 2, floor: '2' },
+  { tableNumber: '202', category: 'room', capacity: 4, floor: '2' },
+  { tableNumber: '203', category: 'room', capacity: 4, floor: '2' },
+  { tableNumber: '301', category: 'room', capacity: 4, floor: '3' },
+  { tableNumber: '302', category: 'room', capacity: 6, floor: '3' },
+  { tableNumber: '303', category: 'room', capacity: 6, floor: '3' },
 ];
 
 async function seed() {

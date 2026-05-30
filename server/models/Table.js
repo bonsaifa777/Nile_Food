@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 const tableSchema = new mongoose.Schema({
   tableNumber: { type: String, required: true, unique: true },
+  category: {
+    type: String,
+    enum: ['regular', 'vip', 'room'],
+    default: 'regular'
+  },
   qrCode: { type: String },
   capacity: { type: Number, default: 4 },
   floor: { type: String, default: '1' },

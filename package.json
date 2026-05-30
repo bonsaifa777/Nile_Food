@@ -1,0 +1,16 @@
+{
+  "name": "nile-food",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nile Food - Full-stack restaurant management system with offline LAN mode",
+  "scripts": {
+    "lan:setup": "bash scripts/lan-setup.sh",
+    "lan:build": "bash scripts/lan-build.sh",
+    "lan:start": "bash scripts/lan-start.sh",
+    "lan:firewall": "bash scripts/lan-firewall.sh",
+    "lan:seed": "cd server && node seed.js",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev:admin": "cd admin && npm run dev"
+  }
+}

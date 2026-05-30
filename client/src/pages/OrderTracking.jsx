@@ -975,7 +975,7 @@ export default function OrderTracking() {
                   Order More
                 </Link>
                 <Link
-                  to="/orders"
+                  to="/profile?tab=order-status"
                   className="flex-1 py-4 rounded-2xl text-center font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                   style={{
                     background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',

@@ -13,6 +13,9 @@ const STATUS_MAP = {
   confirmed: 'confirmed',
   preparing: 'preparing',
   ready: 'ready',
+  delivered: 'delivered',
+  on_the_way: 'on_the_way',
+  cancelled: 'cancelled',
 };
 
 const SYNC_STATUS_MAP = {

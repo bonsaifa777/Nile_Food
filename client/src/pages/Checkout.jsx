@@ -618,7 +618,7 @@ function SuccessAnimation({ onClose, isRoom }) {
                     </div>
                   </div>
                   <Link
-                    to="/orders"
+                    to="/profile?tab=order-status"
                     className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold shadow-xl hover:shadow-2xl transition-all"
                   >
                     Track Order <ArrowRight size={18} />

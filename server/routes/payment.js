@@ -34,6 +34,18 @@ router.post('/chapa/initiate', authenticate, async (req, res) => {
       return res.status(404).json(apiResponse(false, 'Order not found'));
     }
 
+    const isOffline = process.env.OFFLINE_MODE === 'true';
+    if (isOffline || !CHAPA_SECRET_KEY) {
+      order.paymentStatus = PAYMENT_STATUS.PAID;
+      order.paymentMethod = 'cash';
+      await order.save();
+      return res.json(apiResponse(true, 'Payment recorded (offline mode)', {
+        checkoutUrl: null,
+        reference: 'offline-' + order.orderId,
+        offline: true
+      }));
+    }
+
     const response = await fetch(`${CHAPA_BASE_URL}/transaction/initialize`, {
       method: 'POST',
       headers: {

@@ -203,7 +203,7 @@ export default function OrderCard({ order, index, onAccept, onReject, onComplete
           </span>
         </div>
 
-        {order.status === 'pending' && (
+        {(order.status === 'pending' || order.status === 'confirmed') && (
           <div className="flex gap-2 pt-1">
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -216,10 +216,23 @@ export default function OrderCard({ order, index, onAccept, onReject, onComplete
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onReject?.(order.id)}
-              className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
+              onClick={() => onComplete?.(order.id)}
+              className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+              style={{
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
+                color: '#fff',
+              }}
             >
-              <FiX size={14} /> Reject
+              <FiCheck size={14} /> Mark Completed
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onReject?.(order.id)}
+              className="px-2 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
+            >
+              <FiX size={14} />
             </motion.button>
           </div>
         )}

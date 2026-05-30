@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -8,6 +8,7 @@ import Footer from '../components/common/Footer';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import OrderHistory from '../components/dashboard/OrderHistory';
+import OrderStatus from '../components/dashboard/OrderStatus';
 import HotelBookings from '../components/dashboard/HotelBookings';
 import FavoritesSection from '../components/dashboard/FavoritesSection';
 import RoomStatus from '../components/dashboard/RoomStatus';
@@ -23,6 +24,7 @@ const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: FiLayout, color: 'from-indigo-500 to-blue-500' },
   { id: 'profile', label: 'Profile', icon: FiUser, color: 'from-purple-500 to-pink-500' },
   { id: 'orders', label: 'Orders', icon: FiClock, color: 'from-amber-500 to-orange-500' },
+  { id: 'order-status', label: 'Order Status', icon: FiRefreshCw, color: 'from-cyan-500 to-teal-500' },
   { id: 'bookings', label: 'Hotel Bookings', icon: FiCalendar, color: 'from-sky-500 to-indigo-500' },
   { id: 'room-status', label: 'Room Status', icon: FiKey, color: 'from-teal-500 to-emerald-500' },
   { id: 'favorites', label: 'Favorites', icon: FiHeart, color: 'from-red-500 to-rose-500' },
@@ -60,7 +62,8 @@ export default function Profile() {
   const { darkMode } = useTheme();
   const d = darkMode;
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: user?.name || '', phone: user?.phone || '' });
@@ -509,6 +512,10 @@ export default function Profile() {
 
     orders: (
       <OrderHistory orders={orders} />
+    ),
+
+    'order-status': (
+      <OrderStatus />
     ),
 
     bookings: (

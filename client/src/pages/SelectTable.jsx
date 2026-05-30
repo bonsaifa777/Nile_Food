@@ -9,8 +9,35 @@ import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import {
   ChevronLeft, Check, ShoppingBag, Clock, Truck,
-  Sun, Moon, Sparkles, MapPin, Star, Zap
+  Sun, Moon, Sparkles, MapPin, Star, Zap, Home, Building2
 } from 'lucide-react';
+
+const categoryConfig = {
+  regular: {
+    label: 'Regular Tables',
+    icon: MapPin,
+    color: 'from-emerald-500 to-teal-500',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/20',
+    text: 'text-emerald-400',
+  },
+  vip: {
+    label: 'VIP Class',
+    icon: Star,
+    color: 'from-amber-500 to-orange-500',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/20',
+    text: 'text-amber-400',
+  },
+  room: {
+    label: 'Rooms',
+    icon: Building2,
+    color: 'from-indigo-500 to-purple-500',
+    bg: 'bg-indigo-500/10',
+    border: 'border-indigo-500/20',
+    text: 'text-indigo-400',
+  },
+};
 
 export default function SelectTable() {
   const navigate = useNavigate();
@@ -92,6 +119,23 @@ export default function SelectTable() {
     navigate('/cart');
     return null;
   }
+
+  const selectedTableData = tables.find(t => t._id === selectedTable);
+  const selectedCatConfig = selectedTableData ? categoryConfig[selectedTableData.category] || categoryConfig.regular : null;
+
+  const grouped = tables.reduce((acc, table) => {
+    const cat = table.category || 'regular';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(table);
+    return acc;
+  }, {});
+
+  const categoryOrder = ['regular', 'vip', 'room'];
+
+  const tablesCount = tables.length;
+  const regularCount = (grouped.regular || []).length;
+  const vipCount = (grouped.vip || []).length;
+  const roomCount = (grouped.room || []).length;
 
   return (
     <div className="min-h-screen relative">
@@ -203,6 +247,32 @@ export default function SelectTable() {
                 </AnimatePresence>
               </motion.button>
             </div>
+
+            {/* Category stats */}
+            {!loading && tables.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center justify-center gap-4 sm:gap-6 mt-6 flex-wrap"
+              >
+                {regularCount > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <MapPin size={12} className="text-emerald-400" /> {regularCount} Regular
+                  </div>
+                )}
+                {vipCount > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <Star size={12} className="text-amber-400" /> {vipCount} VIP
+                  </div>
+                )}
+                {roomCount > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                    <Building2 size={12} className="text-indigo-400" /> {roomCount} Rooms
+                  </div>
+                )}
+              </motion.div>
+            )}
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -243,7 +313,7 @@ export default function SelectTable() {
                   className="rounded-[2rem] border border-white/20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl shadow-2xl overflow-hidden"
                 >
                   <div className="p-6 md:p-8">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
                           <MapPin size={22} className="text-indigo-400" />
@@ -262,42 +332,63 @@ export default function SelectTable() {
                       </motion.div>
                     </div>
 
-                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3 mt-6">
-                      {tables.map((table, index) => (
-                        <motion.button
-                          key={table._id}
-                          type="button"
-                          initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.03, type: 'spring', stiffness: 200 }}
-                          whileHover={{ scale: 1.08, y: -4 }}
-                          whileTap={{ scale: 0.92 }}
-                          onClick={() => setSelectedTable(table._id)}
-                          className={`relative p-5 rounded-2xl font-bold text-lg transition-all ${
-                            selectedTable === table._id
-                              ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-2xl shadow-indigo-500/30 scale-105'
-                              : 'bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 border border-white/20 hover:border-indigo-500/30'
-                          }`}
-                        >
-                          {selectedTable === table._id && (
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              transition={{ type: 'spring', stiffness: 300 }}
-                              className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg"
-                            >
-                              <Check size={14} className="text-indigo-600" />
-                            </motion.div>
-                          )}
-                          <motion.span
-                            className="block"
-                            animate={selectedTable === table._id ? { scale: [1, 1.1, 1] } : {}}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          >
-                            {table.tableNumber}
-                          </motion.span>
-                        </motion.button>
-                      ))}
+                    <div className="space-y-8">
+                      {categoryOrder.map(cat => {
+                        const catTables = grouped[cat];
+                        if (!catTables || catTables.length === 0) return null;
+                        const config = categoryConfig[cat];
+                        const Icon = config.icon;
+                        return (
+                          <div key={cat}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className={`w-7 h-7 rounded-lg ${config.bg} flex items-center justify-center`}>
+                                <Icon size={14} className={config.text} />
+                              </div>
+                              <span className={`text-sm font-semibold ${config.text}`}>{config.label}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${config.bg} ${config.text}`}>
+                                {catTables.length}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                              {catTables.map((table, index) => (
+                                <motion.button
+                                  key={table._id}
+                                  type="button"
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: index * 0.03, type: 'spring', stiffness: 200 }}
+                                  whileHover={{ scale: 1.08, y: -4 }}
+                                  whileTap={{ scale: 0.92 }}
+                                  onClick={() => setSelectedTable(table._id)}
+                                  className={`relative p-5 rounded-2xl font-bold text-lg transition-all ${
+                                    selectedTable === table._id
+                                      ? `bg-gradient-to-br ${config.color} text-white shadow-2xl shadow-${cat === 'regular' ? 'emerald' : cat === 'vip' ? 'amber' : 'indigo'}-500/30 scale-105`
+                                      : 'bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 border border-white/20 hover:border-indigo-500/30'
+                                  }`}
+                                >
+                                  {selectedTable === table._id && (
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      transition={{ type: 'spring', stiffness: 300 }}
+                                      className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg"
+                                    >
+                                      <Check size={14} className="text-indigo-600" />
+                                    </motion.div>
+                                  )}
+                                  <motion.span
+                                    className="block"
+                                    animate={selectedTable === table._id ? { scale: [1, 1.1, 1] } : {}}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                  >
+                                    {table.tableNumber}
+                                  </motion.span>
+                                </motion.button>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </motion.div>
@@ -444,10 +535,17 @@ export default function SelectTable() {
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.3 }}
                     >
-                      <Star size={18} className="text-amber-400" />
+                      {selectedCatConfig ? <selectedCatConfig.icon size={18} className={selectedCatConfig.text} /> : <Star size={18} className="text-amber-400" />}
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Table {selectedTable ? tables.find(t => t._id === selectedTable)?.tableNumber : '—'}</p>
-                        <p className="text-xs text-gray-400">Premium dine-in service</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {selectedTableData?.tableNumber || '—'}
+                          {selectedTableData?.category && (
+                            <span className={`ml-2 text-xs font-medium ${selectedCatConfig?.text || 'text-amber-400'}`}>
+                              ({selectedCatConfig?.label || selectedTableData.category})
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-xs text-gray-400">{selectedTableData?.capacity || 0} seats</p>
                       </div>
                     </motion.div>
 

@@ -47,12 +47,12 @@ router.get('/qr/:tableId', async (req, res) => {
 
 router.post('/', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN), async (req, res) => {
   try {
-    const { tableNumber, capacity, floor } = req.body;
+    const { tableNumber, category, capacity, floor } = req.body;
     const existing = await Table.findOne({ tableNumber });
     if (existing) {
       return res.status(400).json(apiResponse(false, 'Table number already exists'));
     }
-    const table = new Table({ tableNumber, capacity, floor });
+    const table = new Table({ tableNumber, category, capacity, floor });
     await table.save();
     res.status(201).json(apiResponse(true, 'Table created', table));
   } catch (error) {

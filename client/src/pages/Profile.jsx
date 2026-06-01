@@ -70,6 +70,7 @@ export default function Profile() {
   const [orders, setOrders] = useState([]);
   const [favorites, setFavorites] = useState([]);
   useEffect(() => {
+    if (!localStorage.getItem('token')) return;
     fetchOrders();
     fetchFavorites();
   }, []);

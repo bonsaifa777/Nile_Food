@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import toast from 'react-hot-toast';
 import { useTheme } from '../../context/ThemeContext';
 import {
   FiClock, FiMapPin, FiArrowRight, FiPackage, FiCheckCircle,
@@ -422,6 +423,7 @@ export default function OrderStatus() {
   }, []);
 
   useEffect(() => {
+    if (!localStorage.getItem('token')) return;
     fetchOrders();
   }, []);
 

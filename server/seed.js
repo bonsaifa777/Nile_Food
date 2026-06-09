@@ -225,7 +225,7 @@ async function seed() {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nilefood');
     console.log('Connected to MongoDB');
 
-    await User.deleteMany({ role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER] } });
+    await User.deleteMany({ role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER, ROLES.CASHIER, ROLES.WAITER] } });
     console.log('Cleared staff users');
 
     const adminPassword = await hashPassword('Admin@123');
@@ -264,6 +264,24 @@ async function seed() {
     });
     await deliveryDriver.save();
     console.log('Created delivery driver user: driver@foodapp.com / Admin@123');
+
+    const cashier = new User({
+      name: 'Cashier',
+      email: 'cashier@foodapp.com',
+      password: adminPassword,
+      role: ROLES.CASHIER
+    });
+    await cashier.save();
+    console.log('Created cashier user: cashier@foodapp.com / Admin@123');
+
+    const waiter = new User({
+      name: 'Waiter',
+      email: 'waiter@foodapp.com',
+      password: adminPassword,
+      role: ROLES.WAITER
+    });
+    await waiter.save();
+    console.log('Created waiter user: waiter@foodapp.com / Admin@123');
 
     await Category.deleteMany({});
     const categoryDocs = await Category.insertMany(categories);

@@ -38,8 +38,13 @@ export const apiResponse = (success, message, data = null, statusCode = 200) => 
   };
 };
 
-export const generateOrderId = () => {
-  return String(Math.floor(Math.random() * 900) + 100);
+export const generateOrderId = async () => {
+  const { default: Order } = await import('../models/Order.js');
+  let orderId;
+  do {
+    orderId = String(Math.floor(Math.random() * 900) + 100);
+  } while (await Order.findOne({ orderId }));
+  return orderId;
 };
 
 export const calculateDeliveryFee = (distance, baseFee = 50, perKm = 10) => {

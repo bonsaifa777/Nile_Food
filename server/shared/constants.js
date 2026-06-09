@@ -3,7 +3,9 @@ export const ROLES = {
   ADMIN: 'admin',
   SUPER_ADMIN: 'super_admin',
   KITCHEN_STAFF: 'kitchen_staff',
-  DELIVERY_DRIVER: 'delivery_driver'
+  DELIVERY_DRIVER: 'delivery_driver',
+  CASHIER: 'cashier',
+  WAITER: 'waiter'
 };
 
 export const ORDER_STATUS = {
@@ -83,3 +85,89 @@ export const CATEGORIES = [
 
 export const FOOD_SIZES = ['Small', 'Medium', 'Large'];
 export const SPICE_LEVELS = ['Not Spicy', 'Mild', 'Medium', 'Hot', 'Extra Hot'];
+
+export const ATTENDANCE_STATUS = {
+  CLOCKED_IN: 'clocked_in',
+  ON_BREAK: 'on_break',
+  CLOCKED_OUT: 'clocked_out'
+};
+
+export const SHIFT_TYPES = {
+  MORNING: 'morning',
+  AFTERNOON: 'afternoon',
+  NIGHT: 'night',
+  CUSTOM: 'custom'
+};
+
+export const LEAVE_TYPES = {
+  SICK: 'sick',
+  ANNUAL: 'annual',
+  EMERGENCY: 'emergency',
+  UNPAID: 'unpaid'
+};
+
+export const LEAVE_STATUS = {
+  PENDING: 'pending',
+  APPROVED: 'approved',
+  REJECTED: 'rejected'
+};
+
+export const VERIFICATION_METHOD = {
+  NONE: 'none',
+  QR: 'qr',
+  GPS: 'gps',
+  FACE: 'face'
+};
+
+export const GPS_RADIUS = [50, 100, 200];
+
+export const STAFF_ROLES = [
+  ROLES.ADMIN,
+  ROLES.SUPER_ADMIN,
+  ROLES.KITCHEN_STAFF,
+  ROLES.DELIVERY_DRIVER,
+  ROLES.CASHIER,
+  ROLES.WAITER
+];
+
+export const ATTENDANCE_SOCKET_EVENTS = {
+  ATTENDANCE_UPDATE: 'attendance_update',
+  EMPLOYEE_STATUS: 'employee_status',
+  SHIFT_NOTIFICATION: 'shift_notification',
+  LEAVE_UPDATE: 'leave_update'
+};
+
+export const TABLE_STATUS = {
+  AVAILABLE: 'available',
+  OCCUPIED: 'occupied',
+  RESERVED: 'reserved',
+  BILLING: 'billing',
+  CLEANING: 'cleaning',
+  MAINTENANCE: 'maintenance'
+};
+
+export const CASH_DRAWER_EVENTS = {
+  OPEN: 'open',
+  CLOSE: 'close',
+  DEPOSIT: 'deposit',
+  WITHDRAWAL: 'withdrawal',
+  PAYMENT_IN: 'payment_in',
+  REFUND_OUT: 'refund_out'
+};
+
+export const CHAT_CHANNELS = {
+  CUSTOMER_CASHIER: 'customer_cashier',
+  CUSTOMER_ADMIN: 'customer_admin',
+  CASHIER_KITCHEN: 'cashier_kitchen',
+  ADMIN_KITCHEN: 'admin_kitchen',
+  ADMIN_DRIVER: 'admin_driver',
+  CASHIER_ADMIN: 'cashier_admin'
+};
+
+export const POS_SOCKET_EVENTS = {
+  POS_ORDER_UPDATE: 'pos_order_update',
+  CASH_DRAWER_UPDATE: 'cash_drawer_update',
+  TABLE_UPDATE: 'table_update',
+  CHAT_MESSAGE: 'chat_message',
+  CHAT_TYPING: 'chat_typing'
+};

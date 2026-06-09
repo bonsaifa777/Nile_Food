@@ -137,6 +137,8 @@ export default function Login() {
         navigate('/kitchen');
       } else if (role === 'delivery_driver') {
         navigate('/delivery');
+      } else       if (role === 'cashier' || role === 'waiter') {
+        navigate('/cashier');
       } else {
         navigate('/');
       }
@@ -528,6 +530,8 @@ export default function Login() {
             <span style={{ color: 'var(--text-secondary)' }}>Manager:</span> manager@foodapp.com<br />
             <span style={{ color: 'var(--text-secondary)' }}>Kitchen:</span> kitchen@foodapp.com<br />
             <span style={{ color: 'var(--text-secondary)' }}>Driver:</span> driver@foodapp.com<br />
+            <span style={{ color: 'var(--text-secondary)' }}>Cashier:</span> cashier@foodapp.com<br />
+            <span style={{ color: 'var(--text-secondary)' }}>Waiter:</span> waiter@foodapp.com<br />
             Password: <span style={{ color: 'var(--text-secondary)' }}>Admin@123</span>
           </motion.p>
         </div>

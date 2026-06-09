@@ -22,6 +22,16 @@ import reservationRoutes from './routes/reservation.js';
 import settingsRoutes from './routes/settings.js';
 import inventoryRoutes from './routes/inventory.js';
 import contactRoutes from './routes/contact.js';
+import attendanceRoutes from './routes/attendance.js';
+import shiftRoutes from './routes/shift.js';
+import leaveRoutes from './routes/leave.js';
+import attendanceAdminRoutes from './routes/attendanceAdmin.js';
+import payrollRoutes from './routes/payroll.js';
+import qrAttendanceRoutes from './routes/qrAttendance.js';
+import reportRoutes from './routes/reports.js';
+import cashierRoutes from './routes/cashier.js';
+import cashDrawerRoutes from './routes/cashDrawer.js';
+import chatRoutes from './routes/chat.js';
 import { setupSocket } from './utils/socket.js';
 
 dotenv.config();
@@ -85,6 +95,16 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/shifts', shiftRoutes);
+app.use('/api/leave', leaveRoutes);
+app.use('/api/admin/attendance', attendanceAdminRoutes);
+app.use('/api/payroll', payrollRoutes);
+app.use('/api/qr-attendance', qrAttendanceRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/cashier', cashierRoutes);
+app.use('/api/cash-drawer', cashDrawerRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.use('/uploads', express.static('uploads'));
 

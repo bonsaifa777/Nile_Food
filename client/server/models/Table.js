@@ -12,7 +12,7 @@ const tableSchema = new mongoose.Schema({
   floor: { type: String, default: '1' },
   status: { 
     type: String, 
-    enum: ['available', 'occupied', 'reserved', 'maintenance'], 
+    enum: ['available', 'occupied', 'reserved', 'billing', 'cleaning', 'maintenance'], 
     default: 'available' 
   },
   currentOrder: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },

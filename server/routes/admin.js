@@ -14,7 +14,7 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email, role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER] } });
+    const user = await User.findOne({ email, role: { $in: [ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER, ROLES.CASHIER, ROLES.WAITER] } });
     if (!user) {
       return res.status(401).json(apiResponse(false, 'Invalid staff credentials'));
     }
@@ -280,7 +280,7 @@ router.delete('/coupons/:id', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_A
   }
 });
 
-router.get('/profile', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER), async (req, res) => {
+router.get('/profile', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF, ROLES.DELIVERY_DRIVER, ROLES.CASHIER, ROLES.WAITER), async (req, res) => {
   res.json(apiResponse(true, '', req.user));
 });
 

@@ -4,6 +4,8 @@ import {
   FiHome, FiShoppingBag, FiMenu, FiGrid, FiUsers, FiBarChart2, 
   FiTruck, FiCreditCard, FiSettings, FiLogOut, FiDollarSign, FiFileText, FiPackage,
   FiMonitor, FiCalendar, FiMail, FiBookmark, FiChevronLeft,
+  FiClock, FiUserCheck, FiCalendar as FiCalendarAlt, FiFile, FiCamera, FiBriefcase,
+  FiPrinter, FiLayers, FiMessageSquare, FiSearch,
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
@@ -16,6 +18,24 @@ const allMenuItems = [
   { path: '/categories', label: 'Categories', icon: FiGrid, roles: ['admin', 'super_admin'] },
   { path: '/tables', label: 'Tables', icon: FiDollarSign, roles: ['admin', 'super_admin'] },
   { path: '/bookings', label: 'Bookings', icon: FiBookmark, roles: ['admin', 'super_admin'] },
+  { separator: true, label: 'CASHIER', roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier', label: 'Dashboard', icon: FiHome, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/pos', label: 'POS Terminal', icon: FiPrinter, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/tables', label: 'Tables', icon: FiLayers, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/payments', label: 'Payments', icon: FiCreditCard, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/drawer', label: 'Cash Drawer', icon: FiDollarSign, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/customers', label: 'Customers', icon: FiSearch, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/chat', label: 'Chat', icon: FiMessageSquare, roles: ['admin', 'super_admin', 'cashier', 'waiter'] },
+  { path: '/cashier/reports', label: 'Reports', icon: FiBarChart2, roles: ['admin', 'super_admin', 'cashier'] },
+  { separator: true, label: 'ATTENDANCE', roles: ['admin', 'super_admin', 'kitchen_staff', 'delivery_driver', 'cashier', 'waiter'] },
+  { path: '/my-attendance', label: 'My Attendance', icon: FiUserCheck, roles: ['admin', 'super_admin', 'kitchen_staff', 'delivery_driver', 'cashier', 'waiter'] },
+  { path: '/attendance', label: 'Attendance', icon: FiClock, roles: ['admin', 'super_admin'] },
+  { path: '/shifts', label: 'Shifts', icon: FiCalendarAlt, roles: ['admin', 'super_admin'] },
+  { path: '/leave', label: 'Leave', icon: FiBriefcase, roles: ['admin', 'super_admin', 'kitchen_staff', 'delivery_driver', 'cashier', 'waiter'] },
+  { path: '/attendance-reports', label: 'Reports', icon: FiFile, roles: ['admin', 'super_admin'] },
+  { path: '/payroll', label: 'Payroll', icon: FiDollarSign, roles: ['admin', 'super_admin'] },
+  { path: '/qr-attendance', label: 'QR Code', icon: FiCamera, roles: ['admin', 'super_admin'] },
+  { separator: true, label: 'MANAGEMENT', roles: ['admin', 'super_admin'] },
   { path: '/users', label: 'Users', icon: FiUsers, roles: ['admin', 'super_admin'] },
   { path: '/analytics', label: 'Analytics', icon: FiBarChart2, roles: ['admin', 'super_admin'] },
   { path: '/inventory', label: 'Inventory', icon: FiPackage, roles: ['admin', 'super_admin'] },
@@ -83,6 +103,20 @@ export default function Sidebar({ isOpen }) {
       {/* Navigation */}
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto overflow-x-hidden">
         {menuItems.map((item, i) => {
+          if (item.separator) {
+            return (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isOpen ? 1 : 0 }}
+                className="px-4 pt-4 pb-1"
+              >
+                <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: 'var(--text-muted)' }}>
+                  {item.label}
+                </span>
+              </motion.div>
+            );
+          }
           const isActive = location.pathname === item.path;
           return (
             <motion.div

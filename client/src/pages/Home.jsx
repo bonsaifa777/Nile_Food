@@ -9,6 +9,7 @@ import PremiumRoomCollection from '../components/PremiumRoomCollection';
 import Categories from '../components/Categories';
 import Testimonials from '../components/Testimonials';
 import Footer from '../components/common/Footer';
+import QRCodeButton from '../components/QRCodeButton';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiStar, FiShoppingBag, FiCreditCard, FiTruck, FiSend } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -257,6 +258,7 @@ export default function Home() {
 
       <Testimonials />
       <Footer />
+      <QRCodeButton />
     </div>
   );
 }

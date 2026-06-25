@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import { useCart } from '../context/CartContext';
@@ -12,34 +13,27 @@ import {
   Sun, Moon, Sparkles, MapPin, Star, Zap, Home, Building2
 } from 'lucide-react';
 
-const categoryConfig = {
-  regular: {
-    label: 'Regular Tables',
-    icon: MapPin,
-    color: 'from-emerald-500 to-teal-500',
-    bg: 'bg-emerald-500/10',
-    border: 'border-emerald-500/20',
-    text: 'text-emerald-400',
-  },
-  vip: {
-    label: 'VIP Class',
-    icon: Star,
-    color: 'from-amber-500 to-orange-500',
-    bg: 'bg-amber-500/10',
-    border: 'border-amber-500/20',
-    text: 'text-amber-400',
-  },
-  room: {
-    label: 'Rooms',
-    icon: Building2,
-    color: 'from-indigo-500 to-purple-500',
-    bg: 'bg-indigo-500/10',
-    border: 'border-indigo-500/20',
-    text: 'text-indigo-400',
-  },
-};
-
 export default function SelectTable() {
+  const { t } = useTranslation();
+  const categoryConfig = {
+    regular: {
+      label: t('selectTable.regularTables'),
+      icon: MapPin,
+      color: 'from-emerald-500 to-teal-500',
+      bg: 'bg-emerald-500/10',
+      border: 'border-emerald-500/20',
+      text: 'text-emerald-400',
+    },
+    vip: {
+      label: t('selectTable.vipClass'),
+      icon: Star,
+      color: 'from-amber-500 to-orange-500',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/20',
+      text: 'text-amber-400',
+    },
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
   const routeOrderType = location.state?.orderType || 'dine_in';
@@ -60,7 +54,7 @@ export default function SelectTable() {
       const { data } = await axios.get('/api/tables?status=available');
       setTables(data.data);
     } catch (error) {
-      toast.error('Failed to load tables');
+      toast.error(t('selectTable.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -68,11 +62,11 @@ export default function SelectTable() {
 
   const handleOrderNow = async () => {
     if (!selectedTable) {
-      toast.error('Please select a table');
+      toast.error(t('selectTable.pleaseSelectTable'));
       return;
     }
     if (cart.length === 0) {
-      toast.error('Your cart is empty');
+      toast.error(t('selectTable.cartEmpty'));
       return;
     }
 
@@ -93,7 +87,7 @@ export default function SelectTable() {
 
       const { data } = await axios.post('/api/orders', orderData);
       clearCart();
-      toast.success('Order placed successfully!', {
+      toast.success(t('selectTable.orderSuccess'), {
         position: 'top-right',
         style: {
           background: '#10b981',
@@ -107,7 +101,7 @@ export default function SelectTable() {
       });
       navigate(`/order/${data.data.orderId}`);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to place order', {
+      toast.error(error.response?.data?.message || t('selectTable.orderFailed'), {
         position: 'top-right',
       });
     } finally {
@@ -130,12 +124,11 @@ export default function SelectTable() {
     return acc;
   }, {});
 
-  const categoryOrder = ['regular', 'vip', 'room'];
+  const categoryOrder = ['regular', 'vip'];
 
   const tablesCount = tables.length;
   const regularCount = (grouped.regular || []).length;
   const vipCount = (grouped.vip || []).length;
-  const roomCount = (grouped.room || []).length;
 
   return (
     <div className="min-h-screen relative">
@@ -163,7 +156,7 @@ export default function SelectTable() {
               whileTap={{ scale: 0.98 }}
               className="inline-flex items-center gap-2 text-gray-400 hover:text-indigo-400 mb-6 transition-colors text-sm font-medium"
             >
-              <ChevronLeft size={16} /> Back to menu
+              <ChevronLeft size={16} /> {t('selectTable.backToMenu')}
             </motion.button>
 
             <div className="flex items-center justify-center gap-4">
@@ -173,7 +166,7 @@ export default function SelectTable() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                 >
-                  <Sparkles size={12} /> Dine In Experience
+                  <Sparkles size={12} /> {t('selectTable.dineInExperience')}
                 </motion.div>
                 <motion.h1
                   className="text-4xl sm:text-5xl font-black gradient-text"
@@ -181,7 +174,7 @@ export default function SelectTable() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  Select Your Table
+                  {t('selectTable.title')}
                 </motion.h1>
                 <motion.p
                   className="text-gray-500 dark:text-gray-400 mt-2"
@@ -189,7 +182,7 @@ export default function SelectTable() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  Choose the perfect spot for your dining experience
+                  {t('selectTable.subtitle')}
                 </motion.p>
               </div>
 
@@ -258,17 +251,12 @@ export default function SelectTable() {
               >
                 {regularCount > 0 && (
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    <MapPin size={12} className="text-emerald-400" /> {regularCount} Regular
+                    <MapPin size={12} className="text-emerald-400" /> {regularCount} {t('selectTable.regular')}
                   </div>
                 )}
                 {vipCount > 0 && (
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    <Star size={12} className="text-amber-400" /> {vipCount} VIP
-                  </div>
-                )}
-                {roomCount > 0 && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    <Building2 size={12} className="text-indigo-400" /> {roomCount} Rooms
+                    <Star size={12} className="text-amber-400" /> {vipCount} {t('selectTable.vip')}
                   </div>
                 )}
               </motion.div>
@@ -285,7 +273,7 @@ export default function SelectTable() {
                     transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                     className="w-10 h-10 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full mx-auto mb-4"
                   />
-                  <p className="text-gray-400">Loading available tables...</p>
+                  <p className="text-gray-400">{t('selectTable.loadingTables')}</p>
                 </div>
               ) : tables.length === 0 ? (
                 <motion.div
@@ -296,14 +284,14 @@ export default function SelectTable() {
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 mx-auto mb-6 flex items-center justify-center">
                     <Clock size={32} className="text-indigo-400" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">No Tables Available</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-6">All tables are currently occupied. Please check back later.</p>
+                  <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{t('selectTable.noTables')}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">{t('selectTable.noTablesDesc')}</p>
                   <button
                     type="button"
                     onClick={() => navigate('/menu')}
                     className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold shadow-xl"
                   >
-                    Browse Menu Instead
+                    {t('selectTable.browseMenuInstead')}
                   </button>
                 </motion.div>
               ) : (
@@ -319,8 +307,8 @@ export default function SelectTable() {
                           <MapPin size={22} className="text-indigo-400" />
                         </div>
                         <div>
-                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Available Tables</h2>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{tables.length} tables available</p>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('selectTable.availableTables')}</h2>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('selectTable.tablesAvailable', { count: tables.length })}</p>
                         </div>
                       </div>
                       <motion.div
@@ -328,7 +316,7 @@ export default function SelectTable() {
                         animate={{ scale: [1, 1.03, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        Dine In
+                        {t('selectTable.dineIn')}
                       </motion.div>
                     </div>
 
@@ -416,15 +404,15 @@ export default function SelectTable() {
                     {ordering ? (
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         <motion.span
-                          animate={{ rotate: 360 }}
-                          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full inline-block"
-                        />
-                        Placing Order...
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                            className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full inline-block"
+                          />
+                          {t('selectTable.placingOrder')}
                       </span>
                     ) : (
                       <span className="relative z-10 flex items-center justify-center gap-2">
-                        <Zap size={20} /> Order Now
+                        <Zap size={20} /> {t('selectTable.orderNow')}
                       </span>
                     )}
                   </motion.button>
@@ -446,14 +434,14 @@ export default function SelectTable() {
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-bold flex items-center gap-2 text-gray-900 dark:text-white">
                         <ShoppingBag size={20} className="text-indigo-400" />
-                        Order Summary
+{t('selectTable.orderSummary')}
                       </h3>
                       <motion.span
                         className="px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-400 text-xs font-semibold"
                         animate={{ scale: [1, 1.05, 1] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        {cart.reduce((sum, i) => sum + i.quantity, 0)} items
+                        {t('selectTable.itemCount', { count: cart.reduce((sum, i) => sum + i.quantity, 0) })}
                       </motion.span>
                     </div>
 
@@ -486,33 +474,33 @@ export default function SelectTable() {
 
                     <div className="space-y-3 border-t border-white/10 pt-5">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Subtotal</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{getSubtotal().toFixed(2)} ETB</span>
+                        <span className="text-gray-400">{t('selectTable.subtotal')}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{getSubtotal().toFixed(2)} {t('common.currencyETB')}</span>
                       </div>
                       {orderType === 'delivery' && (
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-400 flex items-center gap-1">
-                            <Truck size={12} /> Delivery
+                            <Truck size={12} /> {t('selectTable.delivery')}
                           </span>
                           <span className="font-medium text-gray-900 dark:text-white">
-                            {getDeliveryFee() === 0 ? (
-                              <span className="text-emerald-400 font-semibold">Free</span>
-                            ) : (
-                              `${getDeliveryFee().toFixed(2)} ETB`
-                            )}
+          {getDeliveryFee() === 0 ? (
+              <span className="text-emerald-400 font-semibold">{t('selectTable.free')}</span>
+            ) : (
+              <>{getDeliveryFee().toFixed(2)} {t('common.currencyETB')}</>
+            )}
                           </span>
                         </div>
                       )}
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">Tax</span>
-                        <span className="font-medium text-gray-900 dark:text-white">{getTax().toFixed(2)} ETB</span>
+                        <span className="text-gray-400">{t('selectTable.tax')}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{getTax().toFixed(2)} {t('common.currencyETB')}</span>
                       </div>
 
                       <div className="border-t border-white/10 pt-4 mt-4">
                         <div className="flex justify-between items-end">
                           <div>
-                            <p className="text-xs text-gray-400">Total</p>
-                            <p className="text-xs text-gray-400">Including all taxes</p>
+                            <p className="text-xs text-gray-400">{t('selectTable.total')}</p>
+                            <p className="text-xs text-gray-400">{t('selectTable.includingTaxes')}</p>
                           </div>
                           <motion.div
                             className="text-right"
@@ -523,7 +511,7 @@ export default function SelectTable() {
                             <span className="text-3xl font-black bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                               {getTotal().toFixed(2)}
                             </span>
-                            <span className="text-sm font-medium text-gray-400 ml-1">ETB</span>
+                            <span className="text-sm font-medium text-gray-400 ml-1">{t('common.currencyETB')}</span>
                           </motion.div>
                         </div>
                       </div>
@@ -545,7 +533,7 @@ export default function SelectTable() {
                             </span>
                           )}
                         </p>
-                        <p className="text-xs text-gray-400">{selectedTableData?.capacity || 0} seats</p>
+                        <p className="text-xs text-gray-400">{t('selectTable.seats', { count: selectedTableData?.capacity || 0 })}</p>
                       </div>
                     </motion.div>
 
@@ -565,11 +553,11 @@ export default function SelectTable() {
                             transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                             className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full inline-block"
                           />
-                          Placing Order...
+                        {t('selectTable.placingOrder')}
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-2">
-                          <Zap size={18} /> {selectedTable ? 'Order Now' : 'Select a Table'}
+                          <Zap size={18} /> {selectedTable ? t('selectTable.orderNow') : t('selectTable.selectTable')}
                         </span>
                       )}
                     </motion.button>

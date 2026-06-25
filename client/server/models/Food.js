@@ -2,7 +2,13 @@ import mongoose from 'mongoose';
 
 const foodSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  name_am: { type: String },
+  name_om: { type: String },
+  name_zh: { type: String },
   description: { type: String, required: true },
+  description_am: { type: String },
+  description_om: { type: String },
+  description_zh: { type: String },
   price: { type: Number, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   image: { type: String },
@@ -11,19 +17,31 @@ const foodSchema = new mongoose.Schema({
   featured: { type: Boolean, default: false },
   sizes: [{
     name: { type: String },
+    name_am: { type: String },
+    name_om: { type: String },
+    name_zh: { type: String },
     price: { type: Number }
   }],
   extras: [{
     name: { type: String },
+    name_am: { type: String },
+    name_om: { type: String },
+    name_zh: { type: String },
     price: { type: Number },
     image: { type: String }
   }],
   ingredients: [{
     name: { type: String },
+    name_am: { type: String },
+    name_om: { type: String },
+    name_zh: { type: String },
     amount: { type: String },
     image: { type: String }
   }],
   allergens: [{ type: String }],
+  allergens_am: [{ type: String }],
+  allergens_om: [{ type: String }],
+  allergens_zh: [{ type: String }],
   nutritionalInfo: {
     servingSize: { type: String },
     calories: { type: Number },

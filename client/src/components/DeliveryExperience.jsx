@@ -1,16 +1,18 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FiMapPin, FiClock, FiNavigation, FiTruck } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 export default function DeliveryExperience() {
+  const { t } = useTranslation();
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   const steps = [
-    { icon: FiMapPin, title: 'Order Placed', desc: 'Your order is confirmed', time: '12:30 PM', active: true },
-    { icon: FiClock, title: 'Preparing', desc: 'Chef is making your food', time: '12:35 PM', active: true },
-    { icon: FiTruck, title: 'On the Way', desc: 'Rider is heading to you', time: '12:50 PM', active: true },
-    { icon: FiNavigation, title: 'Delivered', desc: 'Enjoy your meal!', time: '1:00 PM', active: false },
+    { icon: FiMapPin, title: t('orders.title'), desc: t('orders.title'), time: '12:30 PM', active: true },
+    { icon: FiClock, title: t('menu.title'), desc: t('menu.title'), time: '12:35 PM', active: true },
+    { icon: FiTruck, title: t('home.deliveryExperience'), desc: t('home.deliveryExperience'), time: '12:50 PM', active: true },
+    { icon: FiNavigation, title: t('home.deliveryExperience'), desc: t('home.deliveryExperience'), time: '1:00 PM', active: false },
   ];
 
   return (
@@ -38,13 +40,13 @@ export default function DeliveryExperience() {
             viewport={{ once: true }}
             className="inline-block px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-semibold text-sm mb-6"
           >
-            Live Tracking
+            {t('home.deliveryExperience')}
           </motion.span>
           <h2 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-gray-900 via-indigo-700 to-gray-900 dark:from-white dark:via-indigo-400 dark:to-white bg-clip-text text-transparent">
-            Real-Time Delivery
+            {t('home.deliveryExperience')}
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Track your order every step of the way with live updates
+            {t('home.deliveryExperience')}
           </p>
         </motion.div>
 
@@ -216,7 +218,7 @@ export default function DeliveryExperience() {
                         <FiClock className="text-indigo-600 dark:text-indigo-400" size={20} />
                       </div>
                       <div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Estimated Time</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{t('home.deliveryExperience')}</div>
                         <div className="font-black text-gray-900 dark:text-white">25-30 min</div>
                       </div>
                     </div>
@@ -225,7 +227,7 @@ export default function DeliveryExperience() {
                       transition={{ duration: 2, repeat: Infinity }}
                       className="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-xl"
                     >
-                      Live
+                      {t('home.deliveryExperience')}
                     </motion.div>
                   </div>
                 </div>

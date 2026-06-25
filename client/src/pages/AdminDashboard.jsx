@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Loading from '../components/common/Loading';
@@ -13,7 +14,7 @@ import {
   FiMonitor, FiStar, FiActivity, FiArrowRight, FiMoreVertical, FiRefreshCw
 } from 'react-icons/fi';
 import {
-  Users, Bed, CalendarDays, Clock, ChevronRight, MoreHorizontal,
+  Users, CalendarDays, Clock, ChevronRight, MoreHorizontal,
   CheckCircle, AlertCircle, ArrowUp, ArrowDown, Sparkles,
   RefreshCw, DollarSign, ShoppingBag, MapPin, Phone, Mail
 } from 'lucide-react';
@@ -113,10 +114,10 @@ function StatCard({ stat, index }) {
               {stat.title}
             </p>
 
-            <div className={`mt-4 flex items-center gap-1.5 text-xs font-semibold ${
+              <div className={`mt-4 flex items-center gap-1.5 text-xs font-semibold ${
               d ? 'text-indigo-400/70' : 'text-indigo-600'
             }`}>
-              View Details
+              {t('admin.viewDetails')}
               <ChevronRight className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -148,17 +149,18 @@ function MiniChart({ type = 'line', color = '#6366f1' }) {
 }
 
 function QuickActions({ darkMode }) {
+  const { t } = useTranslation();
   const d = darkMode;
 
   const actions = [
-    { label: 'Manage Menu', icon: FiTag, link: '/admin/menu', color: 'from-orange-500 to-amber-500' },
-    { label: 'View Orders', icon: FiShoppingBag, link: '/admin/orders', color: 'from-blue-500 to-cyan-500' },
-    { label: 'Manage Users', icon: FiUsers, link: '/admin/users', color: 'from-purple-500 to-violet-500' },
-    { label: 'Navigation', icon: FiMenu, link: '/admin/navigation', color: 'from-indigo-500 to-blue-500' },
-    { label: 'Categories', icon: FiTag, link: '/admin/categories', color: 'from-pink-500 to-rose-500' },
-    { label: 'Manage Rooms', icon: Bed, link: '/admin/rooms', color: 'from-emerald-500 to-teal-500', isLucide: true },
-    { label: 'Bookings', icon: CalendarDays, link: '/admin/bookings', color: 'from-indigo-500 to-purple-500', isLucide: true },
-    { label: 'Analytics', icon: FiActivity, link: '/admin/analytics', color: 'from-amber-500 to-orange-500' },
+    { label: t('admin.manageMenu'), icon: FiTag, link: '/admin/menu', color: 'from-orange-500 to-amber-500' },
+    { label: t('admin.viewOrders'), icon: FiShoppingBag, link: '/admin/orders', color: 'from-blue-500 to-cyan-500' },
+    { label: t('admin.manageUsers'), icon: FiUsers, link: '/admin/users', color: 'from-purple-500 to-violet-500' },
+    { label: t('admin.navigation'), icon: FiMenu, link: '/admin/navigation', color: 'from-indigo-500 to-blue-500' },
+    { label: t('admin.categories'), icon: FiTag, link: '/admin/categories', color: 'from-pink-500 to-rose-500' },
+
+    { label: t('admin.bookings'), icon: CalendarDays, link: '/admin/bookings', color: 'from-indigo-500 to-purple-500', isLucide: true },
+    { label: t('admin.analytics'), icon: FiActivity, link: '/admin/analytics', color: 'from-amber-500 to-orange-500' },
   ];
 
   return (
@@ -180,8 +182,8 @@ function QuickActions({ darkMode }) {
             <Sparkles className={`w-5 h-5 ${d ? 'text-indigo-400' : 'text-indigo-600'}`} />
           </div>
           <div>
-            <h2 className={`text-lg font-bold ${d ? 'text-white' : 'text-gray-900'}`}>Quick Actions</h2>
-            <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>Access management tools</p>
+            <h2 className={`text-lg font-bold ${d ? 'text-white' : 'text-gray-900'}`}>{t('admin.quickActions')}</h2>
+            <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('admin.accessManagement')}</p>
           </div>
         </div>
       </div>
@@ -224,6 +226,7 @@ function QuickActions({ darkMode }) {
 }
 
 function RecentOrdersCard({ recentOrders, darkMode }) {
+  const { t } = useTranslation();
   const d = darkMode;
 
   const getStatusConfig = (status) => {
@@ -259,8 +262,8 @@ function RecentOrdersCard({ recentOrders, darkMode }) {
               <ShoppingBag className={`w-5 h-5 ${d ? 'text-blue-400' : 'text-blue-600'}`} />
             </div>
             <div>
-              <h2 className={`text-lg font-bold ${d ? 'text-white' : 'text-gray-900'}`}>Recent Orders</h2>
-              <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>Latest customer orders</p>
+              <h2 className={`text-lg font-bold ${d ? 'text-white' : 'text-gray-900'}`}>{t('admin.recentOrders')}</h2>
+              <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('admin.latestOrders')}</p>
             </div>
           </div>
 
@@ -272,7 +275,7 @@ function RecentOrdersCard({ recentOrders, darkMode }) {
                 : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
             }`}
           >
-            View All
+            {t('admin.viewAll')}
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -297,8 +300,8 @@ function RecentOrdersCard({ recentOrders, darkMode }) {
             >
               <FiShoppingBag className={`w-8 h-8 ${d ? 'text-white/30' : 'text-gray-300'}`} />
             </motion.div>
-            <p className={`font-semibold mb-1 ${d ? 'text-white/60' : 'text-gray-600'}`}>No orders yet</p>
-            <p className={`text-sm ${d ? 'text-white/30' : 'text-gray-400'}`}>Customer orders will appear here</p>
+            <p className={`font-semibold mb-1 ${d ? 'text-white/60' : 'text-gray-600'}`}>{t('admin.noOrdersYet')}</p>
+            <p className={`text-sm ${d ? 'text-white/30' : 'text-gray-400'}`}>{t('admin.ordersWillAppear')}</p>
           </motion.div>
         ) : (
           <div className="space-y-3">
@@ -371,11 +374,12 @@ function RecentOrdersCard({ recentOrders, darkMode }) {
 }
 
 function StatsOverview({ stats, darkMode }) {
+  const { t } = useTranslation();
   const d = darkMode;
 
   const statCards = [
     {
-      title: 'Total Orders',
+      title: t('admin.totalOrders'),
       value: stats?.totalOrders || 0,
       icon: FiShoppingBag,
       link: '/admin/orders',
@@ -384,7 +388,7 @@ function StatsOverview({ stats, darkMode }) {
       trend: 12.5,
     },
     {
-      title: 'Revenue',
+      title: t('admin.revenue'),
       value: `ETB ${(stats?.totalRevenue || 0).toLocaleString()}`,
       icon: FiDollarSign,
       link: '/admin/analytics',
@@ -393,7 +397,7 @@ function StatsOverview({ stats, darkMode }) {
       trend: 8.2,
     },
     {
-      title: 'Customers',
+      title: t('admin.customers'),
       value: stats?.totalUsers || 0,
       icon: FiUsers,
       link: '/admin/users',
@@ -402,7 +406,7 @@ function StatsOverview({ stats, darkMode }) {
       trend: 5.7,
     },
     {
-      title: 'Pending',
+      title: t('admin.pending'),
       value: stats?.pendingOrders || 0,
       icon: FiClock,
       link: '/admin/orders?filter=pending',
@@ -422,6 +426,7 @@ function StatsOverview({ stats, darkMode }) {
 }
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const { darkMode } = useTheme();
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -450,7 +455,7 @@ export default function AdminDashboard() {
     setIsRefreshing(true);
     await fetchDashboard();
     setTimeout(() => setIsRefreshing(false), 800);
-    toast.success('Dashboard refreshed');
+    toast.success(t('admin.dashboardRefreshed'));
   };
 
   if (loading) return <Loading />;
@@ -478,15 +483,15 @@ export default function AdminDashboard() {
                   <div className={`px-3 py-1 rounded-full text-xs font-bold ${
                     d ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-50 text-indigo-600'
                   }`}>
-                    ADMIN PANEL
+                    {t('admin.adminPanel')}
                   </div>
                 </motion.div>
 
                 <h1 className={`text-3xl font-black mb-1 ${d ? 'text-white' : 'text-gray-900'}`}>
-                  Welcome Back
+                  {t('admin.welcomeBack')}
                 </h1>
                 <p className={`text-base ${d ? 'text-white/50' : 'text-gray-500'}`}>
-                  Here's what's happening with your restaurant today
+                  {t('admin.todayStatus')}
                 </p>
               </div>
 
@@ -501,7 +506,7 @@ export default function AdminDashboard() {
                 }`}
               >
                 <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                Refresh
+                {t('admin.refresh')}
               </motion.button>
             </div>
           </motion.div>
@@ -531,8 +536,8 @@ export default function AdminDashboard() {
                     <FiActivity className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className={`font-bold ${d ? 'text-white' : 'text-gray-900'}`}>Activity Summary</h3>
-                    <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>Last 7 days</p>
+                    <h3 className={`font-bold ${d ? 'text-white' : 'text-gray-900'}`}>{t('admin.activitySummary')}</h3>
+                    <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('admin.last7Days')}</p>
                   </div>
                 </div>
 
@@ -540,9 +545,9 @@ export default function AdminDashboard() {
 
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Orders', value: (stats?.totalOrders || 0), color: 'text-blue-500' },
-                    { label: 'Revenue', value: `$${Math.floor((stats?.totalRevenue || 0) / 1000)}k`, color: 'text-emerald-500' },
-                    { label: 'Users', value: (stats?.totalUsers || 0), color: 'text-purple-500' },
+                    { label: t('admin.orders'), value: (stats?.totalOrders || 0), color: 'text-blue-500' },
+                    { label: t('admin.revenue'), value: `$${Math.floor((stats?.totalRevenue || 0) / 1000)}k`, color: 'text-emerald-500' },
+                    { label: t('admin.users'), value: (stats?.totalUsers || 0), color: 'text-purple-500' },
                   ].map((item, i) => (
                     <motion.div
                       key={item.label}

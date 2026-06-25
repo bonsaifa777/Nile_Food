@@ -3,21 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useCart } from '../context/CartContext';
 import { FiSend, FiX, FiMessageCircle, FiShoppingCart, FiMapPin, FiClock, FiSearch } from 'react-icons/fi';
-
-const predefinedResponses = {
-  greeting: "Hello! I'm Nile's AI assistant. How can I help you today?",
-  menu: "You can browse our menu by clicking on 'Menu' above. We have a wide variety of dishes including Breakfast, Lunch, Dinner, Snacks, Beverages, and more!",
-  delivery: "We offer delivery within the city. Delivery fee is ETB 50, and orders typically arrive in 30-45 minutes. You can track your order in real-time!",
-  payment: "We accept multiple payment methods:\n- Cash on delivery\n- Chapa (online payment)\n- Bank transfer",
-  track: "To track your order, go to the Orders section and click on your active order. You can see real-time status updates there.",
-  hours: "We're open daily from 8:00 AM to 10:00 PM. Delivery is available during these hours.",
-  contact: "You can reach us at:\n- Phone: +251-XXX-XXX-XXX\n- Email: support@nilefood.com\n- Live chat (24/7)",
-  default: "I'm not sure about that. Would you like to:\n1. Browse our menu\n2. Track your order\n3. Contact support"
-};
+import { useTranslation } from 'react-i18next';
 
 export default function Chatbot() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([{ text: predefinedResponses.greeting, sender: 'bot', time: new Date() }]);
+  const [messages, setMessages] = useState(() => [{ text: t('chatbot.greeting'), sender: 'bot', time: new Date() }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -36,35 +27,43 @@ export default function Chatbot() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const sugKeys = {
+    menu: 'chatbot.viewMenu',
+    delivery: 'chatbot.deliveryInfo',
+    track: 'chatbot.trackOrder',
+    payment: 'chatbot.paymentMethods',
+    contact: 'chatbot.contact',
+  };
+
   const getBotResponse = async (userInput) => {
     const input = userInput.toLowerCase();
     
     if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-      return predefinedResponses.greeting;
+      return t('chatbot.greeting');
     }
     if (input.includes('menu') || input.includes('food') || input.includes('order')) {
-      return predefinedResponses.menu;
+      return t('chatbot.menuResponse');
     }
     if (input.includes('delivery') || input.includes('deliver') || input.includes('home')) {
-      return predefinedResponses.delivery;
+      return t('chatbot.deliveryResponse');
     }
     if (input.includes('track') || input.includes('status')) {
-      return predefinedResponses.track;
+      return t('chatbot.trackResponse');
     }
     if (input.includes('pay') || input.includes('money') || input.includes('chapa')) {
-      return predefinedResponses.payment;
+      return t('chatbot.paymentResponse');
     }
     if (input.includes('hour') || input.includes('open') || input.includes('time')) {
-      return predefinedResponses.hours;
+      return t('chatbot.hoursResponse');
     }
     if (input.includes('contact') || input.includes('phone') || input.includes('email')) {
-      return predefinedResponses.contact;
+      return t('chatbot.contactResponse');
     }
     if (input.includes('thanks') || input.includes('thank')) {
-      return "You're welcome! Is there anything else I can help you with?";
+      return t('chatbot.youreWelcome');
     }
     if (input.includes('bye') || input.includes('goodbye')) {
-      return "Goodbye! Thank you for chatting with Nile Food. Have a great day!";
+      return t('chatbot.goodbye');
     }
     
     try {
@@ -72,13 +71,13 @@ export default function Chatbot() {
       const { data } = await axios.get(`/api/foods/search?q=${encodeURIComponent(userInput)}`);
       if (data.data && data.data.length > 0) {
         const foundFood = data.data[0];
-        return `I found ${foundFood.name}! It costs ETB ${foundFood.price}. Would you like to add it to your cart?`;
+        return t('chatbot.foundFood', { name: foundFood.name, price: foundFood.price });
       }
     } catch (error) {
       console.log('Search failed');
     }
     
-    return predefinedResponses.default;
+    return t('chatbot.defaultResponse');
   };
 
   const handleSend = async () => {
@@ -97,13 +96,13 @@ export default function Chatbot() {
         setLoading(false);
       }, 500);
     } catch (error) {
-      setMessages(prev => [...prev, { text: "Sorry, I couldn't process your request. Please try again.", sender: 'bot', time: new Date() }]);
+      setMessages(prev => [...prev, { text: t('chatbot.error'), sender: 'bot', time: new Date() }]);
       setLoading(false);
     }
   };
 
   const handleSuggestion = async (action) => {
-    const text = suggestions.find(s => s.action === action)?.label || '';
+    const text = t(sugKeys[action]) || '';
     setInput(text);
     await handleSend();
   };
@@ -137,8 +136,8 @@ export default function Chatbot() {
                   <span className="text-lg">🤖</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Nile AI</h3>
-                  <p className="text-xs text-green-400">Online</p>
+                  <h3 className="font-semibold">{t('chatbot.title')}</h3>
+                  <p className="text-xs text-green-400">{t('chatbot.online')}</p>
                 </div>
               </div>
               <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-white/10 rounded-lg">
@@ -191,7 +190,7 @@ export default function Chatbot() {
                       onClick={() => handleSuggestion(sug.action)}
                       className="px-3 py-1 text-sm glass rounded-full hover:bg-primary-500 transition-colors"
                     >
-                      {sug.label}
+                      {t(sugKeys[sug.action])}
                     </button>
                   ))}
                 </motion.div>
@@ -207,7 +206,7 @@ export default function Chatbot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Type your message..."
+                  placeholder={t('chatbot.inputPlaceholder')}
                   className="flex-1 input-glass text-sm"
                 />
                 <button

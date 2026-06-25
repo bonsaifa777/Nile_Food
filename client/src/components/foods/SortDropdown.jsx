@@ -1,18 +1,30 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck } from 'react-icons/fi';
 
+const sortKeys = {
+  popularity: 'menu.sort.popularity',
+  rating: 'menu.sort.bestRating',
+  fastest: 'menu.sort.fastestDelivery',
+  'price-low': 'menu.sort.lowestPrice',
+  'price-high': 'menu.sort.highestPrice',
+  trending: 'menu.sort.trending',
+  recommended: 'menu.sort.recommended',
+};
+
 const sortOptions = [
-  { value: 'popularity', label: 'Popularity', icon: '🔥' },
-  { value: 'rating', label: 'Best Rating', icon: '⭐' },
-  { value: 'fastest', label: 'Fastest Delivery', icon: '⚡' },
-  { value: 'price-low', label: 'Lowest Price', icon: '💰' },
-  { value: 'price-high', label: 'Highest Price', icon: '💎' },
-  { value: 'trending', label: 'Trending', icon: '📈' },
-  { value: 'recommended', label: 'Recommended', icon: '✅' },
+  { value: 'popularity', icon: '🔥' },
+  { value: 'rating', icon: '⭐' },
+  { value: 'fastest', icon: '⚡' },
+  { value: 'price-low', icon: '💰' },
+  { value: 'price-high', icon: '💎' },
+  { value: 'trending', icon: '📈' },
+  { value: 'recommended', icon: '✅' },
 ];
 
 export default function SortDropdown({ sortBy, onSortChange }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const active = sortOptions.find((o) => o.value === sortBy) || sortOptions[0];
 
@@ -24,7 +36,7 @@ export default function SortDropdown({ sortBy, onSortChange }) {
         className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 hover:border-orange-400 dark:hover:border-orange-500 transition-all shadow-sm"
       >
         <span>{active.icon}</span>
-        <span className="font-medium">{active.label}</span>
+        <span className="font-medium">{t(sortKeys[active.value])}</span>
         <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
           <FiChevronDown size={14} className="text-gray-400" />
         </motion.span>
@@ -56,7 +68,7 @@ export default function SortDropdown({ sortBy, onSortChange }) {
                   }`}
                 >
                   <span className="text-base">{opt.icon}</span>
-                  <span className="flex-1 text-left">{opt.label}</span>
+                  <span className="flex-1 text-left">{t(sortKeys[opt.value])}</span>
                   {isActive && (
                     <motion.span
                       initial={{ scale: 0 }}

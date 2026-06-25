@@ -29,7 +29,7 @@ export default function Attendance() {
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
-    const socket = io(import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin, {
+    const socket = io(import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin, {
       auth: { token },
       transports: ['websocket', 'polling'],
     });

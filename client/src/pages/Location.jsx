@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -10,6 +11,7 @@ export default function Location() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -29,14 +31,16 @@ export default function Location() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Our <span className="text-primary-500">Locations</span></h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Find the Nile Food branch nearest to you</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{t('location.title').split(' ').map((word, i, arr) =>
+                i === arr.length - 1 ? <span key={i} className="text-primary-500">{word}</span> : word + ' '
+              )}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('location.subtitle')}</p>
           </motion.div>
 
           <div className="max-w-md mx-auto mb-10">
             <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 dark:bg-slate-800 rounded-full border border-gray-200 dark:border-slate-700">
               <FiSearch className="text-gray-400" size={18} />
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search location..." className="flex-1 bg-transparent text-sm focus:outline-none text-gray-900 dark:text-white placeholder-gray-400" />
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder={t('location.searchPlaceholder')} className="flex-1 bg-transparent text-sm focus:outline-none text-gray-900 dark:text-white placeholder-gray-400" />
             </div>
           </div>
 
@@ -57,7 +61,7 @@ export default function Location() {
                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-1">{d.phone}</p>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{d.hours}</p>
                     <button className="flex items-center gap-2 text-sm font-semibold text-primary-500 hover:text-primary-600 transition-colors">
-                      <FiNavigation size={14} /> Get Directions
+                      <FiNavigation size={14} /> {t('location.getDirections')}
                     </button>
                   </motion.div>
                 );

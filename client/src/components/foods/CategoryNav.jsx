@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiChevronRight, FiTrendingUp, FiStar, FiClock, FiZap } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 const categories = [
   { id: '', name: 'All Foods', icon: '🍽️' },
@@ -41,6 +42,32 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
   const [activeCat, setActiveCat] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
+  const { t } = useTranslation();
+
+  const catKeys = {
+    '': 'categories.allFoods',
+    'Fast Food': 'categories.fastFood',
+    'Burgers': 'categories.burgers',
+    'Chicken': 'categories.chicken',
+    'Traditional': 'categories.traditional',
+    'Healthy': 'categories.healthy',
+    'Breakfast': 'categories.breakfast',
+    'Lunch': 'categories.lunch',
+    'Dinner': 'categories.dinner',
+    'Vegan': 'categories.vegan',
+    'Seafood': 'categories.seafood',
+    'BBQ & Grill': 'categories.bbqGrill',
+    'Hotel Specials': 'categories.hotelSpecials',
+    'Beverages': 'categories.beverages',
+    'Snacks': 'categories.snacks',
+  };
+
+  const megaKeys = {
+    'Popular Near You': 'categories.popularNearYou',
+    'Chef Picks': 'categories.chefPicks',
+    'Trending Foods': 'categories.trendingFoods',
+    'Frequently Ordered': 'categories.frequentlyOrdered',
+  };
 
   const handleMouseEnter = (catId) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -99,7 +126,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
                 />
               )}
               <span className="relative z-10">{cat.icon}</span>
-              <span className="relative z-10">{cat.name}</span>
+              <span className="relative z-10">{t(catKeys[cat.id])}</span>
               {cat.id && (
                 <FiChevronDown
                   size={12}
@@ -128,7 +155,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
             <div className="flex">
               <div className="w-64 p-6 bg-gray-50 dark:bg-slate-800/50 border-r border-gray-100 dark:border-slate-700">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-                  Subcategories
+{t('categories.subcategories')}
                 </h4>
                 <div className="space-y-1">
                   {subs.map((sub) => (
@@ -153,7 +180,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
 
               <div className="flex-1 p-6">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-                  Discover
+{t('categories.discover')}
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   {megaItems.map((item) => (
@@ -171,7 +198,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
                         <item.icon size={16} className="text-white" />
                       </div>
                       <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-orange-500 transition-colors">
-                        {item.label}
+{t(megaKeys[item.label])}
                       </span>
                     </motion.button>
                   ))}

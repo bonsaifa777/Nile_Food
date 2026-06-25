@@ -1,60 +1,44 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { FiHeart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
-import { FiHeart, FiStar, FiShoppingCart, FiChevronRight } from 'react-icons/fi';
 
 export default function FavoritesSection({ favorites }) {
+  const { t } = useTranslation();
   const { darkMode } = useTheme();
   const d = darkMode;
-  const [hoveredId, setHoveredId] = useState(null);
 
   if (!favorites || favorites.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`rounded-3xl overflow-hidden backdrop-blur-xl ${
-          d ? 'bg-slate-900/60 border border-white/10' : 'bg-white/90 border border-gray-200/60 shadow-xl'
-        }`}
+        className="text-center py-16 px-6"
       >
-        <div className="p-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500/20 to-red-500/20 flex items-center justify-center mx-auto mb-4">
-            <FiHeart className="text-pink-400" size={24} />
-          </div>
-          <h3 className={`text-lg font-semibold ${d ? 'text-white' : 'text-gray-900'} mb-2`}>No Favorites Yet</h3>
-          <p className={`${d ? 'text-white/40' : 'text-gray-500'} text-sm mb-4`}>Save your favorite dishes for quick access</p>
-          <Link to="/menu" className="px-6 py-2.5 rounded-xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-300 text-sm font-medium inline-block hover:bg-indigo-500/30 transition-all">
-            Browse Menu
-          </Link>
-        </div>
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-20 h-20 rounded-full bg-gradient-to-br from-red-400/20 to-rose-400/20 flex items-center justify-center mx-auto mb-6"
+        >
+          <FiHeart className="text-red-400" size={32} />
+        </motion.div>
+        <h3 className={`text-xl font-bold mb-2 ${d ? 'text-white' : 'text-gray-900'}`}>{t('dashboard.noFavoritesYet')}</h3>
+        <p className={`${d ? 'text-white/40' : 'text-gray-500'} text-sm mb-4`}>{t('dashboard.saveFavoriteDishes')}</p>
+        <Link
+          to="/menu"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-2xl shadow-lg shadow-primary-500/30 hover:shadow-primary-500/50 transition-all"
+        >
+          {t('dashboard.browseMenu')}
+        </Link>
       </motion.div>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`rounded-3xl overflow-hidden backdrop-blur-xl ${
-        d ? 'bg-slate-900/60 border border-white/10' : 'bg-white/90 border border-gray-200/60 shadow-xl'
-      }`}
-    >
-      <div className={`absolute inset-0 bg-gradient-to-br ${d ? 'from-pink-500/3' : 'from-pink-500/[0.01]'} to-transparent pointer-events-none`} />
-
-      <div className="relative p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className={`text-xl font-bold flex items-center gap-2 ${d ? 'text-white' : 'text-gray-900'}`}>
-            <FiHeart className="text-pink-400" />
-            Favorites
-          </h2>
-          <Link to="/menu" className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 text-xs flex items-center gap-1">
-            View All <FiChevronRight size={14} />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {favorites.slice(0, 6).map((item, i) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {favorites.slice(0, 6).map((item, i) => (
             <motion.div
               key={item._id}
               initial={{ opacity: 0, scale: 0.95 }}
@@ -100,7 +84,5 @@ export default function FavoritesSection({ favorites }) {
             </motion.div>
           ))}
         </div>
-      </div>
-    </motion.div>
   );
 }

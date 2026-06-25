@@ -12,7 +12,7 @@ export function connectKitchenSocket(token) {
   if (socket?.connected) return socket;
 
   try {
-    socket = io(import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin, {
+    socket = io(import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin, {
       auth: { token },
       transports: ['websocket', 'polling'],
     });

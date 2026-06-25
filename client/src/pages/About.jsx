@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -33,6 +34,7 @@ export default function About() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios.get('/api/content/about_page')
@@ -59,14 +61,14 @@ export default function About() {
 
           <div className="relative mb-20">
             <div className="w-full h-80 lg:h-96 rounded-2xl overflow-hidden">
-              <img src={data.story?.image} alt="About Nile Food" className="w-full h-full object-cover" />
+              <img src={data.story?.image} alt={t('about.alt')} className="w-full h-full object-cover" />
             </div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
               className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 lg:p-8 text-center max-w-lg w-[90%]">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Our Story</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('about.ourStory')}</h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{data.story?.text}</p>
               <Link to={data.story?.ctaLink || '/menu'} className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-lg transition-colors text-sm">
-                {data.story?.ctaLabel || 'Explore Our Menu'}
+                {data.story?.ctaLabel || t('about.exploreMenu')}
               </Link>
             </motion.div>
           </div>
@@ -81,7 +83,7 @@ export default function About() {
             ))}
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-10">Our Core Values</h2>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-10">{t('about.ourCoreValues')}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {(data.values || []).map((val, i) => (
               <motion.div key={val.title || i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}

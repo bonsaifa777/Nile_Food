@@ -9,7 +9,7 @@ import Loading from '../components/common/Loading';
 import {
   CalendarDays, Clock, Users, Phone, Mail, Search, Filter,
   ChevronDown, ChevronRight, MoreHorizontal, X, CheckCircle,
-  AlertCircle, Trash2, Edit, Eye, RefreshCw, Bed, MapPin,
+  AlertCircle, Trash2, Edit, Eye, RefreshCw, MapPin,
   Star, ArrowLeft, Send, AlertTriangle, Download, FilterX
 } from 'lucide-react';
 
@@ -138,7 +138,7 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
     toast((t) => (
       <div className="flex flex-col gap-3">
         <p className="text-sm font-medium">Cancel this reservation?</p>
-        <p className="text-xs text-gray-400">Guest: {reservation.name} &bull; Room: {reservation.roomName || 'N/A'}</p>
+        <p className="text-xs text-gray-400">Guest: {reservation.name}</p>
         <div className="flex gap-2 justify-end">
           <button
             onClick={() => toast.dismiss(t.id)}
@@ -196,7 +196,7 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
               <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden ${
                 d ? 'bg-gradient-to-br from-indigo-500/20 via-purple-500/10 to-pink-500/10' : 'bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50'
               }`}>
-                <Bed className={`w-8 h-8 ${d ? 'text-indigo-400/60' : 'text-indigo-400/50'}`} />
+                <CalendarDays className={`w-8 h-8 ${d ? 'text-indigo-400/60' : 'text-indigo-400/50'}`} />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -205,11 +205,7 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
                     <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                     {status.label}
                   </span>
-                  {reservation.roomName && (
-                    <span className={`text-xs font-semibold ${d ? 'text-indigo-400' : 'text-indigo-600'}`}>
-                      {reservation.roomName}
-                    </span>
-                  )}
+
                 </div>
 
                 <h3 className={`text-lg font-bold truncate ${d ? 'text-white' : 'text-gray-900'}`}>
@@ -318,22 +314,22 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
             d ? 'bg-white/5' : 'bg-gray-50/50'
           }`}>
             <div>
-              <p className={`text-[10px] font-medium uppercase tracking-wider mb-1 ${d ? 'text-white/40' : 'text-gray-400'}`}>
-                Check In
-              </p>
-              <div className={`flex items-center gap-1.5 text-sm font-bold ${d ? 'text-white/80' : 'text-gray-700'}`}>
-                <CalendarDays className="w-3.5 h-3.5 text-indigo-500" />
-                {reservation.date ? new Date(reservation.date).toLocaleDateString() : '—'}
+                <p className={`text-[10px] font-medium uppercase tracking-wider mb-1 ${d ? 'text-white/40' : 'text-gray-400'}`}>
+                  Date
+                </p>
+                <div className={`flex items-center gap-1.5 text-sm font-bold ${d ? 'text-white/80' : 'text-gray-700'}`}>
+                  <CalendarDays className="w-3.5 h-3.5 text-indigo-500" />
+                  {reservation.date ? new Date(reservation.date).toLocaleDateString() : '—'}
+                </div>
               </div>
-            </div>
-            <div>
-              <p className={`text-[10px] font-medium uppercase tracking-wider mb-1 ${d ? 'text-white/40' : 'text-gray-400'}`}>
-                Check Out
-              </p>
-              <div className={`flex items-center gap-1.5 text-sm font-bold ${d ? 'text-white/80' : 'text-gray-700'}`}>
-                <CalendarDays className="w-3.5 h-3.5 text-indigo-500" />
-                {reservation.time ? new Date(reservation.time).toLocaleDateString() : '—'}
-              </div>
+              <div>
+                <p className={`text-[10px] font-medium uppercase tracking-wider mb-1 ${d ? 'text-white/40' : 'text-gray-400'}`}>
+                  Time
+                </p>
+                <div className={`flex items-center gap-1.5 text-sm font-bold ${d ? 'text-white/80' : 'text-gray-700'}`}>
+                  <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                  {reservation.time || '—'}
+                </div>
             </div>
             <div>
               <p className={`text-[10px] font-medium uppercase tracking-wider mb-1 ${d ? 'text-white/40' : 'text-gray-400'}`}>
@@ -350,13 +346,13 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
               </p>
               <div className={`flex items-center gap-1.5 text-sm font-bold ${d ? 'text-white/80' : 'text-gray-700'}`}>
                 <span className={`w-2 h-2 rounded-full ${
-                  reservation.paymentMethod && reservation.paymentMethod !== 'pay_hotel'
+                  reservation.paymentMethod
                     ? 'bg-emerald-500'
                     : 'bg-amber-500'
                 }`} />
                 {reservation.paymentMethod
                   ? reservation.paymentMethod.replace('_', ' ')
-                  : 'Pay at Hotel'}
+                  : 'Pay Later'}
               </div>
             </div>
           </div>
@@ -401,10 +397,7 @@ function BookingCard({ reservation, index, onUpdateStatus, onCancel, onDelete, d
                         <CalendarDays className="w-3.5 h-3.5" /> Booking Info
                       </p>
                       <div className="space-y-2">
-                        <div className={`flex items-center justify-between text-sm ${d ? 'text-white/60' : 'text-gray-600'}`}>
-                          <span>Room</span>
-                          <span className={`font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{reservation.roomName || '—'}</span>
-                        </div>
+
                         <div className={`flex items-center justify-between text-sm ${d ? 'text-white/60' : 'text-gray-600'}`}>
                           <span>Status</span>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${status.bg} ${status.color}`}>
@@ -454,7 +447,7 @@ function EmptyState({ darkMode }) {
       <p className={`text-sm mb-6 max-w-xs mx-auto ${d ? 'text-white/40' : 'text-gray-500'}`}>
         {searchTerm || filter !== 'all'
           ? 'Try adjusting your search or filter criteria'
-          : 'Room reservations will appear here when customers book'}
+          : 'Reservations will appear here when customers book'}
       </p>
     </motion.div>
   );
@@ -517,8 +510,7 @@ export default function AdminBookings() {
       result = result.filter(r =>
         (r.name?.toLowerCase().includes(term)) ||
         (r.email?.toLowerCase().includes(term)) ||
-        (r.phone?.toLowerCase().includes(term)) ||
-        (r.roomName?.toLowerCase().includes(term))
+        (r.phone?.toLowerCase().includes(term))
       );
     }
     return result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
@@ -555,10 +547,10 @@ export default function AdminBookings() {
                   </span>
                 </div>
                 <h1 className={`text-3xl font-black mb-1 ${d ? 'text-white' : 'text-gray-900'}`}>
-                  Room Bookings
+                  Reservations
                 </h1>
                 <p className={`text-base ${d ? 'text-white/50' : 'text-gray-500'}`}>
-                  Manage all customer room reservations
+                  Manage all customer reservations
                 </p>
               </div>
 
@@ -598,7 +590,7 @@ export default function AdminBookings() {
                   <Search className={`w-4 h-4 ${d ? 'text-white/40' : 'text-gray-400'}`} />
                   <input
                     type="text"
-                    placeholder="Search by name, email, phone, or room..."
+                    placeholder="Search by name, email, or phone..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className={`flex-1 bg-transparent text-sm outline-none ${

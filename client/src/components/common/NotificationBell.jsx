@@ -4,10 +4,12 @@ import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { FiBell, FiShoppingBag, FiCheckCircle } from 'react-icons/fi';
 import { useTheme } from '../../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export default function NotificationBell() {
   const { darkMode } = useTheme();
   const d = darkMode;
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [show, setShow] = useState(false);
   const ref = useRef();
@@ -71,7 +73,7 @@ export default function NotificationBell() {
             <div className={`${d ? 'bg-slate-900 border border-white/10' : 'bg-white border border-gray-200'}`}>
               <div className={`flex items-center justify-between p-4 ${d ? 'border-b border-white/10' : 'border-b border-gray-200'}`}>
                 <div className="flex items-center gap-2">
-                  <h3 className={`font-semibold text-sm ${d ? 'text-white' : 'text-gray-900'}`}>Notifications</h3>
+                  <h3 className={`font-semibold text-sm ${d ? 'text-white' : 'text-gray-900'}`}>{t('notification.title')}</h3>
                   {notifCount > 0 && (
                     <motion.span
                       animate={{ scale: [1, 1.1, 1] }}
@@ -79,13 +81,13 @@ export default function NotificationBell() {
                       className="text-xs px-2 py-0.5 rounded-full font-bold"
                       style={{ background: 'rgba(239,68,68,0.2)', color: '#ef4444' }}
                     >
-                      {notifCount} new
+                      {t('notification.countNew', { count: notifCount })}
                     </motion.span>
                   )}
                 </div>
                 {notifCount > 0 && (
                   <button onClick={() => setNotifications([])} className={`text-xs font-medium ${d ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'}`}>
-                    Clear all
+                    {t('notification.clearAll')}
                   </button>
                 )}
               </div>
@@ -95,7 +97,7 @@ export default function NotificationBell() {
                     <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 3, repeat: Infinity }}>
                       <FiBell size={24} className={`mx-auto mb-2 ${d ? 'text-white/30' : 'text-gray-400'}`} />
                     </motion.div>
-                    <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>No notifications</p>
+                    <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('notification.noNotifications')}</p>
                   </div>
                 ) : (
                   notifications.map((notif, index) => (

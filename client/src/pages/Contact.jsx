@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -21,6 +22,7 @@ export default function Contact() {
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -66,7 +68,7 @@ export default function Contact() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Get in Touch</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('contact.getInTouch')}</h2>
               <div className="space-y-6 mb-8">
                 {(data.contactInfo || []).map((info, i) => (
                   <motion.div key={info.label || i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
@@ -87,40 +89,40 @@ export default function Contact() {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send a Message</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('contact.sendMessage')}</h2>
               {submitted ? (
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
                   className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-2xl p-8 text-center">
                   <div className="text-4xl mb-4">✅</div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Message Sent!</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">Thank you for reaching out. We'll get back to you shortly.</p>
-                  <button onClick={() => setSubmitted(false)} className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors text-sm">Send Another Message</button>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('contact.messageSent')}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">{t('contact.thankYou')}</p>
+                  <button onClick={() => setSubmitted(false)} className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors text-sm">{t('contact.sendAnother')}</button>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('contact.name')}</label>
                     <input type="text" name="name" value={form.name} onChange={handleChange} required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('contact.email')}</label>
                     <input type="email" name="email" value={form.email} onChange={handleChange} required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('contact.subject')}</label>
                     <input type="text" name="subject" value={form.subject} onChange={handleChange} required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('contact.message')}</label>
                     <textarea name="message" rows={5} value={form.message} onChange={handleChange} required
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none" />
                   </div>
                   <button type="submit" disabled={submitting}
                     className="w-full py-3 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-semibold rounded-xl shadow-lg transition-colors text-sm">
-                    {submitting ? 'Sending...' : 'Send Message'}
+                    {submitting ? t('contact.sending') : t('contact.sendMessageLabel')}
                   </button>
                 </form>
               )}

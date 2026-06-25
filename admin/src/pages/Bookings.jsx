@@ -3,16 +3,15 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import {
-  FiHome, FiCalendar, FiPackage, FiGift, FiTrendingUp,
-  FiUsers, FiStar, FiMapPin, FiClock, FiDollarSign,
+  FiCalendar, FiPackage, FiGift, FiTrendingUp,
+  FiUsers, FiStar, FiClock,
   FiRefreshCw, FiSearch, FiPlus, FiEdit2, FiTrash2,
-  FiCheck, FiX, FiImage, FiSave, FiHeart, FiBookmark,
-  FiTag, FiPercent, FiBox, FiLayers, FiChevronRight,
+  FiCheck, FiX, FiImage, FiSave,
+  FiTag, FiBox, FiLayers, FiChevronRight,
   FiPhone,
 } from 'react-icons/fi';
 
 const tabs = [
-  { id: 'rooms', label: 'Rooms', icon: FiHome },
   { id: 'events', label: 'Events', icon: FiCalendar },
   { id: 'packages', label: 'Packages', icon: FiPackage },
   { id: 'offers', label: 'Offers', icon: FiGift },
@@ -168,15 +167,6 @@ function ListingModal({ isOpen, onClose, onSave, listing, type }) {
     try {
       let data;
       switch (type) {
-        case 'rooms':
-          data = {
-            name: form.name, price: form.price, capacity: form.capacity,
-            description: form.description, image: form.image,
-            amenities: form.amenities.split(',').map(s => s.trim()).filter(Boolean),
-            featured: form.featured,
-            images: form.images,
-          };
-          break;
         case 'events':
           data = { title: form.title, desc: form.desc, icon: form.icon };
           break;
@@ -233,57 +223,6 @@ function ListingModal({ isOpen, onClose, onSave, listing, type }) {
               </div>
             </div>
             <form onSubmit={handleSubmit} className="p-6 max-h-[60vh] overflow-y-auto space-y-4">
-              {type === 'rooms' && (
-                <>
-                  <div><label className={labelClass}>Room Name</label><input name="name" value={form.name} onChange={handleChange} className={inputClass} placeholder="e.g. Presidential Suite" required /></div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><label className={labelClass}>Price ($)</label><input name="price" value={form.price} onChange={handleChange} className={inputClass} placeholder="e.g. 2500" required /></div>
-                    <div><label className={labelClass}>Capacity</label><input name="capacity" value={form.capacity} onChange={handleChange} className={inputClass} placeholder="e.g. 4" required /></div>
-                  </div>
-                  <div><label className={labelClass}>Description</label><textarea name="description" value={form.description} onChange={handleChange} className={`${inputClass} h-20 resize-none`} placeholder="Room description..." required /></div>
-                  <div><label className={labelClass}>Image URL</label><input name="image" value={form.image} onChange={handleChange} className={inputClass} placeholder="https://..." /></div>
-                  <div><label className={labelClass}>Amenities (comma separated)</label><input name="amenities" value={form.amenities} onChange={handleChange} className={inputClass} placeholder="e.g. King Bed, Ocean View, WiFi" /></div>
-                  <label className="flex items-center gap-2.5 p-3 rounded-xl bg-primary-500/5 border border-primary-500/10 cursor-pointer">
-                    <input type="checkbox" name="featured" checked={form.featured} onChange={handleChange} className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500" />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Featured Room (shows on Reserve Page)</span>
-                  </label>
-                  <div>
-                    <label className={labelClass}>Room Detail Images (optional)</label>
-                    <p className="text-[10px] text-gray-500 mb-2">These appear as element/feature images on the reserve page</p>
-                    {form.images.map((img, idx) => (
-                      <div key={idx} className="flex gap-2 mb-2 p-2 rounded-lg bg-white/30 dark:bg-white/5 border border-gray-200 dark:border-slate-700/30">
-                        <div className="flex-1 space-y-1">
-                          <input value={img.src || ''} onChange={e => {
-                            const updated = [...form.images];
-                            updated[idx] = { ...updated[idx], src: e.target.value };
-                            setForm({ ...form, images: updated });
-                          }} className="w-full px-2 py-1 rounded text-xs bg-transparent border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white" placeholder="Image URL" />
-                          <div className="flex gap-1">
-                            <input value={img.label || ''} onChange={e => {
-                              const updated = [...form.images];
-                              updated[idx] = { ...updated[idx], label: e.target.value };
-                              setForm({ ...form, images: updated });
-                            }} className="flex-1 px-2 py-1 rounded text-xs bg-transparent border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white" placeholder="Label" />
-                            <input value={img.alt || ''} onChange={e => {
-                              const updated = [...form.images];
-                              updated[idx] = { ...updated[idx], alt: e.target.value };
-                              setForm({ ...form, images: updated });
-                            }} className="flex-1 px-2 py-1 rounded text-xs bg-transparent border border-gray-200 dark:border-slate-700/50 text-gray-900 dark:text-white" placeholder="Alt" />
-                          </div>
-                        </div>
-                        <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== idx) })}
-                          className="p-1 rounded-lg hover:bg-red-500/10 text-red-400 shrink-0 self-start mt-1">
-                          <FiTrash2 size={12} />
-                        </button>
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => setForm({ ...form, images: [...form.images, { src: '', label: '', alt: '' }] })}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-500/10 text-primary-500 text-xs font-semibold hover:bg-primary-500/20 transition-all">
-                      <FiPlus size={12} /> Add Detail Image
-                    </button>
-                  </div>
-                </>
-              )}
               {type === 'events' && (
                 <>
                   <div><label className={labelClass}>Event Title</label><input name="title" value={form.title} onChange={handleChange} className={inputClass} placeholder="e.g. Wine Tasting Evening" required /></div>
@@ -377,235 +316,6 @@ const STATUS_OPTIONS = [
   { value: 'confirmed', label: 'Confirmed', color: 'bg-green-500/20 text-green-400', dot: 'bg-green-400', border: 'border-green-500/30', glow: 'rgba(34,197,94,0.15)' },
   { value: 'cancelled', label: 'Cancelled', color: 'bg-red-500/20 text-red-400', dot: 'bg-red-400', border: 'border-red-500/30', glow: 'rgba(239,68,68,0.15)' },
 ];
-
-function RoomsTab({ listings, reservations, onAdd, onEdit, onDelete, onRefresh }) {
-  const [filter, setFilter] = useState('all');
-  const [search, setSearch] = useState('');
-  const [expandedRoom, setExpandedRoom] = useState(null);
-  const [updatingStatus, setUpdatingStatus] = useState(null);
-
-  const roomBookings = {};
-  reservations.forEach(r => {
-    if (r.roomId) {
-      const id = typeof r.roomId === 'object' ? r.roomId._id : r.roomId;
-      if (!roomBookings[id]) roomBookings[id] = [];
-      roomBookings[id].push(r);
-    }
-  });
-
-  const updateReservationStatus = async (id, status) => {
-    setUpdatingStatus(id);
-    try {
-      await axios.put(`/api/reservations/${id}`, { status });
-      toast.success(`Reservation ${status}`);
-      onRefresh();
-    } catch {
-      toast.error('Failed to update status');
-    } finally {
-      setUpdatingStatus(null);
-    }
-  };
-
-  const filtered = (listings || []).filter(r => {
-    const d = r.data || {};
-    const status = r.isActive ? 'active' : 'inactive';
-    const matchFilter = filter === 'all' || status === filter;
-    const matchSearch = (d.name || '').toLowerCase().includes(search.toLowerCase());
-    return matchFilter && matchSearch;
-  });
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-xs">
-          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
-          <input type="text" placeholder="Search rooms..." value={search}
-            onChange={e => setSearch(e.target.value)} className="input-glass pl-10 pr-4 py-2.5 text-sm w-full" />
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {['all', 'active', 'inactive'].map(s => (
-            <motion.button key={s} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-              onClick={() => setFilter(s)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all capitalize ${
-                filter === s ? 'bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg' : 'glass text-gray-600 dark:text-gray-300'
-              }`}>{s}</motion.button>
-          ))}
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-            onClick={onAdd}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 text-white text-xs font-semibold shadow-lg shadow-primary-500/25 flex items-center gap-1.5">
-            <FiPlus size={13} /> Add Room
-          </motion.button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-        <AnimatePresence mode="popLayout">
-          {filtered.map((room, i) => {
-            const d = room.data || {};
-            const bookings = roomBookings[room._id] || [];
-            const isActive = room.isActive;
-            const isExpanded = expandedRoom === room._id;
-            return (
-              <motion.div key={room._id} layout
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                transition={{ delay: i * 0.06, duration: 0.4 }}
-              >
-                <div className="glass-card overflow-hidden p-0">
-                  <TiltCard>
-                    <div>
-                      <div className="relative h-40 overflow-hidden">
-                        <img src={d.image || 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&q=80'}
-                          alt={d.name} className="w-full h-full object-cover transition-transform duration-500" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                        <div className="absolute top-3 right-3 flex gap-2">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md border ${
-                            isActive ? 'bg-emerald-500/30 border-emerald-400/40 text-emerald-200' : 'bg-gray-500/30 border-gray-400/40 text-gray-200'
-                          }`}>{isActive ? 'Active' : 'Inactive'}</span>
-                          {bookings.length > 0 && (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold backdrop-blur-md border bg-amber-500/30 border-amber-400/40 text-amber-200">
-                              {bookings.length} booking{bookings.length > 1 ? 's' : ''}
-                            </span>
-                          )}
-                        </div>
-                        <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                          <p className="text-white font-bold text-lg drop-shadow-lg">{d.name || 'Unnamed Room'}</p>
-                          <div className="flex items-center gap-1.5 text-white/80 text-xs">
-                            <FiUsers size={12} /> Up to {d.capacity || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-xl font-bold text-gray-900 dark:text-white">${d.price || '0'}</span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">/ night</span>
-                          </div>
-                          <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedRoom(isExpanded ? null : room._id); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all glass hover:bg-white/10 text-gray-600 dark:text-gray-300"
-                          >
-                            <span>{bookings.length} booking{bookings.length !== 1 ? 's' : ''}</span>
-                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
-                              <FiChevronRight size={14} />
-                            </motion.div>
-                          </motion.button>
-                        </div>
-                        {(d.amenities || []).length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-3">
-                            {(d.amenities || []).slice(0, 4).map((a, j) => (
-                              <span key={j} className="px-2 py-0.5 rounded-lg text-[10px] font-medium bg-primary-500/10 text-primary-600 dark:text-primary-300 border border-primary-500/10">{a}</span>
-                            ))}
-                            {(d.amenities || []).length > 4 && <span className="text-[10px] text-primary-400 font-semibold self-center">+{d.amenities.length - 4}</span>}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TiltCard>
-
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden border-t border-gray-200 dark:border-slate-700/50"
-                      >
-                        <div className="p-4 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                              Reservations ({bookings.length})
-                            </h4>
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setExpandedRoom(null); }}
-                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
-                            >
-                              <FiX size={14} className="text-gray-400" />
-                            </motion.button>
-                          </div>
-                          {bookings.length === 0 ? (
-                            <p className="text-xs text-gray-400 py-3 text-center">No reservations for this room yet</p>
-                          ) : (
-                            bookings.map((b) => (
-                              <motion.div
-                                key={b._id}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                className="p-3 rounded-xl bg-white/50 dark:bg-white/5 border border-gray-100 dark:border-slate-700/30"
-                              >
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-purple-500 flex items-center justify-center shadow-sm shrink-0">
-                                        <span className="text-white font-bold text-[9px]">
-                                          {b.name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                                        </span>
-                                      </div>
-                                      <div className="min-w-0">
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{b.name}</p>
-                                        <p className="text-[10px] text-gray-500 truncate">{b.email}</p>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-500 dark:text-gray-400 mt-1.5">
-                                      <span className="flex items-center gap-1"><FiCalendar size={10} className="text-primary-400" /> {b.date}</span>
-                                      <span className="flex items-center gap-1"><FiClock size={10} className="text-purple-400" /> {b.time}</span>
-                                      <span className="flex items-center gap-1"><FiUsers size={10} className="text-emerald-400" /> {b.guests} {(b.guests || 0) > 1 ? 'guests' : 'guest'}</span>
-                                      <span className="flex items-center gap-1"><FiPhone size={10} className="text-amber-400" /> {b.phone}</span>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    {STATUS_OPTIONS.map(opt => (
-                                      <motion.button
-                                        key={opt.value}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateReservationStatus(b._id, opt.value); }}
-                                        disabled={b.status === opt.value || updatingStatus === b._id}
-                                        className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
-                                          b.status === opt.value
-                                            ? `${opt.color} ${opt.border} border cursor-not-allowed`
-                                            : 'glass text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                                        }`}
-                                      >
-                                        {updatingStatus === b._id ? '...' : opt.label}
-                                      </motion.button>
-                                    ))}
-                                  </div>
-                                </div>
-                              </motion.div>
-                            ))
-                          )}
-                          <div className="flex gap-2 pt-1">
-                            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onEdit(room); }}
-                              className="flex-1 py-2 rounded-xl glass text-xs font-semibold text-gray-600 dark:text-gray-300 flex items-center justify-center gap-1.5">
-                              <FiEdit2 size={12} /> Edit Room
-                            </motion.button>
-                            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(room); }}
-                              className="flex-1 py-2 rounded-xl border border-red-500/20 text-red-400 text-xs font-semibold flex items-center justify-center gap-1.5">
-                              <FiTrash2 size={12} /> Delete
-                            </motion.button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
 
 function EventsTab({ listings, onAdd, onEdit, onDelete }) {
   const [search, setSearch] = useState('');
@@ -808,25 +518,20 @@ function OffersTab({ listings, onAdd, onEdit, onDelete }) {
 }
 
 export default function Bookings() {
-  const [activeTab, setActiveTab] = useState('rooms');
+  const [activeTab, setActiveTab] = useState('events');
   const [listings, setListings] = useState([]);
-  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const apiType = activeTab === 'rooms' ? 'room' : activeTab === 'events' ? 'event' : activeTab === 'packages' ? 'package' : 'offer';
+  const apiType = activeTab === 'events' ? 'event' : activeTab === 'packages' ? 'package' : 'offer';
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [listingsRes, reservationsRes] = await Promise.all([
-        axios.get(`/api/listings/${apiType}?all=true`),
-        axios.get('/api/reservations').catch(() => ({ data: { data: [] } })),
-      ]);
+      const listingsRes = await axios.get(`/api/listings/${apiType}?all=true`);
       setListings(listingsRes.data.data || []);
-      setReservations(reservationsRes.data.data || []);
     } catch {
       setListings([]);
     } finally {
@@ -866,7 +571,6 @@ export default function Bookings() {
   };
 
   const activeListings = listings.filter(l => l.isActive);
-  const totalReservations = reservations.length;
 
   return (
     <div className="relative">
@@ -884,7 +588,7 @@ export default function Bookings() {
             >Bookings</motion.h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
               className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
-              Manage rooms, events, packages and special offers
+              Manage events, packages and special offers
             </motion.p>
           </div>
           <motion.button initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
@@ -899,9 +603,9 @@ export default function Bookings() {
         >
           <StatCard label="Total Listings" value={listings.length} icon={FiLayers} gradient="from-primary-500 to-purple-500" delay={0.1} subtitle={`${activeListings.length} active`} />
           <StatCard label="Active" value={activeListings.length} icon={FiCheck} gradient="from-emerald-500 to-teal-400" delay={0.15} subtitle="Currently published" />
-          <StatCard label={activeTab === 'rooms' ? 'Reservations' : 'Inactive'} value={activeTab === 'rooms' ? totalReservations : listings.length - activeListings.length} icon={FiCalendar} gradient="from-amber-500 to-orange-400" delay={0.2} subtitle={activeTab === 'rooms' ? 'Total bookings' : 'Hidden items'} />
-          <StatCard label={`Avg. ${activeTab === 'rooms' ? 'Capacity' : activeTab === 'events' ? 'Events' : activeTab === 'packages' ? 'Items' : 'Discount'}`}
-            value={activeTab === 'rooms' ? Math.round(listings.reduce((s, l) => s + parseInt(l.data?.capacity || 0), 0) / (listings.length || 1)) || '-' : listings.length}
+          <StatCard label="Inactive" value={listings.length - activeListings.length} icon={FiCalendar} gradient="from-amber-500 to-orange-400" delay={0.2} subtitle="Hidden items" />
+          <StatCard label={`Avg. ${activeTab === 'events' ? 'Events' : activeTab === 'packages' ? 'Items' : 'Discount'}`}
+            value={listings.length}
             icon={FiStar} gradient="from-rose-500 to-pink-400" delay={0.25} subtitle="Per listing" />
         </motion.div>
 
@@ -923,16 +627,6 @@ export default function Bookings() {
             </div>
           ) : (
             <>
-              {activeTab === 'rooms' && (
-                <RoomsTab
-                  listings={listings}
-                  reservations={reservations}
-                  onAdd={handleAdd}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onRefresh={fetchData}
-                />
-              )}
               {activeTab === 'events' && (
                 <EventsTab
                   listings={listings}

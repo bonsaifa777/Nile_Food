@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -11,6 +12,7 @@ export default function Offers() {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios.get('/api/listings/offer')
@@ -25,8 +27,8 @@ export default function Offers() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Offers & <span className="text-primary-500">Deals</span></h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Exclusive promotions and discounts just for you</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{t('offers.title').split(' & ')[0]} & <span className="text-primary-500">{t('offers.title').split(' & ')[1]}</span></h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('offers.subtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -53,7 +55,7 @@ export default function Offers() {
                         <FiClock size={12} /> {d.valid}
                       </div>
                       <button onClick={() => toast.success('Promo applied!')} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors">
-                        <FiShoppingCart size={14} /> Claim Offer
+                        <FiShoppingCart size={14} /> {t('offers.claimOffer')}
                       </button>
                     </div>
                   </motion.div>

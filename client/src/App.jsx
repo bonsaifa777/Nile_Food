@@ -24,7 +24,6 @@ const Location = lazy(() => import('./pages/Location'));
 const Reserve = lazy(() => import('./pages/Reserve'));
 const Packages = lazy(() => import('./pages/Packages'));
 const Events = lazy(() => import('./pages/Events'));
-const Rooms = lazy(() => import('./pages/Rooms'));
 const Dining = lazy(() => import('./pages/Dining'));
 const OnlineOrdering = lazy(() => import('./pages/OnlineOrdering'));
 const Gallery = lazy(() => import('./pages/Gallery'));
@@ -36,7 +35,6 @@ const CustomerDashboard = lazy(() => import('./pages/CustomerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminNavigation = lazy(() => import('./pages/AdminNavigation'));
 const AdminBookings = lazy(() => import('./pages/AdminBookings'));
-const AdminRooms = lazy(() => import('./pages/AdminRooms'));
 const SuperAdminDashboard = lazy(() => import('./pages/SuperAdminDashboard'));
 const Kiosk = lazy(() => import('./pages/Kiosk'));
 
@@ -79,7 +77,6 @@ function App() {
         <Route path="/reserve" element={<Reserve />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/events" element={<Events />} />
-        <Route path="/rooms" element={<Rooms />} />
         <Route path="/dining" element={<Dining />} />
         <Route path="/online-ordering" element={<OnlineOrdering />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -123,11 +120,6 @@ function App() {
         <Route path="/admin/bookings" element={
           <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
             <AdminBookings />
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/rooms" element={
-          <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
-            <AdminRooms />
           </ProtectedRoute>
         } />
       </Routes>

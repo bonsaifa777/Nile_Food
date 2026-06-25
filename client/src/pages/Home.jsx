@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import FeaturedFoods from '../components/FeaturedFoods';
 import MostOrdered from '../components/MostOrdered';
 import EnterprisePlatform from '../components/EnterprisePlatform';
-import PremiumRoomCollection from '../components/PremiumRoomCollection';
 import Categories from '../components/Categories';
 import Testimonials from '../components/Testimonials';
 import Footer from '../components/common/Footer';
@@ -73,6 +73,7 @@ const sectionVariants = {
 };
 
 export default function Home() {
+  const { t } = useTranslation();
   const [featuredFoods, setFeaturedFoods] = useState([]);
   const [mostOrdered, setMostOrdered] = useState([]);
   const [allFoods, setAllFoods] = useState([]);
@@ -111,12 +112,12 @@ export default function Home() {
 
   const dealFoods = allFoods.slice(0, 4);
   const steps = howItWorks?.steps || [
-    { icon: 'FiShoppingBag', title: 'Browse & Choose', desc: 'Explore our curated menu from top restaurants' },
-    { icon: 'FiCreditCard', title: 'Place Your Order', desc: 'Customize your meal and checkout securely' },
-    { icon: 'FiTruck', title: 'Fast Delivery', desc: 'Track your order in real-time to your door' },
+    { icon: 'FiShoppingBag', title: t('home.chooseFood'), desc: t('home.chooseFood') },
+    { icon: 'FiCreditCard', title: t('home.fastDelivery'), desc: t('home.fastDelivery') },
+    { icon: 'FiTruck', title: t('home.enjoyMeal'), desc: t('home.enjoyMeal') },
   ];
-  const cta = ctaContent || { title: 'Get 20% Off Your First Order', subtitle: 'Sign up today and enjoy exclusive deals delivered to your inbox.', button: { label: 'Sign Up Now', link: '/register' } };
-  const deal = dealSection || { title: 'Deal Of the Week', highlight: 'Of the Week', subtitle: 'Limited time offers!', countdown: { days: '02', hours: '14', minutes: '36', seconds: '48' } };
+  const cta = ctaContent || { title: t('home.appCTA'), subtitle: t('home.appCTAText'), button: { label: t('common.getStarted'), link: '/register' } };
+  const deal = dealSection || { title: t('home.heroTitle'), highlight: t('home.heroTitle'), subtitle: t('home.heroSubtitle'), countdown: { days: '02', hours: '14', minutes: '36', seconds: '48' } };
 
   const iconComponents = { FiShoppingBag, FiCreditCard, FiTruck, FiSend };
 
@@ -132,14 +133,14 @@ export default function Home() {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-              Our <span className="text-primary-500">Featured</span> Products
+              {t('home.featuredDishes')}
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Delicious food picks just for you</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('home.featuredDishes')}</p>
           </div>
           <FeaturedFoods foods={featuredFoods} loading={loading} />
           <div className="text-center mt-10">
             <Link to="/menu" className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-lg transition-colors">
-              View All Menu <FiArrowRight size={18} />
+              {t('common.viewAll')} <FiArrowRight size={18} />
             </Link>
           </div>
         </div>
@@ -149,9 +150,9 @@ export default function Home() {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-              Most <span className="text-primary-500">Ordered</span>
+              {t('home.mostOrdered')}
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Our customers' top picks</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('home.mostOrdered')}</p>
           </div>
           <MostOrdered foods={mostOrdered} loading={loading} />
         </div>
@@ -200,7 +201,7 @@ export default function Home() {
                       <span className="text-gray-400 line-through text-xs">ETB {(food.price * 1.2)?.toFixed(2)}</span>
                     </div>
                     <button className="w-full mt-3 py-2.5 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-full shadow-md transition-colors">
-                      Add to Cart
+                      {t('menu.addToCart')}
                     </button>
                   </div>
                 </motion.div>
@@ -214,9 +215,9 @@ export default function Home() {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={sectionVariants} className="text-center mb-14">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-              How It <span className="text-primary-500">Works</span>
+              {t('home.howItWorks')}
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">{howItWorks?.subtitle || 'Get your favorite food in 3 easy steps'}</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{howItWorks?.subtitle || t('home.chooseFood')}</p>
           </motion.div>
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((item, index) => {
@@ -236,8 +237,6 @@ export default function Home() {
 
       <EnterprisePlatform />
 
-      <PremiumRoomCollection />
-
       <section className="py-20 bg-white dark:bg-slate-950">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div whileHover={{ scale: 1.005 }} className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-primary-500 to-primary-400 dark:from-primary-600 dark:to-primary-500 p-12 lg:p-16 text-center">
@@ -249,7 +248,7 @@ export default function Home() {
               <h2 className="text-3xl lg:text-4xl font-black text-white">{cta.title}</h2>
               <p className="text-primary-100 mt-3 text-lg max-w-xl mx-auto">{cta.subtitle}</p>
               <Link to={cta.button?.link || '/register'}>
-                <button className="mt-8 px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xl transition-colors">{cta.button?.label || 'Sign Up Now'}</button>
+                <button className="mt-8 px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xl transition-colors">{cta.button?.label || t('common.getStarted')}</button>
               </Link>
             </div>
           </motion.div>

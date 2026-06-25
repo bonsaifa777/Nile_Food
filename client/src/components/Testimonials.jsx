@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 export default function Testimonials() {
+  const { t } = useTranslation();
   const [testimonials, setTestimonials] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -54,12 +56,12 @@ export default function Testimonials() {
       <div className="w-full px-4">
         <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
           <motion.span initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} className="inline-block px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-semibold text-sm mb-6">
-            Testimonials
+            {t('home.testimonials')}
           </motion.span>
           <h2 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-gray-900 via-indigo-700 to-gray-900 dark:from-white dark:via-indigo-400 dark:to-white bg-clip-text text-transparent">
-            Loved by Thousands
+            {t('home.testimonials')}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">See what our customers are saying about their experience</p>
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">{t('home.testimonials')}</p>
         </motion.div>
 
         <div className="relative">

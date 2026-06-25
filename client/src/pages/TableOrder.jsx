@@ -7,9 +7,11 @@ import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import FoodCard from '../components/foods/FoodCard';
 import Loading from '../components/common/Loading';
+import { useTranslation } from 'react-i18next';
 import { FiSearch, FiMapPin, FiShoppingCart, FiPlus, FiMinus, FiX } from 'react-icons/fi';
 
 export default function TableOrder() {
+  const { t } = useTranslation();
   const { tableId } = useParams();
   const navigate = useNavigate();
   const [table, setTable] = useState(null);
@@ -131,11 +133,11 @@ export default function TableOrder() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Table {table.tableNumber}</h1>
-                <p className="text-white/60">Scan & Order - No login required</p>
+                <h1 className="text-3xl font-bold mb-2">{t('tableOrder.table')} {table.tableNumber}</h1>
+                <p className="text-white/60">{t('tableOrder.scanAndOrder')}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-white/60">Your Table</p>
+                <p className="text-sm text-white/60">{t('tableOrder.yourTable')}</p>
                 <p className="text-2xl font-bold text-primary-500">#{table.tableNumber}</p>
               </div>
             </div>
@@ -150,7 +152,7 @@ export default function TableOrder() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search dishes..."
+                    placeholder={t('tableOrder.search')}
                     className="input-glass pl-12"
                   />
                 </div>
@@ -163,7 +165,7 @@ export default function TableOrder() {
                     !selectedCategory ? 'bg-primary-500' : 'glass hover:bg-white/10'
                   }`}
                 >
-                  All
+                  {t('menu.all')}
                 </button>
                 {categories.map(category => (
                   <button
@@ -220,12 +222,12 @@ export default function TableOrder() {
                   className="glass-card"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Your Order</h2>
-                    <span className="text-primary-500">{cart.length} items</span>
+                    <h2 className="text-xl font-bold">{t('cart.title')}</h2>
+                    <span className="text-primary-500">{cart.length} {t('tableOrder.items')}</span>
                   </div>
 
                   {cart.length === 0 ? (
-                    <p className="text-white/60 text-center py-8">Cart is empty</p>
+                    <p className="text-white/60 text-center py-8">{t('cart.empty')}</p>
                   ) : (
                     <div className="space-y-4 mb-4">
                       {cart.map((item, index) => (
@@ -261,15 +263,15 @@ export default function TableOrder() {
 
                       <div className="border-t border-white/10 pt-4 mt-4">
                         <div className="flex justify-between mb-2">
-                          <span className="text-white/60">Subtotal</span>
+                          <span className="text-white/60">{t('cart.subtotal')}</span>
                           <span>ETB {getSubtotal()}</span>
                         </div>
                         <div className="flex justify-between mb-2">
-                          <span className="text-white/60">Tax (15%)</span>
+                          <span className="text-white/60">{t('cart.tax')} (15%)</span>
                           <span>ETB {getTax().toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between font-bold text-lg">
-                          <span>Total</span>
+                          <span>{t('cart.total')}</span>
                           <span className="text-primary-500">ETB {getTotal().toFixed(2)}</span>
                         </div>
                       </div>
@@ -279,7 +281,7 @@ export default function TableOrder() {
                   <div className="space-y-4 mt-6">
                     <input
                       type="text"
-                      placeholder="Your Name"
+                      placeholder={t('auth.name')}
                       value={guestInfo.name}
                       onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
                       className="input-glass"
@@ -287,7 +289,7 @@ export default function TableOrder() {
                     />
                     <input
                       type="tel"
-                      placeholder="Phone Number"
+                      placeholder={t('auth.phone')}
                       value={guestInfo.phone}
                       onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
                       className="input-glass"
@@ -298,7 +300,7 @@ export default function TableOrder() {
                       disabled={placingOrder || cart.length === 0}
                       className="w-full btn-primary disabled:opacity-50"
                     >
-                      {placingOrder ? 'Placing Order...' : 'Place Order'}
+                      {placingOrder ? t('common.loading') : t('tableOrder.placeOrder')}
                     </button>
                   </div>
                 </motion.div>

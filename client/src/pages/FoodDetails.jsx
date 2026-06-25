@@ -8,6 +8,7 @@ import FoodCard from '../components/foods/FoodCard';
 import Loading from '../components/common/Loading';
 import { useTheme } from '../context/ThemeContext';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next';
 import {
   FiShoppingCart, FiStar, FiClock, FiMinus, FiPlus, FiHeart,
   FiAlertTriangle, FiBarChart2,
@@ -41,6 +42,16 @@ const fadeUp = {
 };
 
 export default function FoodDetails() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const tl = (item, field) => {
+    if (lang === 'en' || !item) return item?.[field];
+    return item[field + '_' + lang] || item[field];
+  };
+  const getTranslatedArr = (arr, lang) => {
+    if (lang === 'en' || !arr) return arr || [];
+    return arr[lang === 'en' ? 'allergens' : 'allergens_' + lang] || arr || [];
+  };
   const { id } = useParams();
   const navigate = useNavigate();
   const { darkMode } = useTheme();
@@ -70,7 +81,7 @@ export default function FoodDetails() {
       }
       fetchSimilar(data.data);
     } catch (error) {
-      toast.error('Failed to load food details');
+      toast.error(t('foodDetails.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -101,7 +112,7 @@ export default function FoodDetails() {
   const handleAddToCart = () => {
     const extrasPayload = selectedExtras.map(e => ({ name: e.name, price: e.price * e.qty }));
     addToCart(food, quantity, selectedSize, extrasPayload, specialInstructions, removedIngredients);
-    toast.success(`${food.name} added to cart!`);
+    toast.success(t('cart.addToCart', { name: tl(food, 'name') }));
   };
 
   const handleDelivery = () => {
@@ -151,7 +162,7 @@ export default function FoodDetails() {
       <Header />
       <div className="min-h-screen pt-32 flex flex-col items-center justify-center">
         <FiInfo size={48} className="text-gray-400 mb-4" />
-        <p className={`text-lg font-medium ${d ? 'text-gray-400' : 'text-gray-600'}`}>Food not found</p>
+        <p className={`text-lg font-medium ${d ? 'text-gray-400' : 'text-gray-600'}`}>{t('menu.noItems')}</p>
       </div>
     </div>
   );
@@ -173,7 +184,7 @@ export default function FoodDetails() {
               <div className={`aspect-square rounded-3xl overflow-hidden shadow-2xl ${d ? 'shadow-black/30' : 'shadow-primary-500/10'}`}>
                 <img
                   src={food.image || '/placeholder-food.jpg'}
-                  alt={food.name}
+                  alt={tl(food, 'name')}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
@@ -181,7 +192,7 @@ export default function FoodDetails() {
               {food.images?.length > 0 && (
                 <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
                   {food.images.map((img, i) => (
-                    <img key={i} src={img} alt={`${food.name} ${i + 1}`}
+                    <img key={i} src={img} alt={`${tl(food, 'name')} ${i + 1}`}
                       className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border-2 border-transparent hover:border-primary-500 transition-all cursor-pointer"
                     />
                   ))}
@@ -204,7 +215,7 @@ export default function FoodDetails() {
                     {food.category?.name}
                   </span>
                   <h1 className={`text-3xl lg:text-4xl font-black mb-2 ${d ? 'text-white' : 'text-gray-900'}`}>
-                    {food.name}
+                    {tl(food, 'name')}
                   </h1>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5">
@@ -215,7 +226,7 @@ export default function FoodDetails() {
                     </div>
                     <div className={`flex items-center gap-1.5 ${d ? 'text-gray-400' : 'text-gray-500'}`}>
                       <FiClock size={16} />
-                      <span className="font-medium">{food.preparationTime} min</span>
+                      <span className="font-medium">{t('foodDetails.prepTime', { time: food.preparationTime })}</span>
                     </div>
                   </div>
                 </div>
@@ -231,22 +242,22 @@ export default function FoodDetails() {
               </div>
 
               <div className={`text-2xl font-black ${d ? 'text-primary-400' : 'text-primary-600'}`}>
-                ETB {calculatePrice().toFixed(2)}
+                {t('common.currencyETB')} {calculatePrice().toFixed(2)}
               </div>
 
               {/* Description */}
               <motion.div {...fadeUp} transition={{ delay: 0.05 }}
                 className={`p-5 rounded-2xl ${d ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}
               >
-                <SectionTitle icon={FiList} title="Description" dark={d} />
+                <SectionTitle icon={FiList} title={t('foodDetails.description')} dark={d} />
                 <p className={`text-sm leading-relaxed ${d ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {food.description}
+                  {tl(food, 'description')}
                 </p>
               </motion.div>
 
               {/* Ingredients */}
               <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
-                <SectionTitle icon={FiImage} title="Ingredients" dark={d} />
+                <SectionTitle icon={FiImage} title={t('foodDetails.ingredients')} dark={d} />
                 {(food.ingredients?.length > 0 ? food.ingredients : []).length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-3">
                     {food.ingredients.map((ing, i) => {
@@ -262,10 +273,10 @@ export default function FoodDetails() {
                           <div className="flex items-center gap-3 p-3">
                             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                               <img src={ing.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop'}
-                                alt={ing.name} className="w-full h-full object-cover" />
+                                 alt={tl(ing, 'name')} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{ing.name}</p>
+                              <p className={`text-sm font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{tl(ing, 'name')}</p>
                               <p className={`text-[10px] ${d ? 'text-gray-400' : 'text-gray-500'}`}>{ing.amount}</p>
                             </div>
                           </div>
@@ -282,20 +293,20 @@ export default function FoodDetails() {
                                   ? d ? 'bg-primary-500/20 text-primary-300 hover:bg-primary-500/30' : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
                                   : d ? 'bg-red-500/20 text-red-300' : 'bg-red-100 text-red-600'
                               }`}
-                            >{removed ? 'Add' : 'Remove'}</motion.button>
+                                >{removed ? t('kiosk.addToCart') : t('cart.remove')}</motion.button>
                           </div>
                         </motion.div>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className={`text-xs text-center py-6 ${d ? 'text-gray-500' : 'text-gray-400'}`}>No ingredient information available</p>
+                  <p className={`text-xs text-center py-6 ${d ? 'text-gray-500' : 'text-gray-400'}`}>{t('foodDetails.noIngredients')}</p>
                 )}
               </motion.div>
 
               {/* Extras */}
               <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
-                <SectionTitle icon={FiPlus} title="Extras" dark={d} />
+                <SectionTitle icon={FiPlus} title={t('foodDetails.extras')} dark={d} />
                 {(food.extras?.length > 0 ? food.extras : []).length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-3">
                     {food.extras.map((extra, i) => {
@@ -311,11 +322,11 @@ export default function FoodDetails() {
                           <div className="flex items-center gap-3 p-3">
                             <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                               <img src={extra.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&h=100&fit=crop'}
-                                alt={extra.name} className="w-full h-full object-cover" />
+                                alt={tl(extra, 'name')} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{extra.name}</p>
-                              <p className={`text-xs font-medium ${d ? 'text-primary-400' : 'text-primary-600'}`}>+{extra.price} ETB</p>
+                              <p className={`text-sm font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{tl(extra, 'name')}</p>
+                              <p className={`text-xs font-medium ${d ? 'text-primary-400' : 'text-primary-600'}`}>+{extra.price} {t('common.currencyETB')}</p>
                             </div>
                           </div>
                           <div className={`flex items-center justify-between px-3 pb-3 ${d ? 'border-t border-white/5' : 'border-t border-gray-100'}`} style={{ paddingTop: '8px' }}>
@@ -325,7 +336,7 @@ export default function FoodDetails() {
                                   ? d ? 'bg-red-500/20 text-red-300' : 'bg-red-100 text-red-600'
                                   : d ? 'bg-primary-500/20 text-primary-300 hover:bg-primary-500/30' : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
                               }`}
-                            >{qty > 0 ? 'Remove' : 'Add'}</motion.button>
+                              >{qty > 0 ? t('cart.remove') : t('kiosk.addToCart')}</motion.button>
                             {qty > 0 && (
                               <div className={`flex items-center gap-2 rounded-lg px-1.5 ${d ? 'bg-white/10' : 'bg-gray-100'}`}>
                                 <motion.button whileTap={{ scale: 0.9 }} onClick={() => updateExtraQty(extra.name, -1)}
@@ -343,7 +354,7 @@ export default function FoodDetails() {
                     })}
                   </div>
                 ) : (
-                  <p className={`text-xs text-center py-6 ${d ? 'text-gray-500' : 'text-gray-400'}`}>No extra options available</p>
+                  <p className={`text-xs text-center py-6 ${d ? 'text-gray-500' : 'text-gray-400'}`}>{t('foodDetails.noExtras')}</p>
                 )}
               </motion.div>
 
@@ -351,10 +362,10 @@ export default function FoodDetails() {
               <motion.div {...fadeUp} transition={{ delay: 0.2 }}
                 className={`p-5 rounded-2xl ${d ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}
               >
-                <SectionTitle icon={FiAlertTriangle} title="Allergens" dark={d} />
+                <SectionTitle icon={FiAlertTriangle} title={t('foodDetails.allergens')} dark={d} />
                 {(food.allergens?.length > 0 ? food.allergens : []).length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {food.allergens.map(allergen => (
+                    {(lang === 'en' ? food.allergens : (food['allergens_' + lang] || food.allergens || [])).map(allergen => (
                       <motion.span key={allergen} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
                           d ? 'bg-red-500/10 text-red-300 border border-red-500/20' : 'bg-red-50 text-red-700 border border-red-200'
@@ -363,7 +374,7 @@ export default function FoodDetails() {
                     ))}
                   </div>
                 ) : (
-                  <p className={`text-xs ${d ? 'text-gray-500' : 'text-gray-400'}`}>No allergen information available</p>
+                  <p className={`text-xs ${d ? 'text-gray-500' : 'text-gray-400'}`}>{t('foodDetails.noAllergens')}</p>
                 )}
               </motion.div>
 
@@ -371,39 +382,39 @@ export default function FoodDetails() {
               <motion.div {...fadeUp} transition={{ delay: 0.25 }}
                 className={`p-5 rounded-2xl ${d ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'}`}
               >
-                <SectionTitle icon={FiBarChart2} title="Nutritional Info" dark={d} />
+                <SectionTitle icon={FiBarChart2} title={t('foodDetails.nutritionalInfo')} dark={d} />
                 {food.nutritionalInfo ? (
                   <div>
                     {food.nutritionalInfo.servingSize && (
                       <div className={`mb-2 pb-2 border-b ${d ? 'border-white/5' : 'border-gray-100'}`}>
-                        <span className={`text-[10px] ${d ? 'text-gray-500' : 'text-gray-400'}`}>Serving: </span>
+                        <span className={`text-[10px] ${d ? 'text-gray-500' : 'text-gray-400'}`}>{t('foodDetails.serving')}: </span>
                         <span className={`text-xs font-semibold ${d ? 'text-white' : 'text-gray-900'}`}>{food.nutritionalInfo.servingSize}</span>
                       </div>
                     )}
                     <div className="grid grid-cols-2 gap-x-4">
                       {[
-                        { label: 'Calories', value: food.nutritionalInfo.calories ? `${food.nutritionalInfo.calories} kcal` : null },
-                        { label: 'Total Fat', value: food.nutritionalInfo.totalFat },
-                        { label: 'Carbs', value: food.nutritionalInfo.totalCarbohydrates },
-                        { label: 'Protein', value: food.nutritionalInfo.protein },
-                        { label: 'Fiber', value: food.nutritionalInfo.dietaryFiber },
-                        { label: 'Sodium', value: food.nutritionalInfo.sodium },
-                        { label: 'Sugar', value: food.nutritionalInfo.sugars },
-                        { label: 'Cholesterol', value: food.nutritionalInfo.cholesterol },
+                        { label: t('foodDetails.calories'), value: food.nutritionalInfo.calories ? `${food.nutritionalInfo.calories} kcal` : null },
+                        { label: t('foodDetails.totalFat'), value: food.nutritionalInfo.totalFat },
+                        { label: t('foodDetails.carbs'), value: food.nutritionalInfo.totalCarbohydrates },
+                        { label: t('foodDetails.protein'), value: food.nutritionalInfo.protein },
+                        { label: t('foodDetails.fiber'), value: food.nutritionalInfo.dietaryFiber },
+                        { label: t('foodDetails.sodium'), value: food.nutritionalInfo.sodium },
+                        { label: t('foodDetails.sugar'), value: food.nutritionalInfo.sugars },
+                        { label: t('foodDetails.cholesterol'), value: food.nutritionalInfo.cholesterol },
                       ].map(item => (
                         <NutriRow key={item.label} label={item.label} value={item.value} dark={d} />
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <p className={`text-xs ${d ? 'text-gray-500' : 'text-gray-400'}`}>No nutritional information available</p>
+                  <p className={`text-xs ${d ? 'text-gray-500' : 'text-gray-400'}`}>{t('foodDetails.noNutrition')}</p>
                 )}
               </motion.div>
 
               {/* Sizes */}
               {food.sizes?.length > 0 && (
                 <motion.div {...fadeUp} transition={{ delay: 0.3 }}>
-                  <h3 className={`text-sm font-semibold mb-3 ${d ? 'text-white' : 'text-gray-900'}`}>Size</h3>
+                  <h3 className={`text-sm font-semibold mb-3 ${d ? 'text-white' : 'text-gray-900'}`}>{t('foodDetails.size')}</h3>
                   <div className="flex gap-2">
                     {food.sizes.map(size => (
                       <motion.button key={size.name} whileTap={{ scale: 0.95 }} onClick={() => setSelectedSize(size.name)}
@@ -412,7 +423,7 @@ export default function FoodDetails() {
                             ? d ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-primary-600 text-white shadow-lg shadow-primary-600/30'
                             : d ? 'bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                         }`}
-                      >{size.name} {size.price > 0 && <span className="opacity-80">(+{size.price} ETB)</span>}</motion.button>
+                      >{tl(size, 'name')} {size.price > 0 && <span className="opacity-80">(+{size.price} {t('common.currencyETB')})</span>}</motion.button>
                     ))}
                   </div>
                 </motion.div>
@@ -435,14 +446,14 @@ export default function FoodDetails() {
                 </div>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleAddToCart}
                   className="btn-primary flex items-center gap-2 text-sm"
-                ><FiShoppingCart size={16} /> Add to Cart</motion.button>
+                ><FiShoppingCart size={16} /> {t('foodDetails.addToCart')}</motion.button>
               </motion.div>
 
               {/* Special Instructions */}
               <motion.div {...fadeUp} transition={{ delay: 0.4 }}>
-                <SectionTitle icon={FiInfo} title="Special Instructions" dark={d} />
+                <SectionTitle icon={FiInfo} title={t('foodDetails.specialInstructions')} dark={d} />
                 <textarea value={specialInstructions} onChange={(e) => setSpecialInstructions(e.target.value)}
-                  placeholder="Any allergies or special requests?"
+                  placeholder={t('foodDetails.specialInstructionsPlaceholder')}
                   className={`w-full h-20 resize-none rounded-xl p-3.5 text-xs transition-all ${
                     d ? 'bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20' : 'bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20'
                   }`}
@@ -459,7 +470,7 @@ export default function FoodDetails() {
                   }`}
                 >
                   <FiMapPin size={22} />
-                  Dine Here
+                  {t('foodDetails.dineHere')}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -469,7 +480,7 @@ export default function FoodDetails() {
                   }`}
                 >
                   <FiPackage size={22} />
-                  Take Away
+                  {t('foodDetails.takeAway')}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -479,7 +490,7 @@ export default function FoodDetails() {
                   }`}
                 >
                   <FiTruck size={22} />
-                  Delivery
+                  {t('foodDetails.delivery')}
                 </motion.button>
               </motion.div>
             </motion.div>
@@ -492,7 +503,7 @@ export default function FoodDetails() {
                 <div className={`p-3 rounded-xl ${d ? 'bg-primary-500/10' : 'bg-primary-100'}`}>
                   <FiStar className={`${d ? 'text-primary-400' : 'text-primary-600'}`} size={20} />
                 </div>
-                <h2 className={`text-2xl font-bold ${d ? 'text-white' : 'text-gray-900'}`}>Similar Items</h2>
+                <h2 className={`text-2xl font-bold ${d ? 'text-white' : 'text-gray-900'}`}>{t('foodDetails.relatedItems')}</h2>
                 <div className={`flex-1 h-px ml-3 ${d ? 'bg-white/5' : 'bg-gray-200'}`} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

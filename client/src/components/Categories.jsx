@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight, FiShoppingCart } from 'react-icons/fi';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORY_ICONS = {
   'Fast Food': '🍟', 'Burgers': '🍔', 'Pizza': '🍕', 'Chicken': '🍗',
@@ -19,6 +20,7 @@ const CATEGORY_FALLBACK = [
 ];
 
 export default function Categories() {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef(null);
@@ -81,9 +83,9 @@ export default function Categories() {
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-            Explore <span className="text-primary-500">Categories</span>
+            {t('home.howItWorks')} <span className="text-primary-500">{t('menu.categories')}</span>
           </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Choose from our most popular food categories</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">{t('home.featuredDishes')}</p>
         </div>
 
         <div className="relative">
@@ -132,7 +134,7 @@ export default function Categories() {
 
         <div className="text-center mt-8">
           <Link to="/menu" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl shadow-lg transition-colors">
-            View All Categories <FiChevronRight size={16} />
+            {t('common.viewAll')} <FiChevronRight size={16} />
           </Link>
         </div>
       </div>

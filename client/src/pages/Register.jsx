@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { FiMail, FiLock, FiUser, FiPhone, FiArrowRight, FiEye, FiEyeOff, FiCheck, FiSun, FiMoon } from 'react-icons/fi';
 
-const PasswordStrength = ({ password, darkMode }) => {
+const PasswordStrength = ({ password, darkMode, t }) => {
   const getStrength = (pwd) => {
     if (!pwd) return 0;
     let score = 0;
@@ -18,7 +19,7 @@ const PasswordStrength = ({ password, darkMode }) => {
   };
 
   const strength = getStrength(password);
-  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Excellent'];
+  const labels = ['', t('auth.weak'), t('auth.fair'), t('auth.good'), t('auth.strong'), t('auth.excellent')];
   const colors = ['', 'bg-red-500', 'bg-primary-500', 'bg-yellow-500', 'bg-green-500', 'bg-indigo-500'];
 
   return (
@@ -32,7 +33,7 @@ const PasswordStrength = ({ password, darkMode }) => {
       </div>
       {password && (
         <p className={`text-xs ${strength >= 4 ? 'text-indigo-500' : strength >= 2 ? 'text-yellow-500' : 'text-red-500'}`}>
-          {labels[strength]} password
+          {labels[strength]} {t('auth.password')}
         </p>
       )}
     </div>
@@ -40,6 +41,7 @@ const PasswordStrength = ({ password, darkMode }) => {
 };
 
 export default function Register() {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -60,17 +62,17 @@ export default function Register() {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDoNotMatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordMinLength'));
       return;
     }
 
     if (!acceptedTerms) {
-      setError('Please accept the terms and conditions');
+      setError(t('auth.acceptTerms'));
       return;
     }
 
@@ -79,7 +81,7 @@ export default function Register() {
       await register(name, email, password, phone);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || t('auth.registrationFailed'));
     } finally {
       setLoading(false);
     }
@@ -131,7 +133,7 @@ export default function Register() {
               transition={{ delay: 0.4 }}
               className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}
             >
-              Join <span className="text-indigo-600">Nile Food</span>
+              {t('auth.join')} <span className="text-indigo-600">Nile Food</span>
             </motion.h1>
             <motion.p
               initial={{ y: 20, opacity: 0 }}
@@ -139,7 +141,7 @@ export default function Register() {
               transition={{ delay: 0.6 }}
               className={`text-lg max-w-sm mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
             >
-              Create your account and start ordering delicious meals today
+              {t('auth.joinSubtitle')}
             </motion.p>
           </motion.div>
 
@@ -151,9 +153,9 @@ export default function Register() {
             className="mt-12 space-y-4 w-full max-w-sm"
           >
             {[
-              { icon: '🎁', title: 'Exclusive Offers', desc: 'Get special discounts on your first order' },
-              { icon: '📱', title: 'Easy Ordering', desc: 'Order in just a few taps' },
-              { icon: '🚚', title: 'Free Delivery', desc: 'Free shipping on orders over $20' },
+              { icon: '🎁', title: t('auth.exclusiveOffers'), desc: t('auth.getSpecialDiscounts') },
+              { icon: '📱', title: t('auth.easyOrdering'), desc: t('auth.orderInFewTaps') },
+              { icon: '🚚', title: t('auth.freeDelivery'), desc: t('auth.freeShipping') },
             ].map((benefit, i) => (
               <motion.div
                 key={benefit.title}
@@ -207,8 +209,8 @@ export default function Register() {
                 <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nile Food</span>
               </div>
 
-              <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Create Account</h2>
-              <p className={`mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Join us for an amazing food experience</p>
+              <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{t('auth.createAccount')}</h2>
+              <p className={`mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t('auth.joinSubtitle2')}</p>
 
               <AnimatePresence>
                 {error && (
@@ -225,12 +227,12 @@ export default function Register() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Full Name</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.name')}</label>
                   <div className="relative">
                     <FiUser className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type="text" value={name} onChange={(e) => setName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder={t('auth.namePlaceholder')}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -238,12 +240,12 @@ export default function Register() {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email Address</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.email')}</label>
                   <div className="relative">
                     <FiMail className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -252,25 +254,25 @@ export default function Register() {
 
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Phone Number <span className={`font-normal ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>(optional)</span>
+                    {t('auth.phone')} <span className={`font-normal ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>({t('auth.optional')})</span>
                   </label>
                   <div className="relative">
                     <FiPhone className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
+                      placeholder={t('auth.phonePlaceholder')}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Password</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.password')}</label>
                   <div className="relative">
                     <FiLock className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Create a strong password"
+                      placeholder={t('auth.passwordPlaceholderRegister')}
                       className={`w-full pl-12 pr-12 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -278,16 +280,16 @@ export default function Register() {
                       {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                     </button>
                   </div>
-                  <PasswordStrength password={password} darkMode={darkMode} />
+                  <PasswordStrength password={password} darkMode={darkMode} t={t} />
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Confirm Password</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.confirmPassword')}</label>
                   <div className="relative">
                     <FiLock className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type={showConfirmPassword ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm your password"
+                      placeholder={t('auth.confirmPasswordPlaceholder')}
                       className={`w-full pl-12 pr-12 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -296,10 +298,10 @@ export default function Register() {
                     </button>
                   </div>
                   {confirmPassword && password !== confirmPassword && (
-                    <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
+                    <p className="text-xs text-red-500 mt-1">{t('auth.passwordsDoNotMatch')}</p>
                   )}
                   {confirmPassword && password === confirmPassword && (
-                    <p className="text-xs text-indigo-500 mt-1 flex items-center gap-1"><FiCheck size={12} /> Passwords match</p>
+                    <p className="text-xs text-indigo-500 mt-1 flex items-center gap-1"><FiCheck size={12} /> {t('auth.passwordsMatch')}</p>
                   )}
                 </div>
 
@@ -310,7 +312,7 @@ export default function Register() {
                     </div>
                   </button>
                   <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    I agree to the <Link to="/terms" className="text-indigo-600 hover:text-indigo-500">Terms of Service</Link> and <Link to="/privacy" className="text-indigo-600 hover:text-indigo-500">Privacy Policy</Link>
+                    {t('auth.termsAndConditions')}
                   </p>
                 </div>
 
@@ -325,7 +327,7 @@ export default function Register() {
                     <motion.div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
                   ) : (
                     <>
-                      Create Account
+                      {t('auth.createAccount')}
                       <FiArrowRight size={18} />
                     </>
                   )}
@@ -333,9 +335,9 @@ export default function Register() {
               </form>
 
               <p className={`text-center mt-8 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Already have an account?{' '}
+                {t('auth.hasAccount')}{' '}
                 <Link to="/login" className="text-indigo-600 hover:text-indigo-500 font-semibold">
-                  Sign In
+                  {t('auth.signIn')}
                 </Link>
               </p>
             </motion.div>

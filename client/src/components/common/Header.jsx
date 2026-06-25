@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiShoppingCart, FiSearch, FiUser, FiMenu, FiX, FiSun, FiMoon, FiMapPin } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import NotificationBell from './NotificationBell';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 export default function Header() {
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
@@ -42,12 +45,16 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          <Link to="/menu" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">Menu</Link>
-          <Link to="/menu?category=featured" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">Featured</Link>
-          <Link to="/select-table" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">Order at Table</Link>
+          <Link to="/menu" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">{t('nav.menu')}</Link>
+          <Link to="/menu?category=featured" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">{t('home.featuredDishes')}</Link>
+          <Link to="/select-table" className="text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">{t('tableOrder.table')} {t('tableOrder.title')}</Link>
         </nav>
 
         <div className="flex items-center gap-4">
+          <LanguageSwitcher
+            dark={darkMode}
+            btnBase="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/20 flex items-center justify-center text-gray-600 dark:text-white/80 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-all duration-200"
+          />
           <NotificationBell />
           <button
             onClick={toggleDarkMode}
@@ -75,7 +82,7 @@ export default function Header() {
             </Link>
           ) : (
             <Link to="/login" className="hidden sm:flex btn-primary">
-              Sign In
+              {t('nav.signIn')}
             </Link>
           )}
 
@@ -97,16 +104,16 @@ export default function Header() {
             className="md:hidden mt-4 mx-4 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700/50 shadow-xl"
           >
             <nav className="flex flex-col p-4 gap-4">
-              <Link to="/menu" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">Menu</Link>
-              <Link to="/menu?category=featured" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">Featured</Link>
-              <Link to="/select-table" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">Order at Table</Link>
-              <Link to="/cart" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">Cart ({cartCount})</Link>
+              <Link to="/menu" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">{t('nav.menu')}</Link>
+              <Link to="/menu?category=featured" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">{t('home.featuredDishes')}</Link>
+              <Link to="/select-table" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">{t('tableOrder.table')} {t('tableOrder.title')}</Link>
+              <Link to="/cart" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">{t('nav.cart')} ({cartCount})</Link>
               {user ? (
                 <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 text-left font-medium">
-                  Sign Out
+                  {t('dashboard.signOut')}
                 </button>
               ) : (
-                <Link to="/login" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">Sign In</Link>
+                <Link to="/login" className="text-gray-700 dark:text-white/80 hover:text-gray-900 dark:hover:text-white transition-colors py-2 font-medium">{t('nav.signIn')}</Link>
               )}
             </nav>
           </motion.div>

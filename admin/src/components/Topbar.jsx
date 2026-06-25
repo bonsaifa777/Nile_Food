@@ -65,7 +65,7 @@ export default function Topbar({ toggleSidebar, sidebarOpen }) {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
       const { io } = await import('socket.io-client');
-      socket = io(import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin, {
+      socket = io(import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin, {
         auth: { token },
         transports: ['websocket', 'polling'],
       });

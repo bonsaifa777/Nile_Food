@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowRight, FiX } from 'react-icons/fi';
 import { FiSearch, FiMessageSquare, FiZap } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 const sampleRecommendations = [
   { id: 1, name: 'Spicy Burger', category: 'Burgers', price: 12.99, rating: 4.8, emoji: '🍔', reason: 'Popular right now' },
@@ -12,10 +13,11 @@ const sampleRecommendations = [
 ];
 
 export default function AIRecommendation() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'ai', text: 'Hi! What are you craving today? I can help you find the perfect meal.' }
+    { role: 'ai', text: t('home.whatCraving') }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -27,7 +29,7 @@ export default function AIRecommendation() {
     setIsTyping(true);
     
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Great choice! Based on your preference, I recommend our featured dishes. Check out the recommendations below!' }]);
+      setMessages(prev => [...prev, { role: 'ai', text: t('home.aiRecommendation') }]);
       setIsTyping(false);
     }, 1500);
   };
@@ -57,13 +59,13 @@ export default function AIRecommendation() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 font-semibold text-sm mb-6"
           >
             <FiZap size={16} />
-            AI-Powered
+            {t('home.aiRecommendation')}
           </motion.div>
           <h2 className="text-5xl md:text-6xl font-black mb-6 bg-gradient-to-r from-gray-900 via-indigo-700 to-gray-900 dark:from-white dark:via-indigo-400 dark:to-white bg-clip-text text-transparent">
-            Smart Recommendations
+            {t('home.aiRecommendation')}
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            Our AI learns your preferences and suggests dishes you will love
+            {t('home.aiRecommendation')}
           </p>
         </motion.div>
 
@@ -82,7 +84,7 @@ export default function AIRecommendation() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ask AI: What should I eat today?"
+                  placeholder={t('home.whatCraving')}
                   className="w-full pl-14 pr-6 py-5 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-white placeholder-gray-400 font-medium"
                 />
                 <motion.button
@@ -90,7 +92,7 @@ export default function AIRecommendation() {
                   whileTap={{ scale: 0.95 }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl text-sm"
                 >
-                  Ask AI
+                  {t('home.askAI')}
                 </motion.button>
               </div>
             </motion.div>
@@ -130,7 +132,7 @@ export default function AIRecommendation() {
                           whileInView={{ opacity: 1, width: 'auto' }}
                           className="inline-block px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-semibold"
                         >
-                          {item.reason}
+                          {t(item.reason)}
                         </motion.span>
                       </div>
                     </div>
@@ -162,10 +164,10 @@ export default function AIRecommendation() {
                     <FiMessageSquare size={20} className="text-white" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white">Nile Food AI</h3>
+                    <h3 className="font-bold text-white">{t('home.aiRecommendation')}</h3>
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                      <span className="text-xs text-indigo-200">Online</span>
+                      <span className="text-xs text-indigo-200">{t('home.askAI')}</span>
                     </div>
                   </div>
                 </div>
@@ -225,7 +227,7 @@ export default function AIRecommendation() {
                           value={inputMessage}
                           onChange={(e) => setInputMessage(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                          placeholder="Type a message..."
+                          placeholder={t('home.whatCraving')}
                           className="flex-1 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 dark:text-white"
                         />
                         <motion.button
@@ -234,7 +236,7 @@ export default function AIRecommendation() {
                           onClick={handleSend}
                           className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold"
                         >
-                          Send
+                          {t('common.submit')}
                         </motion.button>
                       </div>
                     </div>
@@ -244,14 +246,14 @@ export default function AIRecommendation() {
 
               {!isChatOpen && (
                 <div className="p-5 text-center">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Ask our AI for personalized food recommendations</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('home.whatCraving')}</p>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsChatOpen(true)}
                     className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors"
                   >
-                    Start Chat
+                    {t('home.askAI')}
                   </motion.button>
                 </div>
               )}

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { FiX } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function QRCodeButton() {
   const [open, setOpen] = useState(false);
@@ -14,6 +15,8 @@ export default function QRCodeButton() {
       color: { dark: '#0f172a', light: '#ffffff' },
     }).then(setQrDataUrl);
   }, []);
+
+  const { t } = useTranslation();
 
   return (
     <>
@@ -32,7 +35,7 @@ export default function QRCodeButton() {
           <line x1="14" y1="17" x2="21" y2="17" />
           <line x1="10" y1="21" x2="21" y2="21" />
         </svg>
-        <span className="text-sm font-semibold">Scan QR Code</span>
+        <span className="text-sm font-semibold">{t('qrCode.scanQRCode')}</span>
       </button>
 
       <AnimatePresence>
@@ -58,13 +61,13 @@ export default function QRCodeButton() {
                 <FiX size={20} />
               </button>
 
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Nile Cafe.</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">Scan for Menu</p>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t('qrCode.title')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">{t('qrCode.scanForMenu')}</p>
 
               {qrDataUrl && (
                 <img
                   src={qrDataUrl}
-                  alt="QR Code for Nile Cafe Menu"
+                  alt={t('qrCode.alt')}
                   className="mx-auto rounded-lg"
                   width={250}
                   height={250}
@@ -72,7 +75,7 @@ export default function QRCodeButton() {
               )}
 
               <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-                Point your camera at the QR code to view the menu
+                {t('qrCode.instruction')}
               </p>
             </motion.div>
           </motion.div>

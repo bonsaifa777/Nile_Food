@@ -1,8 +1,10 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FiArrowRight, FiSmartphone, FiDownload } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 
 export default function AppCTA() {
+  const { t } = useTranslation();
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
@@ -50,11 +52,11 @@ export default function AppCTA() {
             </motion.div>
 
             <h2 className="text-5xl md:text-6xl font-black text-white mb-6 leading-tight">
-              Get the App
-              <span className="block text-indigo-200">Experience More</span>
+              {t('home.appCTA')}
+              <span className="block text-indigo-200">{t('home.appCTAText')}</span>
             </h2>
             <p className="text-xl text-indigo-200 mb-10 leading-relaxed max-w-lg">
-              Download our app for exclusive deals, faster checkout, and real-time order tracking on the go.
+              {t('home.appCTAText')}
             </p>
 
             <div className="flex flex-wrap gap-4 mb-10">
@@ -65,7 +67,7 @@ export default function AppCTA() {
               >
                 <FiDownload size={24} />
                 <div className="text-left">
-                  <div className="text-xs text-gray-500 font-medium">Download on</div>
+                  <div className="text-xs text-gray-500 font-medium">{t('common.getStarted')}</div>
                   <div className="text-lg font-black">App Store</div>
                 </div>
               </motion.button>
@@ -77,7 +79,7 @@ export default function AppCTA() {
               >
                 <FiDownload size={24} />
                 <div className="text-left">
-                  <div className="text-xs text-indigo-200 font-medium">Get it on</div>
+                  <div className="text-xs text-indigo-200 font-medium">{t('common.getStarted')}</div>
                   <div className="text-lg font-black">Google Play</div>
                 </div>
               </motion.button>
@@ -86,9 +88,9 @@ export default function AppCTA() {
             {/* Stats */}
             <div className="flex gap-10">
               {[
-                { value: '100K+', label: 'Downloads' },
-                { value: '4.9', label: 'App Rating' },
-                { value: '50K+', label: 'Active Users' },
+                { value: '100K+', label: t('home.appCTAText') },
+                { value: '4.9', label: t('home.appCTAText') },
+                { value: '50K+', label: t('home.appCTAText') },
               ].map((stat, index) => (
                 <motion.div
                   key={index}
@@ -133,7 +135,7 @@ export default function AppCTA() {
                   {/* Search */}
                   <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-3 mb-6 flex items-center gap-3">
                     <div className="w-5 h-5 border-2 border-white/60 rounded-sm" />
-                    <span className="text-white/60 text-sm">Search food...</span>
+                    <span className="text-white/60 text-sm">{t('common.search')}</span>
                   </div>
 
                   {/* Categories */}
@@ -191,8 +193,8 @@ export default function AppCTA() {
                     <span className="text-sm">🔔</span>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Order</div>
-                    <div className="text-sm font-bold text-gray-900">Delivered!</div>
+                    <div className="text-xs text-gray-500">{t('orders.title')}</div>
+                    <div className="text-sm font-bold text-gray-900">{t('home.deliveryExperience')}</div>
                   </div>
                 </div>
               </motion.div>
@@ -207,7 +209,7 @@ export default function AppCTA() {
                     <span className="text-sm">💰</span>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Saved</div>
+                    <div className="text-xs text-gray-500">{t('common.save')}</div>
                     <div className="text-sm font-bold text-indigo-600">$24.50</div>
                   </div>
                 </div>

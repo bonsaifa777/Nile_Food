@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -17,12 +18,12 @@ import {
 } from 'lucide-react';
 
 const statusSteps = [
-  { key: 'pending', label: 'Order Placed', icon: Clock, color: '#6366f1' },
-  { key: 'confirmed', label: 'Confirmed', icon: Check, color: '#8b5cf6' },
-  { key: 'preparing', label: 'Preparing', icon: ChefHat, color: '#f59e0b' },
-  { key: 'ready', label: 'Ready', icon: Utensils, color: '#10b981' },
-  { key: 'on_the_way', label: 'On the Way', icon: Navigation, color: '#06b6d4' },
-  { key: 'delivered', label: 'Delivered', icon: PartyPopper, color: '#22c55e' },
+  { key: 'pending', labelKey: 'orderPlaced', label: 'Order Placed', icon: Clock, color: '#6366f1' },
+  { key: 'confirmed', labelKey: 'confirmed', label: 'Confirmed', icon: Check, color: '#8b5cf6' },
+  { key: 'preparing', labelKey: 'preparing', label: 'Preparing', icon: ChefHat, color: '#f59e0b' },
+  { key: 'ready', labelKey: 'ready', label: 'Ready', icon: Utensils, color: '#10b981' },
+  { key: 'on_the_way', labelKey: 'onTheWay', label: 'On the Way', icon: Navigation, color: '#06b6d4' },
+  { key: 'delivered', labelKey: 'delivered', label: 'Delivered', icon: PartyPopper, color: '#22c55e' },
 ];
 
 function FoodParticles({ mouse }) {
@@ -115,14 +116,14 @@ function AnimatedCounter({ value, style }) {
   return <span style={style}>{display}</span>;
 }
 
-function TimeElapsed({ createdAt }) {
+function TimeElapsed({ createdAt, t }) {
   const [elapsed, setElapsed] = useState('');
   useEffect(() => {
     const update = () => {
       const diff = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000);
-      if (diff < 1) setElapsed('Just now');
-      else if (diff < 60) setElapsed(`${diff}m ago`);
-      else setElapsed(`${Math.floor(diff / 60)}h ${diff % 60}m ago`);
+      if (diff < 1) setElapsed(t('orderTracking.justNow'));
+      else if (diff < 60) setElapsed(`${diff}${t('orderTracking.minutesAgo')}`);
+      else setElapsed(`${Math.floor(diff / 60)}${t('orderTracking.hoursAgo')} ${diff % 60}${t('orderTracking.minutesAgo')}`);
     };
     update();
     const interval = setInterval(update, 30000);
@@ -131,7 +132,7 @@ function TimeElapsed({ createdAt }) {
   return <span>{elapsed}</span>;
 }
 
-function StatusTimeline({ currentIndex, status }) {
+function StatusTimeline({ currentIndex, status, t }) {
   return (
     <div className="relative py-8">
       {/* Progress line with gradient glow */}
@@ -193,7 +194,7 @@ function StatusTimeline({ currentIndex, status }) {
                     isComplete ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'
                   }`}
                 >
-                  Served
+                  {t('orderTracking.served')}
                 </motion.p>
               </div>
             );
@@ -255,7 +256,7 @@ function StatusTimeline({ currentIndex, status }) {
                   isCurrent ? 'text-gray-900 dark:text-white' : isComplete ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500'
                 }`}
               >
-                {step.label}
+                {t('orderTracking.' + step.labelKey)}
               </motion.p>
             </div>
           );
@@ -303,7 +304,7 @@ function OrderItem({ item, index }) {
             )}
             {item.extras?.length > 0 && (
               <span className="text-xs text-gray-400 dark:text-white/40">
-                +{item.extras.length} extras
+                +{item.extras.length} {t('orderTracking.extras')}
               </span>
             )}
           </div>
@@ -402,6 +403,7 @@ function ConfettiOverlay() {
 }
 
 export default function OrderTracking() {
+  const { t } = useTranslation();
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -428,7 +430,7 @@ export default function OrderTracking() {
     socket.on('order_update', (updatedOrder) => {
       setOrder(updatedOrder);
       if (updatedOrder.status === 'ready') {
-        toast.success('Your order is ready! Enjoy your meal!', {
+        toast.success(t('orderTracking.orderReady'), {
           duration: 6000,
           icon: '🍽️',
           style: { background: '#10b981', color: '#fff', borderRadius: '16px', padding: '16px 24px', fontWeight: 600 },
@@ -437,10 +439,10 @@ export default function OrderTracking() {
         setTimeout(() => setShowConfetti(false), 5000);
       }
       if (updatedOrder.status === 'on_the_way') {
-        toast.success('Your driver is on the way!', { duration: 5000 });
+        toast.success(t('orderTracking.driverOnWay'), { duration: 5000 });
       }
       if (updatedOrder.status === 'delivered') {
-        toast.success('Food delivered! Enjoy your meal!', { duration: 5000 });
+        toast.success(t('orderTracking.foodDelivered'), { duration: 5000 });
       }
     });
 
@@ -459,7 +461,7 @@ export default function OrderTracking() {
       const { data } = await axios.get(`/api/orders/${orderId}`);
       setOrder(data.data);
     } catch (error) {
-      toast.error('Order not found');
+      toast.error(t('orderTracking.orderNotFound'));
     } finally {
       setLoading(false);
     }
@@ -469,12 +471,12 @@ export default function OrderTracking() {
     setRating(stars);
     try {
       await axios.put(`/api/orders/${order._id}/review`, { rating: stars, review: '' });
-      toast.success('Thanks for your review!', {
+      toast.success(t('orderTracking.reviewSubmitted'), {
         duration: 3000,
         icon: '🌟',
       });
     } catch (error) {
-      toast.error('Failed to submit review');
+      toast.error(t('orderTracking.reviewFailed'));
     }
   };
 
@@ -496,10 +498,10 @@ export default function OrderTracking() {
         <div className="w-24 h-24 rounded-3xl bg-red-500/10 mx-auto mb-6 flex items-center justify-center">
           <Utensils size={40} className="text-red-500 dark:text-red-400" />
         </div>
-        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Order Not Found</h2>
-        <p className="text-gray-500 dark:text-gray-400 mb-8">This order doesn't exist or has been removed.</p>
+        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2">{t('orderTracking.orderNotFound')}</h2>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">{t('orderTracking.orderNotFoundDesc')}</p>
         <Link to="/menu" className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold shadow-2xl shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all hover:scale-105">
-          <ShoppingBag size={18} /> Browse Menu
+          <ShoppingBag size={18} /> {t('orderTracking.browseMenu')}
         </Link>
       </motion.div>
     </div>
@@ -511,7 +513,7 @@ export default function OrderTracking() {
   const isReady = order.status === 'ready' || order.status === 'served';
 
   const dineInSteps = statusSteps.filter(s => s.key !== 'on_the_way' && s.key !== 'delivered');
-  dineInSteps.push({ key: 'served', label: 'Served', icon: PartyPopper, color: '#22c55e' });
+  dineInSteps.push({ key: 'served', labelKey: 'served', label: 'Served', icon: PartyPopper, color: '#22c55e' });
   const dineInIndex = dineInSteps.findIndex(s => {
     if (s.key === 'served') return order.status === 'delivered' || order.status === 'served' || order.status === 'ready';
     return s.key === order.status;
@@ -545,7 +547,7 @@ export default function OrderTracking() {
               transition={{ delay: 0.2 }}
             >
               <Sparkle size={12} />
-              {isDineIn ? 'Dine In Experience' : 'Delivery Tracking'}
+              {isDineIn ? t('orderTracking.dineInExperience') : t('orderTracking.deliveryTracking')}
             </motion.div>
 
             <motion.h1
@@ -565,7 +567,7 @@ export default function OrderTracking() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
             >
-              <TimeElapsed createdAt={order.createdAt} />
+              <TimeElapsed createdAt={order.createdAt} t={t} />
             </motion.p>
 
             <motion.div
@@ -586,7 +588,7 @@ export default function OrderTracking() {
                 }}
               >
                 {isDelivered ? <PartyPopper size={16} /> : <Zap size={16} />}
-                {isDelivered ? 'Completed' : `${statusSteps[currentIndex]?.label || 'Processing'}`}
+                {isDelivered ? t('orderTracking.completed') : t('orderTracking.' + (statusSteps[currentIndex]?.labelKey || 'processing'))}
               </motion.div>
             </motion.div>
           </motion.div>
@@ -612,7 +614,7 @@ export default function OrderTracking() {
                       <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
                         <Timer size={20} className="text-indigo-600 dark:text-indigo-400" />
                       </div>
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Order Progress</h2>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('orderTracking.orderProgress')}</h2>
                     </div>
                     <motion.div
                       className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2"
@@ -625,11 +627,11 @@ export default function OrderTracking() {
                       transition={{ duration: 2, repeat: Infinity }}
                     >
                       <Clock size={14} />
-                      <TimeElapsed createdAt={order.createdAt} />
+                      <TimeElapsed createdAt={order.createdAt} t={t} />
                     </motion.div>
                   </div>
 
-                  <StatusTimeline currentIndex={isDineIn ? dineInIndex : currentIndex} status={order.type} />
+                  <StatusTimeline currentIndex={isDineIn ? dineInIndex : currentIndex} status={order.type} t={t} />
                 </div>
               </motion.div>
 
@@ -665,11 +667,11 @@ export default function OrderTracking() {
                         <Utensils size={28} className="text-emerald-600 dark:text-emerald-400" />
                       </motion.div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Dine In</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('orderTracking.dineIn')}</h3>
                         {order.table && (
                           <div className="flex items-center gap-2 mt-1">
                             <MapPin size={14} className="text-emerald-600 dark:text-emerald-400" />
-                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Table {order.table.tableNumber || order.table}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{t('orderTracking.table')} {order.table.tableNumber || order.table}</span>
                           </div>
                         )}
                       </div>
@@ -683,10 +685,10 @@ export default function OrderTracking() {
 
                     <div className="grid grid-cols-2 gap-4">
                       {[
-                        { label: 'Status', value: isReady ? 'Ready to Serve' : 'In Progress', color: isReady ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' },
-                        { label: 'Items', value: order.items?.length || 0, color: 'text-gray-900 dark:text-white' },
-                        { label: 'Total', value: `ETB ${order.total?.toFixed(2)}`, color: 'text-indigo-600 dark:text-indigo-400' },
-                        { label: 'Payment', value: order.type === 'dine_in' || order.type === 'takeaway' ? 'Unpaid' : order.paymentStatus || 'Cash', color: order.type === 'dine_in' || order.type === 'takeaway' ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400' },
+                        { label: t('orderTracking.status'), value: isReady ? t('orderTracking.readyToServe') : t('orderTracking.inProgress'), color: isReady ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400' },
+                        { label: t('orderTracking.items'), value: order.items?.length || 0, color: 'text-gray-900 dark:text-white' },
+                        { label: t('orderTracking.total'), value: `ETB ${order.total?.toFixed(2)}`, color: 'text-indigo-600 dark:text-indigo-400' },
+                        { label: t('orderTracking.payment'), value: order.type === 'dine_in' || order.type === 'takeaway' ? t('orderTracking.unpaid') : order.paymentStatus || t('orderTracking.cash'), color: order.type === 'dine_in' || order.type === 'takeaway' ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400' },
                       ].map((stat, i) => (
                         <motion.div
                           key={stat.label}
@@ -721,8 +723,8 @@ export default function OrderTracking() {
                         </motion.div>
                         <div className="flex-1">
                           <div className="flex justify-between items-center mb-2">
-                            <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">Preparing your meal</p>
-                            <span className="text-xs text-amber-600/60 dark:text-amber-400/60">Almost ready</span>
+                            <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('orderTracking.preparingMeal')}</p>
+                            <span className="text-xs text-amber-600/60 dark:text-amber-400/60">{t('orderTracking.almostReady')}</span>
                           </div>
                           <div className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
                             <motion.div
@@ -755,8 +757,8 @@ export default function OrderTracking() {
                           <PartyPopper size={20} className="text-emerald-600 dark:text-emerald-400" />
                         </motion.div>
                         <div>
-                          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">Your meal is ready!</p>
-                          <p className="text-xs text-emerald-600/60 dark:text-emerald-400/60 mt-0.5">Please collect from the counter</p>
+                          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{t('orderTracking.mealReady')}</p>
+                          <p className="text-xs text-emerald-600/60 dark:text-emerald-400/60 mt-0.5">{t('orderTracking.pleaseCollect')}</p>
                         </div>
                       </motion.div>
                     )}
@@ -782,10 +784,10 @@ export default function OrderTracking() {
                         <Navigation size={28} className="text-cyan-600 dark:text-cyan-400" />
                       </motion.div>
                       <div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Driver on the way!</h3>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('orderTracking.driverOnWay')}</h3>
                         {order.estimatedDeliveryTime && (
                           <p className="text-cyan-600 dark:text-cyan-400 text-sm font-semibold mt-1">
-                            ~{order.estimatedDeliveryTime} min remaining
+                            ~{order.estimatedDeliveryTime} {t('orderTracking.minRemaining')}
                           </p>
                         )}
                       </div>
@@ -799,7 +801,7 @@ export default function OrderTracking() {
                           >
                             <Navigation size={18} className="text-cyan-600 dark:text-cyan-400" />
                           </motion.div>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">Driver is nearby</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('orderTracking.driverNearby')}</p>
                         </div>
                         <div className="h-40 rounded-2xl flex items-center justify-center relative overflow-hidden"
                           style={{ background: 'linear-gradient(135deg, rgba(6,182,212,0.1), rgba(99,102,241,0.05))' }}>
@@ -820,7 +822,7 @@ export default function OrderTracking() {
                             transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
                           />
                           <Navigation size={32} className="text-cyan-600 dark:text-cyan-400 relative z-10" />
-                          <p className="absolute bottom-4 text-xs text-gray-400 dark:text-white/40">Live tracking</p>
+                          <p className="absolute bottom-4 text-xs text-gray-400 dark:text-white/40">{t('orderTracking.liveTracking')}</p>
                         </div>
                       </div>
                     )}
@@ -840,7 +842,7 @@ export default function OrderTracking() {
                     <MapPin size={22} className="text-indigo-600 dark:text-indigo-400" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">Delivery Address</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-0.5">{t('orderTracking.deliveryAddress')}</p>
                     <p className="font-semibold text-gray-900 dark:text-white">
                       {order.deliveryAddress.address}, {order.deliveryAddress.city}
                     </p>
@@ -866,7 +868,7 @@ export default function OrderTracking() {
                       <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
                         <ShoppingBag size={20} className="text-indigo-600 dark:text-indigo-400" />
                       </div>
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Order Items</h2>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('orderTracking.orderItems')}</h2>
                     </div>
                     <motion.span
                       className="px-3 py-1.5 rounded-xl text-xs font-bold"
@@ -878,7 +880,7 @@ export default function OrderTracking() {
                       animate={{ scale: [1, 1.1, 1] }}
                       transition={{ duration: 0.3 }}
                     >
-                      {order.items?.length} items
+                      {order.items?.length} {t('orderTracking.items').toLowerCase()}
                     </motion.span>
                   </div>
 
@@ -897,23 +899,23 @@ export default function OrderTracking() {
                     style={{ borderTop: '1px solid rgba(156,163,175,0.2)' }}
                   >
                     <div className="flex justify-between text-sm py-1">
-                      <span className="text-gray-400 dark:text-gray-500">Subtotal</span>
+                      <span className="text-gray-400 dark:text-gray-500">{t('orderTracking.subtotal')}</span>
                       <span className="text-gray-900 dark:text-white font-medium">{order.subtotal?.toFixed(2)} ETB</span>
                     </div>
                     {order.deliveryFee > 0 && (
                       <div className="flex justify-between text-sm py-1">
-                        <span className="text-gray-400 dark:text-gray-500">Delivery Fee</span>
+                        <span className="text-gray-400 dark:text-gray-500">{t('orderTracking.deliveryFee')}</span>
                         <span className="text-gray-900 dark:text-white font-medium">{order.deliveryFee?.toFixed(2)} ETB</span>
                       </div>
                     )}
                     {order.discount > 0 && (
                       <div className="flex justify-between text-sm py-1">
-                        <span className="text-emerald-600 dark:text-emerald-400">Discount</span>
+                        <span className="text-emerald-600 dark:text-emerald-400">{t('orderTracking.discount')}</span>
                         <span className="text-emerald-600 dark:text-emerald-400 font-medium">-{order.discount?.toFixed(2)} ETB</span>
                       </div>
                     )}
                     <div className="flex justify-between text-sm py-1">
-                      <span className="text-gray-400 dark:text-gray-500">Tax</span>
+                      <span className="text-gray-400 dark:text-gray-500">{t('orderTracking.tax')}</span>
                       <span className="text-gray-900 dark:text-white font-medium">{order.tax?.toFixed(2)} ETB</span>
                     </div>
 
@@ -921,7 +923,7 @@ export default function OrderTracking() {
                       className="flex justify-between pt-4"
                       style={{ borderTop: '1px solid rgba(156,163,175,0.2)' }}
                     >
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
+                      <span className="text-lg font-bold text-gray-900 dark:text-white">{t('orderTracking.total')}</span>
                       <motion.span
                         className="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent"
                         key={order.total}
@@ -950,8 +952,8 @@ export default function OrderTracking() {
                   >
                     <Star size={28} className="text-amber-600 dark:text-amber-400" />
                   </motion.div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Rate Your Experience</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">How was your meal at Nile Food?</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('orderTracking.rateYourExperience')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{t('orderTracking.howWasMeal')}</p>
                   <RatingStars submitRating={submitRating} rating={rating} existingRating={order.rating} />
                 </motion.div>
               )}
@@ -972,7 +974,7 @@ export default function OrderTracking() {
                     color: '#6366f1',
                   }}
                 >
-                  Order More
+                  {t('orderTracking.orderMore')}
                 </Link>
                 <Link
                   to="/profile?tab=order-status"
@@ -983,7 +985,7 @@ export default function OrderTracking() {
                     boxShadow: '0 0 30px rgba(99,102,241,0.3)',
                   }}
                 >
-                  My Orders
+                  {t('orderTracking.myOrders')}
                 </Link>
               </motion.div>
             </div>

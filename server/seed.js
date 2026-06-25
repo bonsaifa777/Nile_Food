@@ -209,15 +209,6 @@ const tables = [
   { tableNumber: 'T8', category: 'regular', capacity: 8 },
   { tableNumber: 'V1', category: 'vip', capacity: 10 },
   { tableNumber: 'V2', category: 'vip', capacity: 12 },
-  { tableNumber: '101', category: 'room', capacity: 2, floor: '1' },
-  { tableNumber: '102', category: 'room', capacity: 2, floor: '1' },
-  { tableNumber: '103', category: 'room', capacity: 4, floor: '1' },
-  { tableNumber: '201', category: 'room', capacity: 2, floor: '2' },
-  { tableNumber: '202', category: 'room', capacity: 4, floor: '2' },
-  { tableNumber: '203', category: 'room', capacity: 4, floor: '2' },
-  { tableNumber: '301', category: 'room', capacity: 4, floor: '3' },
-  { tableNumber: '302', category: 'room', capacity: 6, floor: '3' },
-  { tableNumber: '303', category: 'room', capacity: 6, floor: '3' },
 ];
 
 async function seed() {

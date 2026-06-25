@@ -2,16 +2,18 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiStar, FiTrendingUp } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 function MostOrderedCard({ food, index = 0 }) {
+  const { t } = useTranslation();
   const { addToCart } = useCart();
 
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
     addToCart(food, 1);
-    toast.success(`${food.name} added to cart!`);
+    toast.success(`${food.name} ${t('cart.addToCart')}`);
   };
 
   return (
@@ -25,7 +27,7 @@ function MostOrderedCard({ food, index = 0 }) {
         <div className="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 relative">
           <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white text-[10px] font-bold rounded-full shadow-md">
             <FiTrendingUp size={12} />
-            <span>{food.orderCount} ordered</span>
+            <span>{food.orderCount} {t('home.mostOrdered')}</span>
           </div>
 
           <div className="relative p-6 pb-0">

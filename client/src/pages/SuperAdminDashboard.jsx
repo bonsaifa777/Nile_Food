@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Loading from '../components/common/Loading';
 import { FiShoppingBag, FiUsers, FiDollarSign, FiClock, FiSettings, FiShield, FiTrendingUp, FiAlertTriangle } from 'react-icons/fi';
 
 export default function SuperAdminDashboard() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function SuperAdminDashboard() {
       setStats(data.data.stats);
       setRecentOrders(data.data.recentOrders || []);
     } catch (error) {
-      toast.error('Failed to load dashboard data');
+      toast.error(t('admin.dashboardLoadFailed'));
     } finally {
       setLoading(false);
     }
@@ -33,10 +35,10 @@ export default function SuperAdminDashboard() {
   if (loading) return <Loading />;
 
   const statCards = [
-    { title: 'Total Orders', value: stats?.totalOrders || 0, icon: FiShoppingBag, color: 'from-blue-500 to-blue-600', link: '/admin/orders' },
-    { title: 'Revenue', value: `ETB ${(stats?.totalRevenue || 0).toLocaleString()}`, icon: FiDollarSign, color: 'from-green-500 to-green-600', link: '/admin/analytics' },
-    { title: 'Customers', value: stats?.totalUsers || 0, icon: FiUsers, color: 'from-purple-500 to-purple-600', link: '/admin/users' },
-    { title: 'Pending', value: stats?.pendingOrders || 0, icon: FiClock, color: 'from-yellow-500 to-yellow-600', link: '/admin/orders?filter=pending' }
+    { title: t('admin.totalOrders'), value: stats?.totalOrders || 0, icon: FiShoppingBag, color: 'from-blue-500 to-blue-600', link: '/admin/orders' },
+    { title: t('admin.revenue'), value: `ETB ${(stats?.totalRevenue || 0).toLocaleString()}`, icon: FiDollarSign, color: 'from-green-500 to-green-600', link: '/admin/analytics' },
+    { title: t('admin.customers'), value: stats?.totalUsers || 0, icon: FiUsers, color: 'from-purple-500 to-purple-600', link: '/admin/users' },
+    { title: t('admin.pending'), value: stats?.pendingOrders || 0, icon: FiClock, color: 'from-yellow-500 to-yellow-600', link: '/admin/orders?filter=pending' }
   ];
 
   const getStatusColor = (status) => {
@@ -65,9 +67,9 @@ export default function SuperAdminDashboard() {
           >
             <div className="flex items-center gap-3 mb-2">
               <FiShield className="text-primary-500" size={32} />
-              <h1 className="text-4xl font-bold">Super Admin Dashboard</h1>
+              <h1 className="text-4xl font-bold">{t('admin.superAdminDashboard')}</h1>
             </div>
-            <p className="text-white/60">Full system access and management</p>
+            <p className="text-white/60">{t('admin.fullSystemAccess')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -102,16 +104,16 @@ export default function SuperAdminDashboard() {
             >
               <div className="glass-card">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold">Recent Orders</h2>
+                  <h2 className="text-xl font-semibold">{t('admin.recentOrders')}</h2>
                   <Link to="/admin/orders" className="text-primary-500 text-sm hover:underline">
-                    View All
+                    {t('admin.viewAll')}
                   </Link>
                 </div>
 
                 {recentOrders.length === 0 ? (
                   <div className="text-center py-12">
                     <FiShoppingBag className="mx-auto text-white/30 mb-4" size={48} />
-                    <p className="text-white/60">No orders yet</p>
+                    <p className="text-white/60">{t('admin.noOrdersYet')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -148,16 +150,16 @@ export default function SuperAdminDashboard() {
               className="space-y-6"
             >
               <div className="glass-card">
-                <h2 className="text-xl font-semibold mb-6">Super Admin Actions</h2>
+                <h2 className="text-xl font-semibold mb-6">{t('admin.superAdminActions')}</h2>
                 <div className="space-y-2">
                   <Link to="/admin/users" className="btn-ghost w-full flex items-center justify-center gap-2">
-                    <FiUsers /> Manage Admins
+                    <FiUsers /> {t('admin.manageAdmins')}
                   </Link>
                   <Link to="/admin/analytics" className="btn-ghost w-full flex items-center justify-center gap-2">
-                    <FiTrendingUp /> Sales Analytics
+                    <FiTrendingUp /> {t('admin.salesAnalytics')}
                   </Link>
                   <Link to="/admin/settings" className="btn-ghost w-full flex items-center justify-center gap-2">
-                    <FiSettings /> System Settings
+                    <FiSettings /> {t('admin.systemSettings')}
                   </Link>
                 </div>
               </div>
@@ -165,19 +167,19 @@ export default function SuperAdminDashboard() {
               <div className="glass-card">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                   <FiAlertTriangle className="text-yellow-500" />
-                  System Status
+                  {t('admin.systemStatus')}
                 </h2>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between glass-light rounded-xl p-3">
-                    <span className="text-white/60">Database</span>
-                    <span className="text-green-500 font-semibold">Connected</span>
+                    <span className="text-white/60">{t('admin.database')}</span>
+                    <span className="text-green-500 font-semibold">{t('admin.connected')}</span>
                   </div>
                   <div className="flex items-center justify-between glass-light rounded-xl p-3">
-                    <span className="text-white/60">Payment Gateway</span>
-                    <span className="text-green-500 font-semibold">Active</span>
+                    <span className="text-white/60">{t('admin.paymentGateway')}</span>
+                    <span className="text-green-500 font-semibold">{t('admin.active')}</span>
                   </div>
                   <div className="flex items-center justify-between glass-light rounded-xl p-3">
-                    <span className="text-white/60">Total Users</span>
+                    <span className="text-white/60">{t('admin.totalUsers')}</span>
                     <span className="font-semibold">{stats?.totalUsers || 0}</span>
                   </div>
                 </div>

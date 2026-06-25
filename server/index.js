@@ -57,7 +57,7 @@ const allowedOrigins = isOffline
   ? '*'
   : process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map(s => s.trim())
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5001'];
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5002'];
 
 const io = new Server(httpServer, {
   cors: {
@@ -183,7 +183,7 @@ mongoose.connect(MONGODB_URI)
     process.exit(1);
   });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 
 httpServer.listen(PORT, '0.0.0.0', () => {
   const interfaces = os.networkInterfaces();

@@ -1,28 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { FiPlay, FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { useRef, useCallback } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
-const DEFAULT_HERO = {
-  title: 'Fastest Delivery & Easy Pickup.',
-  subtitle: 'Grocen ensures fresh grocery every morning to your family without getting out in this pandemic.',
-  badge: 'Bike Delivery',
-  cta: { label: 'Order Now', link: '/menu' },
-  secondaryCta: { label: 'Order Process', link: '#' },
-  quote: { text: 'When you are too lazy to cook,\nwe are just a click away!', author: 'Chef' },
-  images: {
-    main: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
-    chef: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&q=80',
-    floating: [
-      { image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=100&h=100&fit=crop&q=80', label: 'Pasta' },
-      { image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=100&h=100&fit=crop&q=80', label: 'Steak' },
-      { image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=100&h=100&fit=crop&q=80', label: 'Ramen' },
-      { image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=100&h=100&fit=crop&q=80', label: 'Tacos' },
-      { image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100&h=100&fit=crop&q=80', label: 'Pancakes' },
-    ]
-  }
+const HERO_IMAGES = {
+  main: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
+  chef: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=100&q=80',
+  floating: [
+    { image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=100&h=100&fit=crop&q=80', label: 'home.pasta' },
+    { image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=100&h=100&fit=crop&q=80', label: 'home.steak' },
+    { image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=100&h=100&fit=crop&q=80', label: 'home.ramen' },
+    { image: 'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=100&h=100&fit=crop&q=80', label: 'home.tacos' },
+    { image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=100&h=100&fit=crop&q=80', label: 'home.pancakes' },
+  ]
 };
 
 const FLOATING_POSITIONS = [
@@ -34,6 +26,7 @@ const FLOATING_POSITIONS = [
 ];
 
 export default function Hero() {
+  const { t } = useTranslation();
   const [hero, setHero] = useState(null);
   const containerRef = useRef(null);
   const x = useMotionValue(0);
@@ -48,7 +41,15 @@ export default function Hero() {
       .catch(() => setHero(null));
   }, []);
 
-  const data = hero || DEFAULT_HERO;
+  const data = hero || {
+    title: t('home.heroTitle'),
+    subtitle: t('home.heroSubtitle'),
+    badge: t('home.heroOrderOnline'),
+    cta: { label: t('home.heroCTA'), link: '/menu' },
+    secondaryCta: { label: t('home.heroBookTable'), link: '#' },
+    quote: { text: t('home.deliveryExperience'), author: t('home.chef') },
+    images: HERO_IMAGES,
+  };
   const { images, quote, badge, cta, secondaryCta } = data;
 
   const handleMouseMove = useCallback((e) => {
@@ -104,14 +105,14 @@ export default function Hero() {
               {cta && (
                 <Link to={cta.link || '/menu'}>
                   <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-2 px-8 py-4 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-xl shadow-slate-900/20 transition-colors">
-                    {cta.label || 'Order Now'}
+                    {cta.label || t('home.heroCTA')}
                   </motion.button>
                 </Link>
               )}
               {secondaryCta && (
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex items-center gap-3 px-6 py-4 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-semibold rounded-full shadow-md hover:shadow-lg transition-shadow border border-gray-200 dark:border-slate-700">
                   <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white"><FiPlay size={14} className="ml-0.5" /></div>
-                  {secondaryCta.label || 'Order Process'}
+                  {secondaryCta.label || t('home.heroOrderOnline')}
                 </motion.button>
               )}
             </div>
@@ -146,7 +147,7 @@ export default function Hero() {
             <motion.div style={{ rotateX, rotateY }} className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[450px] lg:h-[450px] xl:w-[500px] xl:h-[500px]">
               <div className="absolute inset-0 bg-white dark:bg-slate-800 rounded-full shadow-2xl shadow-gray-200/50 dark:shadow-black/30 overflow-hidden z-0">
                 {images?.main && (
-                  <img src={images.main} alt="Fast delivery" className="w-full h-full object-cover object-center" />
+                  <img src={images.main} alt={t('home.heroImageAlt')} className="w-full h-full object-cover object-center" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-transparent pointer-events-none" />
               </div>
@@ -162,7 +163,7 @@ export default function Hero() {
                     zIndex: 10 - i,
                   }}
                 >
-                  <img src={food.image} alt={food.label} className="w-full h-full object-cover" />
+                  <img src={food.image} alt={t(food.label)} className="w-full h-full object-cover" />
                   <div className="absolute -top-0.5 -right-0.5 w-5 h-5 sm:w-6 sm:h-6 bg-slate-900 dark:bg-white rounded-full flex items-center justify-center shadow-sm">
                     <FiShoppingCart size={10} className="text-white dark:text-slate-900" />
                   </div>

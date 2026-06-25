@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiShoppingCart, FiX, FiTrash2, FiPlus, FiMinus, FiArrowRight } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 
 export default function FloatingCart() {
+  const { t } = useTranslation();
   const { cart, updateQuantity, removeFromCart, getSubtotal, getTotal, totalItems } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const itemCount = totalItems();
@@ -57,8 +59,8 @@ export default function FloatingCart() {
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Your Cart</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{itemCount} items</p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('cart.title')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{itemCount} {t('cart.items')}</p>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -72,7 +74,7 @@ export default function FloatingCart() {
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <FiShoppingCart size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">Your cart is empty</p>
+                    <p className="text-gray-500 dark:text-gray-400">{t('cart.empty')}</p>
                   </div>
                 ) : (
                   cart.map((item) => (
@@ -123,11 +125,11 @@ export default function FloatingCart() {
               {cart.length > 0 && (
                 <div className="px-6 py-5 border-t border-gray-100 dark:border-slate-800 space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                    <span className="text-gray-500 dark:text-gray-400">{t('cart.subtotal')}</span>
                     <span className="font-semibold text-gray-900 dark:text-white">ETB {getSubtotal().toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500 dark:text-gray-400">Total</span>
+                    <span className="text-gray-500 dark:text-gray-400">{t('cart.total')}</span>
                     <span className="text-lg font-bold text-orange-500">ETB {getTotal().toFixed(2)}</span>
                   </div>
                   <Link
@@ -135,7 +137,7 @@ export default function FloatingCart() {
                     onClick={() => setIsOpen(false)}
                     className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-orange-500/25 transition-all"
                   >
-                    Checkout <FiArrowRight size={16} />
+                    {t('cart.checkout')} <FiArrowRight size={16} />
                   </Link>
                 </div>
               )}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import { useCart } from '../context/CartContext';
@@ -10,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { FiMapPin, FiArrowLeft, FiPlus } from 'react-icons/fi';
 
 export default function BillingAddress() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { cart, getSubtotal, getDeliveryFee, getTax, getTotal, setOrderType } = useCart();
   
@@ -50,20 +52,20 @@ export default function BillingAddress() {
     e.preventDefault();
     try {
       const { data } = await axios.post('/api/users/addresses', form);
-      toast.success('Address added');
+      toast.success(t('billingAddress.addressAdded'));
       setAddresses(prev => [...prev, data.data]);
       setSelectedAddress(data.data._id);
       setShowForm(false);
       setForm({ label: '', address: '', city: '', isDefault: false });
     } catch (error) {
-      toast.error('Failed to save address');
+      toast.error(t('billingAddress.failedToSave'));
     }
   };
 
   const handleProceed = () => {
     if (!user) {
       if (!guestInfo.name || !guestInfo.phone || !guestInfo.address) {
-        toast.error('Please fill in all fields');
+        toast.error(t('billingAddress.pleaseFillAllFields'));
         return;
       }
       navigate('/checkout', {
@@ -79,7 +81,7 @@ export default function BillingAddress() {
     }
 
     if (!selectedAddress) {
-      toast.error('Please select a delivery address');
+      toast.error(t('billingAddress.pleaseSelectAddress'));
       return;
     }
 
@@ -112,10 +114,10 @@ export default function BillingAddress() {
               onClick={() => navigate('/checkout')}
               className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-colors"
             >
-              <FiArrowLeft /> Back to order type
+              <FiArrowLeft /> {t('billingAddress.backToOrderType')}
             </button>
-            <h1 className="text-4xl font-bold mb-2">Delivery Address</h1>
-            <p className="text-white/60">Where should we deliver your order?</p>
+            <h1 className="text-4xl font-bold mb-2">{t('billingAddress.deliveryAddress')}</h1>
+            <p className="text-white/60">{t('billingAddress.whereToDeliver')}</p>
           </motion.div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -123,12 +125,12 @@ export default function BillingAddress() {
               {!user ? (
                 <div className="glass-card">
                   <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                    <FiMapPin /> Your Information
+                    <FiMapPin /> {t('billingAddress.yourInformation')}
                   </h3>
                   <div className="space-y-4">
                     <input
                       type="text"
-                      placeholder="Your name"
+                      placeholder={t('billingAddress.yourName')}
                       value={guestInfo.name}
                       onChange={(e) => setGuestInfo({ ...guestInfo, name: e.target.value })}
                       className="input-glass w-full"
@@ -136,14 +138,14 @@ export default function BillingAddress() {
                     />
                     <input
                       type="tel"
-                      placeholder="Phone number"
+                      placeholder={t('billingAddress.phoneNumber')}
                       value={guestInfo.phone}
                       onChange={(e) => setGuestInfo({ ...guestInfo, phone: e.target.value })}
                       className="input-glass w-full"
                       required
                     />
                     <textarea
-                      placeholder="Delivery address"
+                      placeholder={t('billingAddress.address')}
                       value={guestInfo.address}
                       onChange={(e) => setGuestInfo({ ...guestInfo, address: e.target.value })}
                       className="input-glass w-full h-24 resize-none"
@@ -155,13 +157,13 @@ export default function BillingAddress() {
                 <div className="glass-card">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-semibold flex items-center gap-2">
-                      <FiMapPin /> Saved Addresses
+                      <FiMapPin /> {t('billingAddress.savedAddresses')}
                     </h3>
                     <button
                       onClick={() => setShowForm(true)}
                       className="btn-primary flex items-center gap-2 text-sm"
                     >
-                      <FiPlus /> Add New
+                      <FiPlus /> {t('billingAddress.addNew')}
                     </button>
                   </div>
 
@@ -174,14 +176,14 @@ export default function BillingAddress() {
                       <form onSubmit={handleAddAddress} className="space-y-3">
                         <input
                           type="text"
-                          placeholder="Label (e.g., Home, Office)"
+                          placeholder={t('billingAddress.labelPlaceholder')}
                           value={form.label}
                           onChange={(e) => setForm({ ...form, label: e.target.value })}
                           className="input-glass w-full"
                           required
                         />
                         <textarea
-                          placeholder="Address"
+                          placeholder={t('billingAddress.addressPlaceholder')}
                           value={form.address}
                           onChange={(e) => setForm({ ...form, address: e.target.value })}
                           className="input-glass w-full h-20 resize-none"
@@ -189,7 +191,7 @@ export default function BillingAddress() {
                         />
                         <input
                           type="text"
-                          placeholder="City"
+                          placeholder={t('billingAddress.cityPlaceholder')}
                           value={form.city}
                           onChange={(e) => setForm({ ...form, city: e.target.value })}
                           className="input-glass w-full"
@@ -202,21 +204,21 @@ export default function BillingAddress() {
                             onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
                             className="w-4 h-4"
                           />
-                          Set as default address
+                          {t('billingAddress.setAsDefault')}
                         </label>
                         <div className="flex gap-2">
-                          <button type="submit" className="btn-primary">Save</button>
-                          <button type="button" onClick={() => setShowForm(false)} className="btn-ghost">Cancel</button>
+                          <button type="submit" className="btn-primary">{t('billingAddress.save')}</button>
+                          <button type="button" onClick={() => setShowForm(false)} className="btn-ghost">{t('billingAddress.cancel')}</button>
                         </div>
                       </form>
                     </motion.div>
                   )}
 
                   {loading ? (
-                    <p className="text-white/60">Loading addresses...</p>
+                    <p className="text-white/60">{t('billingAddress.loadingAddresses')}</p>
                   ) : addresses.length === 0 ? (
                     <p className="text-white/60 text-center py-8">
-                      No saved addresses. Add one to continue.
+                      {t('billingAddress.noSavedAddresses')}
                     </p>
                   ) : (
                     <div className="space-y-3">
@@ -240,7 +242,7 @@ export default function BillingAddress() {
                                 {addr.label}
                                 {addr.isDefault && (
                                   <span className="px-2 py-0.5 rounded-full bg-primary-500/20 text-xs text-primary-500">
-                                    Default
+                                    {t('billingAddress.default')}
                                   </span>
                                 )}
                               </p>
@@ -255,11 +257,11 @@ export default function BillingAddress() {
               )}
 
               <div className="glass-card">
-                <label className="block text-sm mb-2">Delivery Notes (Optional)</label>
+                <label className="block text-sm mb-2">{t('billingAddress.deliveryNotes')}</label>
                 <textarea
                   value={deliveryNotes}
                   onChange={(e) => setDeliveryNotes(e.target.value)}
-                  placeholder="Any special instructions for delivery..."
+                  placeholder={t('billingAddress.specialInstructions')}
                   className="input-glass w-full h-20 resize-none"
                 />
               </div>
@@ -267,7 +269,7 @@ export default function BillingAddress() {
 
             <div>
               <div className="glass-card sticky top-24">
-                <h3 className="text-xl font-semibold mb-6">Order Summary</h3>
+                <h3 className="text-xl font-semibold mb-6">{t('billingAddress.orderSummary')}</h3>
 
                 <div className="space-y-3 mb-6 max-h-60 overflow-y-auto">
                   {cart.map(item => (
@@ -280,19 +282,19 @@ export default function BillingAddress() {
 
                 <div className="space-y-3 border-t border-white/10 pt-4">
                   <div className="flex justify-between">
-                    <span className="text-white/60">Subtotal</span>
+                    <span className="text-white/60">{t('billingAddress.subtotal')}</span>
                     <span>{getSubtotal().toFixed(2)} ETB</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/60">Delivery</span>
+                    <span className="text-white/60">{t('billingAddress.delivery')}</span>
                     <span>{getDeliveryFee().toFixed(2)} ETB</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/60">Tax</span>
+                    <span className="text-white/60">{t('billingAddress.tax')}</span>
                     <span>{getTax().toFixed(2)} ETB</span>
                   </div>
                   <div className="flex justify-between text-xl font-bold pt-3">
-                    <span>Total</span>
+                    <span>{t('billingAddress.total')}</span>
                     <span className="text-primary-500">{getTotal().toFixed(2)} ETB</span>
                   </div>
                 </div>
@@ -301,7 +303,7 @@ export default function BillingAddress() {
                   onClick={handleProceed}
                   className="btn-primary w-full mt-6"
                 >
-                  Proceed to Payment
+                  {t('billingAddress.proceedToPayment')}
                 </button>
               </div>
             </div>

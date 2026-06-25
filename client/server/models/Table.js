@@ -4,7 +4,7 @@ const tableSchema = new mongoose.Schema({
   tableNumber: { type: String, required: true, unique: true },
   category: {
     type: String,
-    enum: ['regular', 'vip', 'room'],
+    enum: ['regular', 'vip'],
     default: 'regular'
   },
   qrCode: { type: String },

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   motion, AnimatePresence, useInView
 } from 'framer-motion';
@@ -104,6 +105,7 @@ function AnimatedCounter({ value, prefix = '', suffix = '', className = '' }) {
 }
 
 function CartItemCard({ item, index, onUpdateQuantity, onRemove }) {
+  const { t } = useTranslation();
   const [removing, setRemoving] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -176,7 +178,7 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove }) {
                     </div>
                   )}
                   <p className="mt-1.5 text-sm font-medium text-gray-400 dark:text-gray-500">
-                    ETB {unitPrice.toFixed(2)} each
+                    ETB {unitPrice.toFixed(2)}
                   </p>
                 </div>
                 <motion.button
@@ -192,7 +194,7 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove }) {
                     <FiTrash2 size={16} />
                   </motion.div>
                   <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 bg-red-500 text-white text-[10px] font-semibold rounded-lg opacity-0 group-hover/remove:opacity-100 transition-opacity duration-200 whitespace-nowrap shadow-lg pointer-events-none">
-                    Remove
+                    {t('cart.remove')}
                   </span>
                 </motion.button>
               </div>
@@ -259,6 +261,7 @@ function CartItemCard({ item, index, onUpdateQuantity, onRemove }) {
 }
 
 function SuggestedCard({ food, onAdd, dark }) {
+  const { t } = useTranslation();
   const [added, setAdded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -319,9 +322,9 @@ function SuggestedCard({ food, onAdd, dark }) {
                 }`}
               >
                 {added ? (
-                  <><FiCheck size={13} /> Added</>
+                  <><FiCheck size={13} /> {t('menu.addToCart')}</>
                 ) : (
-                  <><FiPlus size={13} /> Add</>
+                  <><FiPlus size={13} /> {t('menu.addToCart')}</>
                 )}
               </motion.button>
             </div>
@@ -343,6 +346,7 @@ function SuggestedCard({ food, onAdd, dark }) {
 }
 
 function EmptyCart({ dark }) {
+  const { t } = useTranslation();
   const [floating, setFloating] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setFloating(true), 300);
@@ -393,14 +397,14 @@ function EmptyCart({ dark }) {
         variants={itemVariants}
         className="text-4xl font-black text-gray-900 dark:text-white mb-3 text-center"
       >
-        Your cart is empty
+        {t('cart.empty')}
       </motion.h2>
 
       <motion.p
         variants={itemVariants}
         className="text-gray-500 dark:text-gray-400 text-lg mb-4 text-center max-w-md"
       >
-        Looks like you haven't added anything yet. Let's find something delicious!
+        {t('cart.emptyMessage')}
       </motion.p>
 
       <motion.div variants={itemVariants}>
@@ -409,7 +413,7 @@ function EmptyCart({ dark }) {
           className="relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/25 hover:shadow-2xl hover:shadow-indigo-500/40 transition-all duration-300 group"
         >
           <FiShoppingCart size={18} />
-          <span>Browse Our Menu</span>
+          <span>{t('cart.startOrdering')}</span>
           <FiArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
           <motion.span
             className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/15 to-transparent -skew-x-12"
@@ -432,6 +436,7 @@ const ORDER_TYPES = [
 function CheckoutSummary({
   subtotal, deliveryFee, tax, total, itemCount, dark, orderType, setOrderType, onCheckout
 }) {
+  const { t } = useTranslation();
   const [coupon, setCoupon] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState(false);
@@ -464,14 +469,14 @@ function CheckoutSummary({
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-200/50 dark:border-slate-700/30">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Order Summary</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('checkout.orderSummary')}</h2>
             <motion.span
               key={itemCount}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               className="px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-full"
             >
-              {itemCount} {itemCount === 1 ? 'item' : 'items'}
+              {itemCount} {itemCount === 1 ? t('cart.quantity') : t('cart.quantity')}
             </motion.span>
           </div>
         </div>
@@ -480,7 +485,7 @@ function CheckoutSummary({
           {/* Price breakdown */}
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('cart.subtotal')}</span>
               <AnimatedCounter
                 value={subtotal}
                 prefix="ETB "
@@ -491,7 +496,7 @@ function CheckoutSummary({
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                   <FiTruck size={13} />
-                  Delivery Fee
+                  {t('cart.deliveryFee')}
                 </span>
                 {deliveryFee === 0 ? (
                   <span className="font-semibold text-emerald-500">FREE</span>
@@ -505,7 +510,7 @@ function CheckoutSummary({
               </div>
             )}
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500 dark:text-gray-400">Tax (15%)</span>
+              <span className="text-gray-500 dark:text-gray-400">{t('cart.tax')}</span>
               <AnimatedCounter
                 value={tax}
                 prefix="ETB "
@@ -523,7 +528,7 @@ function CheckoutSummary({
                       type="text"
                       value={coupon}
                       onChange={(e) => { setCoupon(e.target.value.toUpperCase()); setCouponError(false); }}
-                      placeholder="Coupon code"
+                      placeholder={t('cart.couponPlaceholder')}
                       className={`w-full pl-9 pr-3 py-2.5 text-sm bg-white/60 dark:bg-slate-700/40 backdrop-blur-sm rounded-xl border transition-all duration-200 outline-none ${
                         couponApplied
                           ? 'border-emerald-400/50 dark:border-emerald-500/30 ring-2 ring-emerald-500/20'
@@ -555,7 +560,7 @@ function CheckoutSummary({
                           : 'bg-gray-100 dark:bg-slate-700/50 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    {couponApplied ? 'Applied' : 'Apply'}
+                    {couponApplied ? t('cart.apply') : t('cart.apply')}
                   </motion.button>
                 </div>
                 {couponError && (
@@ -591,7 +596,7 @@ function CheckoutSummary({
               >
                 <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
                   <FiTag size={13} />
-                  Discount (20%)
+                  {t('cart.discount')}
                 </span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400">
                   -ETB {discount.toFixed(2)}
@@ -608,7 +613,7 @@ function CheckoutSummary({
 
           {/* Total */}
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
+            <span className="text-lg font-bold text-gray-900 dark:text-white">{t('cart.total')}</span>
             <motion.div
               key={finalTotal}
               initial={{ scale: 1.15 }}
@@ -668,8 +673,8 @@ function CheckoutSummary({
               onClick={onCheckout}
               className="relative w-full py-4 bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:via-indigo-400 hover:to-purple-500 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/25 hover:shadow-2xl hover:shadow-indigo-500/40 transition-all duration-300 overflow-hidden group"
             >
-              <span className="relative z-10 flex items-center justify-center gap-2.5">
-                {orderType === 'dine_in' ? 'Select Table' : 'Proceed to Checkout'}
+                <span className="relative z-10 flex items-center justify-center gap-2.5">
+                  {orderType === 'dine_in' ? 'Select Table' : t('cart.checkout')}
                 <motion.span
                   animate={{ x: [0, 4, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -705,6 +710,7 @@ function CheckoutSummary({
 }
 
 function SuggestedSection({ dark, onAddToCart }) {
+  const { t } = useTranslation();
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -743,7 +749,7 @@ function SuggestedSection({ dark, onAddToCart }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            You May Also Like
+            {t('menu.relatedItems')}
             <motion.span
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
@@ -805,6 +811,7 @@ function SuggestedSection({ dark, onAddToCart }) {
 }
 
 export default function Cart() {
+  const { t } = useTranslation();
   const {
     cart, updateQuantity, removeFromCart, addToCart,
     getSubtotal, getDeliveryFee, getTax, getTotal, totalItems,
@@ -874,9 +881,8 @@ export default function Cart() {
             <motion.h1
               className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 dark:text-white leading-tight"
             >
-              Your
-              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer ml-2">
-                Cart
+              <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer">
+                {t('cart.title')}
               </span>
             </motion.h1>
             <div className="flex items-center gap-2 mt-2">
@@ -902,7 +908,7 @@ export default function Cart() {
                   className="ml-4 px-3 py-1.5 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 border border-red-200/50 dark:border-red-800/30 transition-all duration-200 flex items-center gap-1.5"
                 >
                   <FiTrash2 size={12} />
-                  Clear All
+                  {t('cart.clearCart')}
                 </motion.button>
               )}
             </div>
@@ -939,7 +945,7 @@ export default function Cart() {
                   className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors group"
                 >
                   <FiRefreshCw size={14} className="transition-transform duration-300 group-hover:rotate-180" />
-                  Continue Shopping
+                  {t('cart.checkout')}
                 </Link>
               </motion.div>
             </div>
@@ -975,7 +981,7 @@ export default function Cart() {
           >
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-t border-gray-200/50 dark:border-slate-700/30 px-4 py-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Total</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{t('cart.total')}</span>
                 <motion.span
                   key={total}
                   initial={{ scale: 1.1 }}
@@ -1010,7 +1016,7 @@ export default function Cart() {
                   whileTap={{ scale: 0.97 }}
                   className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/25 flex items-center justify-center gap-2"
                 >
-                  {orderType === 'dine_in' ? 'Select Table' : 'Proceed to Checkout'}
+                {orderType === 'dine_in' ? 'Select Table' : t('cart.checkout')}
                   <FiArrowRight size={18} />
                 </motion.button>
               </Link>
@@ -1040,8 +1046,8 @@ export default function Cart() {
               <div className="w-14 h-14 mx-auto mb-4 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center">
                 <FiTrash2 size={24} className="text-red-500" />
               </div>
-              <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">
-                Clear Cart?
+                <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">
+                {t('cart.clearCart')}?
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
                 This will remove all {itemCount} items from your cart.
@@ -1053,7 +1059,7 @@ export default function Cart() {
                   onClick={() => setShowClearConfirm(false)}
                   className="flex-1 py-3 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 font-semibold text-sm transition-all duration-200 hover:bg-gray-200 dark:hover:bg-slate-600"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -1061,7 +1067,7 @@ export default function Cart() {
                   onClick={clearCart}
                   className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-200"
                 >
-                  Clear All
+                  {t('cart.clearCart')}
                 </motion.button>
               </div>
             </motion.div>

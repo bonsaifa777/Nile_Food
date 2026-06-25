@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiChevronDown, FiX, FiSliders } from 'react-icons/fi';
 
 const filterGroups = [
@@ -58,10 +59,59 @@ const filterGroups = [
 const SHOW_MORE_THRESHOLD = 5;
 
 function FilterSection({ group, activeFilters, onToggle }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const options = showAll ? group.options : group.options.slice(0, SHOW_MORE_THRESHOLD);
   const hasMore = group.options.length > SHOW_MORE_THRESHOLD;
+  const filterOptKeys = {
+    'Burger': 'filters.optBurger',
+    'Pizza': 'filters.optPizza',
+    'Pasta': 'filters.optPasta',
+    'Chicken': 'filters.optChicken',
+    'Vegan': 'filters.optVegan',
+    'Seafood': 'filters.optSeafood',
+    'Desserts': 'filters.optDesserts',
+    'Drinks': 'filters.optDrinks',
+    'Ethiopian': 'filters.optEthiopian',
+    'Italian': 'filters.optItalian',
+    'Chinese': 'filters.optChinese',
+    'Indian': 'filters.optIndian',
+    'Arabic': 'filters.optArabic',
+    'American': 'filters.optAmerican',
+    'Korean': 'filters.optKorean',
+    'Mexican': 'filters.optMexican',
+    'Mild': 'filters.optMild',
+    'Medium': 'filters.optMedium',
+    'Hot': 'filters.optHot',
+    'Extra Hot': 'filters.optExtraHot',
+    'Vegetarian': 'filters.optVegetarian',
+    'Halal': 'filters.optHalal',
+    'Gluten Free': 'filters.optGlutenFree',
+    'Keto': 'filters.optKeto',
+    'Breakfast': 'categories.breakfast',
+    'Lunch': 'categories.lunch',
+    'Dinner': 'categories.dinner',
+    'Late Night': 'filters.optLateNight',
+    'Budget': 'filters.optBudget',
+    'Standard': 'filters.optStandard',
+    'Premium': 'filters.optPremium',
+    'Luxury': 'filters.optLuxury',
+    'Under 15 min': 'filters.optUnder15min',
+    'Under 30 min': 'filters.optUnder30min',
+    'Under 45 min': 'filters.optUnder45min',
+    '5 stars': 'filters.opt5stars',
+    '4+ stars': 'filters.opt4plus',
+    '3+ stars': 'filters.opt3plus',
+    'Free Delivery': 'filters.optFreeDelivery',
+    'Buy 1 Get 1': 'filters.optBuy1Get1',
+    'Discounted': 'filters.optDiscounted',
+    'Combo Meals': 'filters.optComboMeals',
+    'Cheese': 'filters.optCheese',
+    'Beef': 'filters.optBeef',
+    'Fish': 'filters.optFish',
+    'Organic': 'filters.optOrganic',
+  };
 
   return (
     <div className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
@@ -69,7 +119,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between py-3.5 px-1 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
       >
-        <span>{group.label}</span>
+        <span>{t(`filters.${group.id}`)}</span>
         <motion.span
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -122,7 +172,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
                         </motion.svg>
                       )}
                     </div>
-                    <span className="text-sm font-medium">{option}</span>
+                    <span className="text-sm font-medium">{t(filterOptKeys[option])}</span>
                   </label>
                 );
               })}
@@ -131,7 +181,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
                   onClick={() => setShowAll(!showAll)}
                   className="text-xs font-semibold text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 px-3 py-1.5 transition-colors"
                 >
-                  {showAll ? 'Show less' : `+${group.options.length - SHOW_MORE_THRESHOLD} more`}
+                  {showAll ? t('filters.showLess') : `+${group.options.length - SHOW_MORE_THRESHOLD} ${t('filters.more')}`}
                 </button>
               )}
             </div>
@@ -143,6 +193,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
 }
 
 export default function FilterSidebar({ activeFilters, onToggleFilter, onClearAll }) {
+  const { t } = useTranslation();
   const totalActive = Object.values(activeFilters).reduce((acc, arr) => acc + arr.length, 0);
 
   return (
@@ -150,7 +201,7 @@ export default function FilterSidebar({ activeFilters, onToggleFilter, onClearAl
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-slate-700/50">
         <div className="flex items-center gap-2">
           <FiSliders size={16} className="text-orange-500" />
-          <span className="font-semibold text-gray-900 dark:text-white text-sm">Filters</span>
+          <span className="font-semibold text-gray-900 dark:text-white text-sm">{t('filters.title')}</span>
           {totalActive > 0 && (
             <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-[10px] font-bold rounded-full">
               {totalActive}
@@ -163,7 +214,7 @@ export default function FilterSidebar({ activeFilters, onToggleFilter, onClearAl
             className="text-xs font-semibold text-orange-500 hover:text-orange-600 dark:hover:text-orange-400 transition-colors flex items-center gap-1"
           >
             <FiX size={12} />
-            Clear all
+            {t('filters.clearAll')}
           </button>
         )}
       </div>

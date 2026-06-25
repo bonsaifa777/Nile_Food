@@ -4,9 +4,16 @@ import { motion } from 'framer-motion';
 import { FiShoppingCart, FiHeart, FiStar, FiClock } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function FoodCard({ food, index = 0 }) {
   const { addToCart } = useCart();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const tl = (item, field) => {
+    if (lang === 'en' || !item) return item?.[field];
+    return item[field + '_' + lang] || item[field];
+  };
   const [isFavorite, setIsFavorite] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [imgAttempt, setImgAttempt] = useState(0);
@@ -18,7 +25,7 @@ export default function FoodCard({ food, index = 0 }) {
     e.stopPropagation();
     setCartBounce(true);
     addToCart(food, 1);
-    toast.success(`${food.name} added to cart!`);
+    toast.success(t('foodCard.addedToCart', { name: tl(food, 'name') }));
     setTimeout(() => setCartBounce(false), 400);
   };
 
@@ -27,7 +34,7 @@ export default function FoodCard({ food, index = 0 }) {
     : 0;
 
   const seed = useMemo(
-    () => food.name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0),
+      () => (food.name || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0),
     [food.name]
   );
 
@@ -35,7 +42,7 @@ export default function FoodCard({ food, index = 0 }) {
     food.image,
     `https://loremflickr.com/600/400/food?lock=${seed}`,
     `https://picsum.photos/seed/${seed}/600/400`,
-    `https://placehold.co/600x400/4f46e5/ffffff?text=${encodeURIComponent(food.name)}`,
+    `https://placehold.co/600x400/4f46e5/ffffff?text=${encodeURIComponent(food.name || '')}`,
   ];
 
   const imgSrc = imgSources[Math.min(imgAttempt, imgSources.length - 1)];
@@ -82,7 +89,7 @@ export default function FoodCard({ food, index = 0 }) {
           <div className="relative overflow-hidden bg-gray-100 dark:bg-slate-800" style={{ aspectRatio: '4/5' }}>
             <motion.img
               src={imgSrc}
-              alt={food.name}
+              alt={tl(food, 'name')}
               className="w-full h-full object-cover"
               animate={{ scale: isHovered ? 1.15 : 1 }}
               transition={{ duration: 0.7, ease: 'easeOut' }}
@@ -102,7 +109,7 @@ export default function FoodCard({ food, index = 0 }) {
                   transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
                   className="px-3 py-1 bg-gradient-to-r from-red-500 to-rose-500 text-white text-[11px] font-extrabold rounded-full shadow-lg shadow-red-500/30"
                 >
-                  {discount}% OFF
+                  {discount}% {t('foodCard.off')}
                 </motion.span>
               )}
               {food.featured && (
@@ -112,7 +119,7 @@ export default function FoodCard({ food, index = 0 }) {
                   transition={{ delay: 0.15 }}
                   className="px-3 py-1 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[11px] font-extrabold rounded-full shadow-lg shadow-amber-500/30"
                 >
-                  Featured
+                  {t('foodCard.featured')}
                 </motion.span>
               )}
             </div>
@@ -163,7 +170,7 @@ export default function FoodCard({ food, index = 0 }) {
                 >
                   <FiShoppingCart size={16} />
                 </motion.span>
-                {cartBounce ? 'Added!' : 'Add to Cart'}
+                {cartBounce ? t('foodCard.added') : t('foodCard.addToCart')}
               </motion.button>
             </motion.div>
           </div>
@@ -171,7 +178,7 @@ export default function FoodCard({ food, index = 0 }) {
           {/* Content */}
           <div className="p-6">
             <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2.5 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
-              {food.name}
+              {tl(food, 'name')}
             </h3>
 
             {food.rating > 0 && (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Header from '../components/common/Header';
@@ -11,7 +12,6 @@ import OrderHistory from '../components/dashboard/OrderHistory';
 import OrderStatus from '../components/dashboard/OrderStatus';
 import HotelBookings from '../components/dashboard/HotelBookings';
 import FavoritesSection from '../components/dashboard/FavoritesSection';
-import RoomStatus from '../components/dashboard/RoomStatus';
 import SettingsSection from '../components/dashboard/SettingsSection';
 import {
   FiUser, FiHeart, FiClock, FiLogOut, FiLayout, FiKey,
@@ -20,15 +20,14 @@ import {
   FiArrowRight, FiBox, FiTruck, FiCheckCircle, FiTrendingUp, FiSettings
 } from 'react-icons/fi';
 
-const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: FiLayout, color: 'from-indigo-500 to-blue-500' },
-  { id: 'profile', label: 'Profile', icon: FiUser, color: 'from-purple-500 to-pink-500' },
-  { id: 'orders', label: 'Orders', icon: FiClock, color: 'from-amber-500 to-orange-500' },
+const menuItems = (t) => [
+  { id: 'dashboard', label: t('dashboard.dashboard'), icon: FiLayout, color: 'from-indigo-500 to-blue-500' },
+  { id: 'profile', label: t('profile.title'), icon: FiUser, color: 'from-purple-500 to-pink-500' },
+  { id: 'orders', label: t('orders.title'), icon: FiClock, color: 'from-amber-500 to-orange-500' },
   { id: 'order-status', label: 'Order Status', icon: FiRefreshCw, color: 'from-cyan-500 to-teal-500' },
   { id: 'bookings', label: 'Hotel Bookings', icon: FiCalendar, color: 'from-sky-500 to-indigo-500' },
-  { id: 'room-status', label: 'Room Status', icon: FiKey, color: 'from-teal-500 to-emerald-500' },
-  { id: 'favorites', label: 'Favorites', icon: FiHeart, color: 'from-red-500 to-rose-500' },
-  { id: 'settings', label: 'Settings', icon: FiSettings, color: 'from-gray-500 to-slate-500' },
+  { id: 'favorites', label: t('dashboard.favorites'), icon: FiHeart, color: 'from-red-500 to-rose-500' },
+  { id: 'settings', label: t('profile.settings'), icon: FiSettings, color: 'from-gray-500 to-slate-500' },
 ];
 
 const statCards = [
@@ -58,11 +57,12 @@ function FloatingParticles({ d }) {
 }
 
 export default function Profile() {
-  const { user, logout, updateProfile } = useAuth();
+  const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const { darkMode } = useTheme();
-  const d = darkMode;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const items = menuItems(t);
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -526,9 +526,6 @@ export default function Profile() {
     favorites: (
       <FavoritesSection favorites={favorites} />
     ),
-    'room-status': (
-      <RoomStatus />
-    ),
     settings: (
       <SettingsSection />
     ),
@@ -610,7 +607,7 @@ export default function Profile() {
                 </div>
 
                 <nav className="px-4 pb-4 space-y-1">
-                  {menuItems.map((item) => {
+                  {items.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
                     return (

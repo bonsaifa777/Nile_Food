@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiMoon, FiSun } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
@@ -19,10 +21,10 @@ export default function Login() {
     setLoading(true);
     try {
       await login(form.email, form.password);
-      toast.success('Welcome back to Nile Food!');
+      toast.success(t('auth.welcomeBack'));
       navigate('/');
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Invalid credentials');
+      toast.error(error.response?.data?.message || t('auth.invalidCredentials'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export default function Login() {
               transition={{ delay: 0.4 }}
               className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}
             >
-              Welcome to{' '}
+              {t('auth.welcomeTo')}{' '}
               <span className="text-indigo-600">Nile Food</span>
             </motion.h1>
             <motion.p
@@ -99,7 +101,7 @@ export default function Login() {
               transition={{ delay: 0.6 }}
               className={`text-lg max-w-sm mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
             >
-              Discover delicious meals delivered fresh to your doorstep
+              {t('auth.discoverMeals')}
             </motion.p>
           </motion.div>
 
@@ -110,11 +112,11 @@ export default function Login() {
             transition={{ delay: 0.8 }}
             className="grid grid-cols-3 gap-4 mt-12 w-full max-w-md"
           >
-            {[
-              { icon: '🚀', label: 'Fast Delivery' },
-              { icon: '', label: 'Fresh Food' },
-              { icon: '💎', label: 'Best Price' },
-            ].map((feature, i) => (
+              {[
+                { icon: '🚀', label: t('auth.fastDelivery') },
+                { icon: '', label: t('auth.freshFood') },
+                { icon: '💎', label: t('auth.bestPrice') },
+              ].map((feature, i) => (
               <motion.div
                 key={feature.label}
                 className={`rounded-xl p-4 text-center shadow-sm ${darkMode ? 'bg-slate-800' : 'bg-white'}`}
@@ -164,19 +166,19 @@ export default function Login() {
                 <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nile Food</span>
               </div>
 
-              <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Welcome Back</h2>
-              <p className={`mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sign in to continue your food journey</p>
+              <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>{t('auth.welcomeBack')}</h2>
+              <p className={`mb-8 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t('auth.signInSubtitle')}</p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email Address</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.email')}</label>
                   <div className="relative">
                     <FiMail className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type="email"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="your@email.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       className={`w-full pl-12 pr-4 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -184,14 +186,14 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Password</label>
+                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.password')}</label>
                   <div className="relative">
                     <FiLock className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
-                      placeholder="Enter your password"
+                      placeholder={t('auth.passwordPlaceholder')}
                       className={`w-full pl-12 pr-12 py-3.5 rounded-xl focus:ring-0 focus:outline-none transition-colors ${darkMode ? 'bg-slate-800 border-2 border-slate-700 text-white placeholder-gray-500 focus:border-indigo-500' : 'bg-white border-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-500'}`}
                       required
                     />
@@ -204,10 +206,10 @@ export default function Login() {
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-                    <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Remember me</span>
+                    <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{t('auth.rememberMe')}</span>
                   </label>
                   <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
-                    Forgot password?
+                    {t('auth.forgotPassword')}
                   </Link>
                 </div>
 
@@ -222,7 +224,7 @@ export default function Login() {
                     <motion.div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
                   ) : (
                     <>
-                      Sign In
+                      {t('auth.signIn')}
                       <FiArrowRight size={18} />
                     </>
                   )}
@@ -232,7 +234,7 @@ export default function Login() {
               <div className="mt-8">
                 <div className="flex items-center gap-4 mb-6">
                   <div className={`flex-1 h-px ${darkMode ? 'bg-slate-700' : 'bg-gray-200'}`} />
-                  <span className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>or continue with</span>
+                  <span className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{t('auth.orContinueWith')}</span>
                   <div className={`flex-1 h-px ${darkMode ? 'bg-slate-700' : 'bg-gray-200'}`} />
                 </div>
 
@@ -252,9 +254,9 @@ export default function Login() {
               </div>
 
               <p className={`text-center mt-8 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                Don't have an account?{' '}
+                {t('auth.noAccount')}{' '}
                 <Link to="/register" className="text-indigo-600 hover:text-indigo-500 font-semibold">
-                  Sign up
+                  {t('auth.signUp')}
                 </Link>
               </p>
             </motion.div>

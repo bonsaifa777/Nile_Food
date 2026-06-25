@@ -2,6 +2,7 @@ import { useRef, useCallback, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { CalendarDays, Users, Search, ChevronDown, SlidersHorizontal, ArrowUpDown, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 function FloatingBlob({ index }) {
   const positions = [
@@ -97,6 +98,7 @@ function FloatingParticle({ index }) {
 }
 
 function FilterBar() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('default');
 
@@ -112,7 +114,7 @@ function FilterBar() {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300" />
         <input
           type="text"
-          placeholder="Search rooms, cuisines, experiences..."
+          placeholder={t('common.search')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-11 pr-4 py-3 bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-indigo-200/50 dark:border-indigo-400/20 rounded-xl text-sm text-indigo-950 dark:text-white placeholder-indigo-300 dark:placeholder-indigo-400/50 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-400/50 transition-all duration-300"
@@ -124,11 +126,11 @@ function FilterBar() {
           onChange={(e) => setSort(e.target.value)}
           className="appearance-none pl-10 pr-10 py-3 bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-indigo-200/50 dark:border-indigo-400/20 rounded-xl text-sm text-indigo-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-indigo-400/50 transition-all duration-300 cursor-pointer"
         >
-          <option value="default">Sort by: Default</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="rating">Highest Rated</option>
-          <option value="popular">Most Popular</option>
+          <option value="default">{t('menu.sortBy')}</option>
+          <option value="price-asc">{t('menu.price')}: Low to High</option>
+          <option value="price-desc">{t('menu.price')}: High to Low</option>
+          <option value="rating">{t('menu.sortBy')}</option>
+          <option value="popular">{t('home.mostOrdered')}</option>
         </select>
         <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300 pointer-events-none" />
         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-300 pointer-events-none" />
@@ -139,13 +141,14 @@ function FilterBar() {
         className="flex items-center gap-2 px-5 py-3 bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-indigo-200/50 dark:border-indigo-400/20 rounded-xl text-sm font-semibold text-indigo-700 dark:text-indigo-300 hover:border-indigo-400/50 hover:bg-white/80 dark:hover:bg-white/10 transition-all duration-300"
       >
         <SlidersHorizontal className="w-4 h-4" />
-        Filters
+        {t('menu.filter')}
       </motion.button>
     </motion.div>
   );
 }
 
-export default function LuxuryHero({ variant = 'rooms' }) {
+export default function LuxuryHero() {
+  const { t } = useTranslation();
   const { darkMode } = useTheme();
   const sectionRef = useRef(null);
   const searchRef = useRef(null);
@@ -165,8 +168,6 @@ export default function LuxuryHero({ variant = 'rooms' }) {
     x.set((e.clientX - rect.left) / rect.width);
     y.set((e.clientY - rect.top) / rect.height);
   }, [x, y]);
-
-  const isRooms = variant === 'rooms';
 
   return (
     <section
@@ -210,7 +211,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
             >
               <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-300" />
               <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-200 tracking-wide">
-                Reserve Your Delicious Experience
+                {t('reserve.title')}
               </span>
             </motion.div>
 
@@ -220,12 +221,12 @@ export default function LuxuryHero({ variant = 'rooms' }) {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold leading-[1.05] mb-5"
             >
-              <span className="text-indigo-950 dark:text-white">Find Your Perfect<br />
+              <span className="text-indigo-950 dark:text-white">{t('home.heroTitle')}<br />
               </span>
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-700 dark:from-indigo-300 dark:via-indigo-200 dark:to-indigo-400">
-                {isRooms ? 'Room & Dining' : 'Meal & Dining'}{' '}
+                {t('menu.title')}{' '}
               </span>
-              <span className="text-indigo-950 dark:text-white">Experience</span>
+              <span className="text-indigo-950 dark:text-white">{t('reserve.title')}</span>
             </motion.h1>
 
             <motion.p
@@ -234,7 +235,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-base sm:text-lg text-indigo-400/80 dark:text-indigo-300/70 max-w-2xl mx-auto leading-relaxed"
             >
-              Discover {isRooms ? 'premium rooms, ' : ''}delicious dishes, premium dining spaces, breathtaking ambiance, and unforgettable culinary experiences tailored for your taste.
+              {t('home.heroSubtitle')}
             </motion.p>
           </motion.div>
 
@@ -263,7 +264,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                 <div className={`flex-1 relative group ${focusedField === 'checkin' ? 'z-20' : 'z-10'}`}>
                   <div className={`px-4 sm:px-6 py-4 sm:py-5 rounded-2xl transition-all duration-300 ${focusedField === 'checkin' ? 'bg-indigo-50/60 dark:bg-white/10 ring-1 ring-indigo-400/40 shadow-lg shadow-indigo-500/10' : 'hover:bg-indigo-50/30 dark:hover:bg-white/5'}`}>
                     <label className="block text-[10px] uppercase tracking-[0.15em] font-semibold text-indigo-500 dark:text-indigo-300 mb-1.5">
-                      Check In
+                      {t('reserve.title')}
                     </label>
                     <div className="flex items-center gap-2.5">
                       <CalendarDays className="w-4 h-4 text-indigo-400/70 dark:text-indigo-300/70 shrink-0" />
@@ -274,7 +275,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                         onFocus={() => setFocusedField('checkin')}
                         onBlur={() => setFocusedField(null)}
                         className="w-full bg-transparent text-indigo-950 dark:text-white text-sm font-medium focus:outline-none [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                        placeholder="Select date"
+                        placeholder={t('common.search')}
                       />
                     </div>
                   </div>
@@ -284,7 +285,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                 <div className={`flex-1 relative group ${focusedField === 'checkout' ? 'z-20' : 'z-10'}`}>
                   <div className={`px-4 sm:px-6 py-4 sm:py-5 rounded-2xl transition-all duration-300 ${focusedField === 'checkout' ? 'bg-indigo-50/60 dark:bg-white/10 ring-1 ring-indigo-400/40 shadow-lg shadow-indigo-500/10' : 'hover:bg-indigo-50/30 dark:hover:bg-white/5'}`}>
                     <label className="block text-[10px] uppercase tracking-[0.15em] font-semibold text-indigo-500 dark:text-indigo-300 mb-1.5">
-                      Check Out
+                      {t('reserve.title')}
                     </label>
                     <div className="flex items-center gap-2.5">
                       <CalendarDays className="w-4 h-4 text-indigo-400/70 dark:text-indigo-300/70 shrink-0" />
@@ -295,7 +296,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                         onFocus={() => setFocusedField('checkout')}
                         onBlur={() => setFocusedField(null)}
                         className="w-full bg-transparent text-indigo-950 dark:text-white text-sm font-medium focus:outline-none [color-scheme:light] dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:hover:opacity-100 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                        placeholder="Select date"
+                        placeholder={t('common.search')}
                       />
                     </div>
                   </div>
@@ -305,7 +306,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                 <div className={`flex-1 relative group ${focusedField === 'guests' ? 'z-20' : 'z-10'}`}>
                   <div className={`px-4 sm:px-6 py-4 sm:py-5 rounded-2xl transition-all duration-300 ${focusedField === 'guests' ? 'bg-indigo-50/60 dark:bg-white/10 ring-1 ring-indigo-400/40 shadow-lg shadow-indigo-500/10' : 'hover:bg-indigo-50/30 dark:hover:bg-white/5'}`}>
                     <label className="block text-[10px] uppercase tracking-[0.15em] font-semibold text-indigo-500 dark:text-indigo-300 mb-1.5">
-                      Guests
+                      {t('profile.title')}
                     </label>
                     <div className="flex items-center gap-2.5">
                       <Users className="w-4 h-4 text-indigo-400/70 dark:text-indigo-300/70 shrink-0" />
@@ -318,7 +319,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                       >
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                           <option key={n} value={n} className="bg-white dark:bg-indigo-950 text-indigo-950 dark:text-white">
-                            {n} {n === 1 ? 'Guest' : 'Guests'}
+                            {n} {n === 1 ? t('profile.title') : t('profile.title')}
                           </option>
                         ))}
                       </select>
@@ -346,7 +347,7 @@ export default function LuxuryHero({ variant = 'rooms' }) {
                     />
                     <span className="relative z-10 flex items-center justify-center gap-2.5 text-white">
                       <Search className="w-4 h-4" />
-                      Search Meals
+                      {t('common.search')}
                     </span>
                   </motion.button>
                 </div>

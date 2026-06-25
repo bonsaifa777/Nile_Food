@@ -664,28 +664,6 @@ function ReservePageForm({ data, onChange }) {
 
       <div className={sectionClass}>
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">Room Element Images (Detail Shots)</h3>
-          <button type="button" onClick={() => { const cur = data?.elementImages || []; set('elementImages', [...cur, { src: '', alt: '', label: '' }]); }} className={btnAddClass}>Add Image</button>
-        </div>
-        <p className="text-[10px] text-gray-500 dark:text-gray-400 -mt-2">These appear below the hero image showing room details (bed, bath, view, etc.)</p>
-        {(data?.elementImages || []).length === 0 && <p className="text-xs text-gray-500 mt-2">No element images yet.</p>}
-        {(data?.elementImages || []).map((item, idx) => (
-          <div key={idx} className="p-4 rounded-xl bg-white/40 dark:bg-slate-800/40 border border-gray-200/50 dark:border-slate-700/30 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-gray-500">Element #{idx + 1}</span>
-              <button type="button" onClick={() => { const cur = data?.elementImages || []; set('elementImages', cur.filter((_, i) => i !== idx)); }} className={btnRemoveClass}>Remove</button>
-            </div>
-            <Input label="Image URL" value={item.src} onChange={v => { const cur = data?.elementImages || []; set('elementImages', cur.map((e, i) => i === idx ? { ...e, src: v } : e)); }} placeholder="https://images.unsplash.com/..." />
-            <div className="grid grid-cols-2 gap-3">
-              <Input label="Label" value={item.label} onChange={v => { const cur = data?.elementImages || []; set('elementImages', cur.map((e, i) => i === idx ? { ...e, label: v } : e)); }} placeholder="Master Bedroom" />
-              <Input label="Alt Text" value={item.alt} onChange={v => { const cur = data?.elementImages || []; set('elementImages', cur.map((e, i) => i === idx ? { ...e, alt: v } : e)); }} placeholder="Luxury bedroom" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className={sectionClass}>
-        <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">Guest Reviews</h3>
           <button type="button" onClick={addReview} className={btnAddClass}>Add Review</button>
         </div>
@@ -815,15 +793,6 @@ const LISTING_FIELDS = {
     { key: 'icon', label: 'Icon', type: 'select', options: ICON_OPTIONS.map(i => ({ value: i, label: i.replace('Fi', '') })) },
     { key: 'title', label: 'Title', type: 'text' },
     { key: 'desc', label: 'Description', type: 'textarea', fullWidth: true },
-  ],
-  room: [
-    { key: 'name', label: 'Room Name', type: 'text' },
-    { key: 'capacity', label: 'Capacity', type: 'text' },
-    { key: 'price', label: 'Price', type: 'text' },
-    { key: 'description', label: 'Description', type: 'textarea', fullWidth: true },
-    { key: 'image', label: 'Image URL', type: 'text' },
-    { key: 'amenities', label: 'Amenities (comma separated)', type: 'text' },
-    { key: 'featured', label: 'Featured?', type: 'checkbox' },
   ],
   location: [
     { key: 'name', label: 'Location Name', type: 'text' },
@@ -1130,38 +1099,6 @@ function ListingTable({ type }) {
           <div className="flex-1 min-w-0">
             <div className="font-bold text-gray-900 dark:text-white mb-1">{d.title}</div>
             <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{d.desc}</p>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'room') {
-      return (
-        <div className="flex items-start gap-4">
-          {d.image ? (
-            <div className="w-20 h-16 rounded-xl overflow-hidden bg-gray-100 dark:bg-slate-700 shrink-0 shadow-md">
-              <img src={d.image} alt={d.name} className="w-full h-full object-cover" />
-            </div>
-          ) : (
-            <div className="w-20 h-16 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-lg shadow-md shrink-0">🏠</div>
-          )}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-bold text-gray-900 dark:text-white">{d.name}</span>
-              {d.featured && <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 text-xs font-semibold">Featured</span>}
-            </div>
-            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
-              {d.capacity && <span>👤 {d.capacity}</span>}
-              {d.price && <span className="font-semibold text-emerald-500">{d.price}</span>}
-            </div>
-            {d.amenities && (
-              <div className="flex gap-1 mt-1 flex-wrap">
-                {d.amenities.split(',').slice(0, 3).map((a, ai) => (
-                  <span key={ai} className="text-xs px-2 py-0.5 rounded-full bg-white/50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400">{a.trim()}</span>
-                ))}
-                {d.amenities.split(',').length > 3 && <span className="text-xs text-gray-400">+{d.amenities.split(',').length - 3}</span>}
-              </div>
-            )}
           </div>
         </div>
       );

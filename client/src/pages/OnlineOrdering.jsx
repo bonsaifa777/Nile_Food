@@ -7,8 +7,10 @@ import { FiArrowRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getIcon } from '../utils/icons';
+import { useTranslation } from 'react-i18next';
 
 export default function OnlineOrdering() {
+  const { t } = useTranslation();
   const [steps, setSteps] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
@@ -26,8 +28,8 @@ export default function OnlineOrdering() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Online <span className="text-primary-500">Ordering</span></h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Order your favorite meals online and enjoy fast delivery</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{t('onlineOrdering.titleBefore')} <span className="text-primary-500">{t('onlineOrdering.titleHighlight')}</span></h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('onlineOrdering.subtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -56,11 +58,11 @@ export default function OnlineOrdering() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="max-w-3xl mx-auto">
             <div className="bg-gradient-to-r from-primary-500 to-primary-400 rounded-2xl p-8 lg:p-12 text-center">
-              <h2 className="text-2xl lg:text-3xl font-black text-white mb-3">Ready to Order?</h2>
-              <p className="text-primary-100 mb-6">Browse our menu and place your order in minutes</p>
+              <h2 className="text-2xl lg:text-3xl font-black text-white mb-3">{t('onlineOrdering.readyTitle')}</h2>
+              <p className="text-primary-100 mb-6">{t('onlineOrdering.browseText')}</p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/menu" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow">Order Now <FiArrowRight size={16} /></Link>
-                <Link to="/packages" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow">View Packages <FiArrowRight size={16} /></Link>
+                <Link to="/menu" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow">{t('onlineOrdering.orderNow')} <FiArrowRight size={16} /></Link>
+                <Link to="/packages" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow">{t('onlineOrdering.viewPackages')} <FiArrowRight size={16} /></Link>
               </div>
             </div>
           </motion.div>

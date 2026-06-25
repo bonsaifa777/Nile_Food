@@ -214,12 +214,7 @@ const listingData = [
   { type: 'experience_feature', data: { icon: 'FiHeart', title: 'Community Focused', desc: 'We support local farmers and give back to the communities we serve.' }, order: 6 },
 
   // Rooms
-  { type: 'room', data: { name: 'Standard Lounge', capacity: '2-4 People', amenities: ['Comfortable Seating', 'WiFi', 'TV'], price: 'Free', image: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=400&q=80' }, order: 1 },
-  { type: 'room', data: { name: 'Family Room', capacity: '4-8 People', amenities: ['Private Space', 'WiFi', 'TV', 'Kids Menu'], price: 'ETB 500', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=80' }, order: 2 },
-  { type: 'room', data: { name: 'VIP Lounge', capacity: '2-6 People', amenities: ['Premium Seating', 'Personal Server', 'WiFi', 'TV', 'AC'], price: 'ETB 1,200', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80' }, order: 3 },
-  { type: 'room', data: { name: 'Conference Hall', capacity: '20-50 People', amenities: ['Projector', 'Sound System', 'Catering', 'WiFi'], price: 'ETB 3,000', image: 'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=400&q=80' }, order: 4 },
-  { type: 'room', data: { name: 'Rooftop Terrace', capacity: '10-30 People', amenities: ['Open Air', 'City View', 'BBQ Grill', 'Music System'], price: 'ETB 2,000', image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=400&q=80' }, order: 5 },
-  { type: 'room', data: { name: 'Private Dining Room', capacity: '6-12 People', amenities: ['Exclusive Server', 'Custom Menu', 'WiFi', 'AC'], price: 'ETB 1,500', image: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80' }, order: 6 },
+
 
   // Locations
   { type: 'location', data: { name: 'Addis Ababa - Bole', address: 'Bole Road, near Bole International Airport', phone: '+251 11 123 4567', hours: '8:00 AM - 11:00 PM', latitude: 9.0, longitude: 38.75 }, order: 1 },

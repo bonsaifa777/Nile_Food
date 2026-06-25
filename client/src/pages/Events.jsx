@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -12,6 +13,7 @@ export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios.get('/api/listings/event')
@@ -26,8 +28,8 @@ export default function Events() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4"><span className="text-primary-500">Events</span> & Catering</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Let Nile Food make your next event unforgettable</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4"><span className="text-primary-500">{t('events.title').split(' & ')[0]}</span> & {t('events.title').split(' & ')[1]}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('events.subtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-16">
@@ -47,7 +49,7 @@ export default function Events() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{d.title}</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">{d.desc}</p>
-                    <Link to="/reserve" className="text-sm font-semibold text-primary-500 hover:text-primary-600 transition-colors">Inquire Now →</Link>
+                    <Link to="/reserve" className="text-sm font-semibold text-primary-500 hover:text-primary-600 transition-colors">{t('events.inquireNow')} →</Link>
                   </motion.div>
                 );
               })
@@ -56,10 +58,10 @@ export default function Events() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
             className="max-w-2xl mx-auto bg-gradient-to-r from-primary-500 to-primary-400 rounded-2xl p-8 lg:p-12 text-center">
-            <h2 className="text-2xl lg:text-3xl font-black text-white mb-2">Plan Your Event</h2>
-            <p className="text-primary-100 mb-6">Contact our events team for a customized quote</p>
+            <h2 className="text-2xl lg:text-3xl font-black text-white mb-2">{t('events.planYourEvent')}</h2>
+            <p className="text-primary-100 mb-6">{t('events.contactTeam')}</p>
             <a href="tel:+251112345678" className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-600 font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-              <FiPhone size={18} /> Call Us: +251 11 234 5678
+              <FiPhone size={18} /> {t('events.callUs')}
             </a>
           </motion.div>
         </div>

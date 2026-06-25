@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiFacebook, FiInstagram, FiTwitter, FiPhone, FiMail, FiMapPin, FiArrowRight, FiSend, FiChevronRight } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -21,7 +22,7 @@ const DEFAULT_FOOTER = {
   newsletter: { title: 'Stay in the Loop', subtitle: 'Get exclusive deals, new menu alerts, and food stories delivered to your inbox.' }
 };
 
-const LINK_GROUPS = ['Product', 'Company', 'Services'];
+// LINK_GROUPS moved inside component for i18n support
 
 function FloatingParticle({ index }) {
   const duration = 5 + Math.random() * 5;
@@ -261,6 +262,8 @@ function LinkColumn({ section, index }) {
 }
 
 export default function Footer() {
+  const { t } = useTranslation();
+  const LINK_GROUPS = [t('footer.sectionProduct'), t('footer.sectionCompany'), t('footer.sectionServices')];
   const [footer, setFooter] = useState(null);
   const [email, setEmail] = useState('');
   const sectionRef = useRef(null);
@@ -271,12 +274,24 @@ export default function Footer() {
       .catch(() => setFooter(null));
   }, []);
 
-  const data = footer || DEFAULT_FOOTER;
+  const defaultFooter = useMemo(() => ({
+    ...DEFAULT_FOOTER,
+    brand: { ...DEFAULT_FOOTER.brand, name: t('footer.brandName'), description: t('footer.brandDescription') },
+    sections: DEFAULT_FOOTER.sections.map(s => ({
+      ...s,
+      title: t('footer.section' + s.title),
+      links: s.links.map(l => ({ ...l, label: t('footer.link' + l.label.replace(/\s+/g, '')) }))
+    })),
+    socials: DEFAULT_FOOTER.socials.map(s => ({ ...s, label: t('footer.social' + s.label) })),
+    newsletter: { ...DEFAULT_FOOTER.newsletter, title: t('footer.newsletterTitle'), subtitle: t('footer.newsletterSubtitle') }
+  }), [t]);
+
+  const data = footer || defaultFooter;
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email) {
-      toast.success('Subscribed! Welcome to Nile Food.');
+      toast.success(t('footer.subscribed'));
       setEmail('');
     }
   };
@@ -336,7 +351,7 @@ export default function Footer() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="Enter your email"
+                          placeholder={t('footer.emailPlaceholder')}
                           required
                           whileFocus={{ scale: 1.01 }}
                           className="w-full pl-12 pr-4 py-3.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400/50 focus:border-primary-400 transition-all duration-300"
@@ -348,7 +363,7 @@ export default function Footer() {
                           whileTap={{ scale: 0.95 }}
                           className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-primary-600 to-primary-500 text-white font-bold rounded-2xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-shadow text-sm"
                         >
-                          Subscribe <FiSend size={14} />
+                          {t('footer.subscribe')} <FiSend size={14} />
                         </motion.span>
                       </MagneticButton>
                     </motion.form>
@@ -463,9 +478,9 @@ export default function Footer() {
             >
               &copy; {new Date().getFullYear()}{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-purple-500 font-semibold">
-                {data.brand?.name || 'Nile Food'}
+                {data.brand?.name || t('footer.brandName')}
               </span>
-              . All rights reserved.
+              . {t('footer.rights')}
             </motion.p>
           </div>
         </motion.div>

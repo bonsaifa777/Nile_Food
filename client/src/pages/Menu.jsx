@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import {
   FiSearch, FiFilter, FiX, FiMapPin, FiBell, FiHeart, FiShoppingCart,
   FiUser, FiChevronDown, FiMenu, FiMic, FiClock, FiArrowLeft,
@@ -15,6 +16,8 @@ import CategoryNav from '../components/foods/CategoryNav';
 import FilterSidebar from '../components/foods/FilterSidebar';
 import SortDropdown from '../components/foods/SortDropdown';
 import FloatingCart from '../components/foods/FloatingCart';
+import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useTheme } from '../context/ThemeContext';
 
 const SORT_OPTIONS = {
   popularity: (a, b) => (b.reviewCount || 0) - (a.reviewCount || 0),
@@ -27,6 +30,8 @@ const SORT_OPTIONS = {
 };
 
 export default function Menu() {
+  const { t } = useTranslation();
+  const { darkMode } = useTheme();
   const [searchParams, setSearchParams] = useSearchParams();
   const [foods, setFoods] = useState([]);
   const [filteredFoods, setFilteredFoods] = useState([]);
@@ -67,7 +72,7 @@ export default function Menu() {
       const { data } = await axios.get('/api/foods?limit=100');
       setFoods(data.data?.foods || []);
     } catch {
-      toast.error('Failed to load menu');
+      toast.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -170,15 +175,15 @@ export default function Menu() {
               <span className="text-white font-black text-lg">N</span>
             </div>
             <span className={`font-bold transition-all duration-300 hidden sm:block ${scrolled ? 'text-lg' : 'text-xl'} text-gray-900 dark:text-white`}>
-              Nile Food
+              {t('footer.brandName')}
             </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
             <FiMapPin size={14} className="text-indigo-500" />
-            <span>Deliver to</span>
+            <span>{t('menu.deliverTo')}</span>
             <button className="flex items-center gap-1 text-gray-900 dark:text-white font-semibold hover:text-indigo-500 transition-colors">
-              Home <FiChevronDown size={12} />
+              {t('nav.home')} <FiChevronDown size={12} />
             </button>
           </div>
 
@@ -195,7 +200,7 @@ export default function Menu() {
                   onChange={(e) => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
                   onFocus={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                  placeholder="Search burgers, pizza, drinks..."
+                  placeholder={t('menu.search')}
                   className="w-full bg-transparent pl-12 pr-12 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none"
                 />
                 <button type="button" className="absolute right-3 p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-400 transition-colors">
@@ -223,7 +228,7 @@ export default function Menu() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{food.name}</p>
-                        <p className="text-xs text-gray-500">ETB {food.price?.toFixed(2)}</p>
+                        <p className="text-xs text-gray-500">{t('common.currencyETB')} {food.price?.toFixed(2)}</p>
                       </div>
                     </Link>
                   ))}
@@ -233,6 +238,10 @@ export default function Menu() {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            <LanguageSwitcher
+              dark={darkMode}
+              btnBase="w-9 h-9 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-500 transition-all"
+            />
             {[FiHeart, FiBell, FiShoppingCart].map((Icon, i) => (
               <motion.button
                 key={i}
@@ -263,7 +272,7 @@ export default function Menu() {
               </Link>
             ) : (
               <Link to="/login" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all">
-                <FiUser size={14} /> Sign In
+                <FiUser size={14} /> {t('nav.signIn')}
               </Link>
             )}
 
@@ -292,7 +301,7 @@ export default function Menu() {
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search dishes..."
+                    placeholder={t('menu.search')}
                     className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none"
                     autoFocus
                   />
@@ -325,7 +334,7 @@ export default function Menu() {
             <div className="flex-1" />
 
             <p className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-semibold text-gray-900 dark:text-white">{filteredFoods.length}</span> dishes
+              <span className="font-semibold text-gray-900 dark:text-white">{filteredFoods.length}</span> {t('menu.dishes')}
             </p>
 
             <SortDropdown sortBy={sortBy} onSortChange={setSortBy} />
@@ -350,7 +359,7 @@ export default function Menu() {
               className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-300 hover:border-indigo-400 transition-all"
             >
               <FiFilter size={15} />
-              Filters
+              {t('menu.filter')}
               {totalActiveFilters > 0 && (
                 <span className="px-1.5 py-0.5 bg-indigo-500 text-white text-[10px] rounded-full">{totalActiveFilters}</span>
               )}
@@ -366,7 +375,7 @@ export default function Menu() {
                 exit={{ opacity: 0, height: 0 }}
                 className="flex items-center gap-2 mb-6 flex-wrap"
               >
-                <span className="text-xs text-gray-400">Active:</span>
+                <span className="text-xs text-gray-400">{t('menu.active')}:</span>
                 {selectedCategory && (
                   <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-100
               dark:bg-indigo-900/30
@@ -374,7 +383,7 @@ export default function Menu() {
               dark:text-indigo-300 text-xs font-semibold rounded-full">
                     {typeof selectedCategory === 'string' && selectedCategory.length < 20
                       ? selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)
-                      : 'Category'}
+                      : t('menu.categories')}
                     <button onClick={() => setSelectedCategory('')} className="hover:text-indigo-900"><FiX size={11} /></button>
                   </span>
                 )}
@@ -396,7 +405,7 @@ export default function Menu() {
                   ))
                 )}
                 <button onClick={clearFilters} className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 underline underline-offset-2">
-                  Clear all
+                  {t('menu.clearAll')}
                 </button>
               </motion.div>
             )}
@@ -437,10 +446,10 @@ export default function Menu() {
                   className="text-center py-20"
                 >
                   <div className="text-7xl mb-6">🔍</div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No dishes found</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your filters or search</p>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('menu.noItems')}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">{t('menu.adjustFilters')}</p>
                   <button onClick={clearFilters} className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-xl transition-all">
-                    Clear All Filters
+                    {t('menu.clearAllFilters')}
                   </button>
                 </motion.div>
               ) : (
@@ -455,7 +464,7 @@ export default function Menu() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <FiClock size={16} className="text-indigo-500" />
-                          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Recently Viewed</h2>
+                          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('menu.recentlyViewed')}</h2>
                         </div>
                       </div>
                       <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
@@ -470,7 +479,7 @@ export default function Menu() {
                             </div>
                             <div className="p-2.5">
                               <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{food.name}</p>
-                              <p className="text-xs font-bold text-indigo-500">ETB {food.price?.toFixed(2)}</p>
+                              <p className="text-xs font-bold text-indigo-500">{t('common.currencyETB')} {food.price?.toFixed(2)}</p>
                             </div>
                           </Link>
                         ))}
@@ -489,7 +498,7 @@ export default function Menu() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                           <span className="text-lg">🔥</span>
-                          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Trending Now</h2>
+                          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('menu.trendingNow')}</h2>
                         </div>
                       </div>
                       <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
@@ -510,7 +519,7 @@ export default function Menu() {
                               </div>
                             </div>
                             <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{food.name}</p>
-                            <p className="text-[11px] font-bold text-indigo-500">ETB {food.price?.toFixed(2)}</p>
+                            <p className="text-[11px] font-bold text-indigo-500">{t('common.currencyETB')} {food.price?.toFixed(2)}</p>
                           </Link>
                         ))}
                       </div>
@@ -520,7 +529,7 @@ export default function Menu() {
                   {/* RESULTS COUNT */}
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Showing <span className="font-semibold text-gray-900 dark:text-white">{filteredFoods.length}</span> results
+                      {t('menu.showing')} <span className="font-semibold text-gray-900 dark:text-white">{filteredFoods.length}</span> {t('menu.results')}
                     </p>
                   </div>
 
@@ -562,7 +571,7 @@ export default function Menu() {
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-800">
                 <div className="flex items-center gap-2">
                   <FiSliders size={16} className="text-indigo-500" />
-                  <span className="font-bold text-gray-900 dark:text-white">Filters</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{t('menu.filter')}</span>
                 </div>
                 <button
                   onClick={() => setMobileFilterOpen(false)}
@@ -583,7 +592,7 @@ export default function Menu() {
                   onClick={() => setMobileFilterOpen(false)}
                   className="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20"
                 >
-                  Apply Filters {totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}
+                  {t('menu.applyFilters')} {totalActiveFilters > 0 ? `(${totalActiveFilters})` : ''}
                 </button>
               </div>
             </motion.div>
@@ -598,11 +607,11 @@ export default function Menu() {
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 lg:hidden safe-area-bottom">
         <div className="flex items-center justify-around py-2">
           {[
-            { icon: FiGrid, label: 'Menu', active: true, onClick: undefined },
-            { icon: FiSearch, label: 'Search', onClick: undefined },
-            { icon: FiShoppingCart, label: 'Cart', badge: cartCount, onClick: () => navigate('/cart') },
-            { icon: FiHeart, label: 'Favorites', onClick: undefined },
-            { icon: FiUser, label: 'Profile', onClick: () => navigate(user ? '/profile' : '/login') },
+            { icon: FiGrid, label: t('nav.menu'), active: true, onClick: undefined },
+            { icon: FiSearch, label: t('common.search'), onClick: undefined },
+            { icon: FiShoppingCart, label: t('nav.cart'), badge: cartCount, onClick: () => navigate('/cart') },
+            { icon: FiHeart, label: t('dashboard.favorites'), onClick: undefined },
+            { icon: FiUser, label: t('nav.profile'), onClick: () => navigate(user ? '/profile' : '/login') },
           ].map(({ icon: Icon, label, active, badge, onClick }) => (
             <button
               key={label}

@@ -1,23 +1,24 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { FiGrid, FiShoppingBag, FiCreditCard, FiHeart, FiLogOut, FiChevronLeft, FiHome, FiBell, FiMessageCircle, FiKey, FiMail } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
-const navItems = [
-  { id: 'overview', label: 'Overview', icon: FiGrid },
-  { id: 'orders', label: 'Orders', icon: FiShoppingBag },
-  { id: 'room-status', label: 'Room Status', icon: FiKey },
-  { id: 'wallet', label: 'Wallet', icon: FiCreditCard },
-  { id: 'favorites', label: 'Favorites', icon: FiHeart },
-  { id: 'messages', label: 'Messages', icon: FiMail },
-];
-
 export default function Sidebar({ active, setActive, collapsed, setCollapsed }) {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { darkMode } = useTheme();
   const d = darkMode;
   const navigate = useNavigate();
+
+  const navItems = [
+    { id: 'overview', label: t('dashboard.overview'), icon: FiGrid },
+    { id: 'orders', label: t('dashboard.orders'), icon: FiShoppingBag },
+    { id: 'wallet', label: t('dashboard.wallet'), icon: FiCreditCard },
+    { id: 'favorites', label: t('dashboard.favorites'), icon: FiHeart },
+    { id: 'messages', label: t('dashboard.messages'), icon: FiMail },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -49,7 +50,7 @@ export default function Sidebar({ active, setActive, collapsed, setCollapsed }) 
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                   <FiHome className="text-white" size={16} />
                 </div>
-                <span className={`font-bold text-sm ${d ? 'text-white/90' : 'text-gray-800'}`}>Dashboard</span>
+                <span className={`font-bold text-sm ${d ? 'text-white/90' : 'text-gray-800'}`}>{t('dashboard.dashboard')}</span>
               </motion.div>
             )}
             <button
@@ -127,7 +128,7 @@ export default function Sidebar({ active, setActive, collapsed, setCollapsed }) 
             className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all ${collapsed ? 'justify-center px-0' : ''}`}
           >
             <FiLogOut size={20} />
-            {!collapsed && <span className="text-sm font-medium">Sign Out</span>}
+            {!collapsed && <span className="text-sm font-medium">{t('dashboard.signOut')}</span>}
           </motion.button>
         </div>
       </div>

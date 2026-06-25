@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
-  FiShoppingCart, FiMenu, FiX, FiUser, FiHeart, FiMapPin,
+  FiShoppingCart, FiMenu, FiX, FiUser, FiMapPin,
   FiCalendar, FiBox, FiGift, FiHome, FiCoffee, FiSmartphone,
   FiImage, FiAward, FiTag, FiSearch, FiSun, FiMoon, FiChevronDown,
   FiBell, FiShoppingBag, FiCheckCircle,
@@ -12,6 +13,7 @@ import toast from 'react-hot-toast';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import LanguageSwitcher from './LanguageSwitcher';
 
 function playNotificationSound() {
   try {
@@ -37,7 +39,7 @@ const STATUS_ICONS = {
 
 const iconMap = {
   FiCalendar, FiBox, FiGift, FiHome, FiCoffee, FiSmartphone,
-  FiTag, FiMapPin, FiImage, FiAward, FiSearch, FiHeart,
+  FiTag, FiMapPin, FiImage, FiAward, FiSearch,
 };
 
 const springTap = { type: 'spring', stiffness: 500, damping: 12 };
@@ -126,6 +128,7 @@ function CartBadge({ count }) {
 }
 
 const Navbar = ({ darkMode, onToggleDarkMode }) => {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -211,39 +214,32 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
 
   const defaults = {
     menuItems: [
-      { label: 'Home', path: '/' },
-      { label: 'Menu', path: '/menu' },
-      { label: 'Rooms', path: '/rooms' },
-      { label: 'About', path: '/about' },
-      { label: 'Contact', path: '/contact' },
+      { label: t('nav.home'), path: '/' },
+      { label: t('nav.menu'), path: '/menu' },
+      { label: t('nav.about'), path: '/about' },
+      { label: t('nav.contact'), path: '/contact' },
     ],
     categoryItems: [
-      { label: 'Pizza', path: '/menu?category=pizza', emoji: '🍕' },
-      { label: 'Burger', path: '/menu?category=burger', emoji: '🍔' },
-      { label: 'Sushi', path: '/menu?category=sushi', emoji: '🍣' },
-      { label: 'Drinks', path: '/menu?category=drinks', emoji: '🥤' },
-      { label: 'Desserts', path: '/menu?category=desserts', emoji: '🍰' },
-      { label: 'Ethiopian', path: '/menu?category=ethiopian', emoji: '🇪🇹' },
-      { label: 'Pasta', path: '/menu?category=pasta', emoji: '🍝' },
-      { label: 'Salads', path: '/menu?category=salads', emoji: '🥗' },
+      { label: t('nav.pizza'), path: '/menu?category=pizza', emoji: '🍕' },
+      { label: t('nav.burger'), path: '/menu?category=burger', emoji: '🍔' },
+      { label: t('nav.sushi'), path: '/menu?category=sushi', emoji: '🍣' },
+      { label: t('nav.drinks'), path: '/menu?category=drinks', emoji: '🥤' },
+      { label: t('nav.desserts'), path: '/menu?category=desserts', emoji: '🍰' },
+      { label: t('nav.ethiopian'), path: '/menu?category=ethiopian', emoji: '🇪🇹' },
+      { label: t('nav.pasta'), path: '/menu?category=pasta', emoji: '🍝' },
+      { label: t('nav.salads'), path: '/menu?category=salads', emoji: '🥗' },
     ],
     bookingDropdownItems: [
-      { label: 'Reserve', path: '/reserve', icon: 'FiCalendar' },
-      { label: 'Package', path: '/packages', icon: 'FiBox' },
-      { label: 'Events', path: '/events', icon: 'FiGift' },
-      { label: 'Dining', path: '/dining', icon: 'FiCoffee' },
-      { label: 'Online Order', path: '/online-ordering', icon: 'FiSmartphone' },
-      { label: 'Offers', path: '/offers', icon: 'FiTag' },
+      { label: t('nav.packages'), path: '/packages', icon: 'FiBox' },
+      { label: t('nav.events'), path: '/events', icon: 'FiGift' },
+
     ],
-    primLinks: [
-      { label: 'Location', path: '/location', icon: 'FiMapPin' },
-    ],
+    primLinks: [],
     secLinks: [
-      { label: 'Gallery', path: '/gallery', icon: 'FiImage' },
-      { label: 'Experience', path: '/experience', icon: 'FiAward' },
+      { label: t('nav.gallery'), path: '/gallery', icon: 'FiImage' },
+      { label: t('nav.experience'), path: '/experience', icon: 'FiAward' },
     ],
-    locationLabel: 'Location',
-    locationPath: '/location',
+
   };
 
   const nav = navData || defaults;
@@ -354,26 +350,6 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
               </motion.div>
             ))}
 
-            <motion.div
-              className={`w-px h-5 mx-1 ${
-                d ? 'bg-gradient-to-b from-transparent via-white/10 to-transparent' : 'bg-gradient-to-b from-transparent via-primary-200 to-transparent'
-              }`}
-            />
-
-            <Link to={nav.locationPath || '/location'}>
-              <motion.div
-                whileHover={{ scale: 1.08, y: -3 }}
-                whileTap={{ scale: 0.92 }}
-                transition={springTap}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-xl cursor-pointer transition-all duration-300 border ${
-                  linkActiveClasses(isActive(nav.locationPath || '/location'))
-                }`}
-              >
-                <FiMapPin size={14} />
-                {nav.locationLabel || 'Location'}
-              </motion.div>
-            </Link>
-
             {/* Booking Dropdown */}
             <div ref={bookingRef} className="relative">
               <motion.button
@@ -448,9 +424,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
             className="flex items-center gap-0.5 sm:gap-1"
           >
             <motion.div variants={itemVariants}>
-              <TiltBtn className={`p-2.5 rounded-xl ${btnBase}`} dark={d} tooltip="Wishlist">
-                <FiHeart size={20} />
-              </TiltBtn>
+              <LanguageSwitcher dark={d} btnBase={btnBase} />
             </motion.div>
 
             <motion.div variants={itemVariants}>
@@ -458,7 +432,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 href="/cart"
                 className={`relative p-2.5 rounded-xl ${btnBase}`}
                 dark={d}
-                tooltip="Cart"
+                tooltip={t('nav.cart')}
               >
                 <FiShoppingCart size={20} />
                 <CartBadge count={cartCount} />
@@ -470,7 +444,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 className={`relative p-2.5 rounded-xl ${btnBase}`}
                 dark={d}
                 onClick={() => setShowNotifs(!showNotifs)}
-                tooltip="Notifications"
+                tooltip={t('nav.notifications')}
               >
                 <FiBell size={20} />
                 {notifCount > 0 && (
@@ -498,17 +472,17 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                   >
                     <div className={`flex items-center justify-between p-4 border-b ${d ? 'border-white/10' : 'border-gray-200'}`}>
                       <div className="flex items-center gap-2">
-                        <h3 className={`font-semibold text-sm ${d ? 'text-white' : 'text-gray-900'}`}>Notifications</h3>
+                        <h3 className={`font-semibold text-sm ${d ? 'text-white' : 'text-gray-900'}`}>{t('nav.notifications')}</h3>
                         {notifCount > 0 && (
                           <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400">
-                            {notifCount} new
+                            {notifCount} {t('nav.new')}
                           </span>
                         )}
                       </div>
                       {notifCount > 0 && (
                         <button onClick={() => setNotifications(prev => prev.map(n => ({ ...n, read: true })))}
                           className={`text-xs font-medium ${d ? 'text-white/40' : 'text-gray-500'}`}>
-                          Clear
+                          {t('nav.clear')}
                         </button>
                       )}
                     </div>
@@ -516,7 +490,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                       {notifications.length === 0 ? (
                         <div className="p-8 text-center">
                           <FiBell size={20} className={`mx-auto mb-2 ${d ? 'text-white/30' : 'text-gray-400'}`} />
-                          <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>No notifications yet</p>
+                          <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('nav.noNotifications')}</p>
                         </div>
                       ) : (
                         notifications.map((n, i) => (
@@ -548,7 +522,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 className={`p-2.5 rounded-xl ${btnBase}`}
                 dark={d}
                 onClick={onToggleDarkMode}
-                tooltip={d ? 'Light Mode' : 'Dark Mode'}
+                tooltip={d ? t('nav.lightMode') : t('nav.darkMode')}
               >
                 <motion.div
                   key={d ? 'moon' : 'sun'}
@@ -577,7 +551,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                       <FiUser className="text-white" size={14} />
                     </div>
                     <span className={`hidden lg:block text-sm font-semibold ${d ? 'text-primary-300' : 'text-primary-700'}`}>
-                      {user.name?.split(' ')[0] || 'Profile'}
+                      {user.name?.split(' ')[0] || t('nav.profile')}
                     </span>
                   </motion.div>
                 </Link>
@@ -586,7 +560,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
               <motion.div variants={itemVariants}>
                 <ShimmerButton href="/login" dark={d}>
                   <FiUser size={15} />
-                  Sign In
+                  {t('nav.signIn')}
                 </ShimmerButton>
               </motion.div>
             )}
@@ -681,7 +655,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 className={`pt-3 border-t ${d ? 'border-white/5' : 'border-primary-100/50'}`}
               >
                 <p className={`px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] ${d ? 'text-gray-500' : 'text-primary-400'}`}>
-                  Booking
+                  {t('nav.booking')}
                 </p>
                 {bookingDropdownItems.map((item) => (
                   <Link key={item.path} to={item.path} onClick={() => { setIsMenuOpen(false); setIsBookingOpen(false); }}>

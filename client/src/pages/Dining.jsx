@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import LuxuryHero from '../components/LuxuryHero';
@@ -13,6 +14,7 @@ export default function Dining() {
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios.get('/api/listings/dining_experience')
@@ -50,7 +52,7 @@ export default function Dining() {
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{d.title}</h3>
                       <p className="text-sm text-primary-500 font-semibold mb-3">{d.time}</p>
                       <p className="text-gray-500 dark:text-gray-400 mb-5">{d.desc}</p>
-                      <Link to="/menu" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors">View Menu <FiArrowRight size={14} /></Link>
+                      <Link to="/menu" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors">{t('dining.viewMenu')} <FiArrowRight size={14} /></Link>
                     </div>
                   </motion.div>
                 );

@@ -6,6 +6,7 @@ import {
   FiArrowRight, FiChevronRight
 } from 'react-icons/fi';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 const FEATURES = [
   {
@@ -53,6 +54,7 @@ const FEATURES = [
 ];
 
 function TiltCard({ feature, index }) {
+  const { t } = useTranslation();
   const cardRef = useRef(null);
   const x = useMotionValue(0.5);
   const y = useMotionValue(0.5);
@@ -119,10 +121,10 @@ function TiltCard({ feature, index }) {
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-slate-900 group-hover:to-slate-600 dark:group-hover:from-white dark:group-hover:to-slate-300 transition-all duration-300">
-                {feature.title}
+                {t(feature.title)}
               </h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                {feature.desc}
+                {t(feature.desc)}
               </p>
             </div>
             <div className="absolute top-0 right-0 w-32 h-32 opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-y-1/2 translate-x-1/2 group-hover:translate-y-0 group-hover:translate-x-0 pointer-events-none">
@@ -206,6 +208,7 @@ function FloatingBlob({ index }) {
 }
 
 export default function EnterprisePlatform() {
+  const { t } = useTranslation();
   const { darkMode } = useTheme();
   const sectionRef = useRef(null);
 
@@ -245,7 +248,7 @@ export default function EnterprisePlatform() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500" />
             </span>
             <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 tracking-wide">
-              Everything You Need
+              {t('home.enterprisePlatform')}
             </span>
           </motion.div>
 
@@ -257,11 +260,11 @@ export default function EnterprisePlatform() {
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.1] mb-5"
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white">
-              Enterprise-Grade
+              {t('home.enterprisePlatform')}
             </span>
             <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500">
-              Hospitality Platform
+              {t('home.enterprisePlatform')}
             </span>
           </motion.h2>
 
@@ -272,7 +275,7 @@ export default function EnterprisePlatform() {
             transition={{ delay: 0.25, duration: 0.6 }}
             className="text-base sm:text-lg text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed"
           >
-            A complete cloud ecosystem for restaurants and hotels — from online ordering and room booking to real-time tracking and intelligent operations.
+            {t('home.enterprisePlatform')}
           </motion.p>
         </motion.div>
 
@@ -298,7 +301,7 @@ export default function EnterprisePlatform() {
               className="group relative px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold rounded-xl shadow-2xl shadow-slate-900/25 dark:shadow-white/10 overflow-hidden"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Explore Menu
+                {t('common.learnMore')}
                 <FiArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
               <motion.div
@@ -306,18 +309,7 @@ export default function EnterprisePlatform() {
               />
             </motion.button>
           </Link>
-          <Link to="/rooms">
-            <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="group px-8 py-4 bg-transparent text-slate-700 dark:text-slate-300 font-semibold rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-primary-400 dark:hover:border-primary-500 shadow-lg transition-colors duration-300"
-            >
-              <span className="flex items-center gap-2">
-                Book Luxury Stay
-                <FiChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </motion.button>
-          </Link>
+
         </motion.div>
       </div>
     </section>

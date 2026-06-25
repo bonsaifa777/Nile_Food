@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -11,6 +12,7 @@ export default function Packages() {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     axios.get('/api/listings/package')
@@ -25,8 +27,10 @@ export default function Packages() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Our <span className="text-primary-500">Packages</span></h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">Choose the perfect meal package for any occasion</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{t('packages.title').split(' ').map((word, i, arr) =>
+                i === arr.length - 1 ? <span key={i} className="text-primary-500">{word}</span> : word + ' '
+              )}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('packages.subtitle')}</p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -40,7 +44,7 @@ export default function Packages() {
                     className={`relative bg-white dark:bg-slate-800 rounded-2xl border-2 p-6 shadow-sm transition-all duration-300 hover:shadow-xl ${d.popular ? 'border-primary-500 dark:border-primary-400' : 'border-gray-100 dark:border-slate-700'}`}>
                     {d.popular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
-                        <FiStar size={12} /> Most Popular
+                        <FiStar size={12} /> {t('packages.mostPopular')}
                       </div>
                     )}
                     <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center mb-4">
@@ -57,7 +61,7 @@ export default function Packages() {
                     </ul>
                     <button onClick={() => toast.success(`${d.name} package added to cart!`)}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-white dark:text-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl transition-colors">
-                      <FiShoppingCart size={14} /> Order Now
+                      <FiShoppingCart size={14} /> {t('packages.orderNow')}
                     </button>
                   </motion.div>
                 );

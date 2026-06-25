@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   motion, useMotionValue, useSpring, useTransform, AnimatePresence,
   useScroll, useVelocity, useAnimation
@@ -13,18 +13,13 @@ import Footer from '../components/common/Footer';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 import {
    CalendarDays, Users, ChevronLeft, ChevronRight, Heart, Share2,
-   Star, MapPin, Clock, Wifi, Tv, Wind, Coffee, Bath, Utensils,
-   Shield, Sparkles, ArrowRight, CheckCircle, Minus, Plus,
-   Camera, Sun, Monitor, Music, Phone, Gem, Quote, Layers,
-   ChevronDown, Award, CheckSquare, Loader2, Sparkle, ScrollText,
-   Maximize2, Minimize2, Info, BadgeCheck, Flame, Zap, CircleDot,
-   Wine, ChefHat, Cake, Bell, TreePine, Palette, PartyPopper,
-   Instagram, Facebook, Twitter, ExternalLink, BookOpen, GlassWater,
-   RotateCcw, Eye, X, Bed, Sofa, Trees, Waves, UtensilsCrossed,
-   Dumbbell, Car, Shirt, Lamp, Refrigerator, Armchair,
-   SunDim, Fan, DoorOpen, Library, Soup, CreditCard, Building2, Smartphone, Landmark, Upload
+   Star, MapPin, Clock, Shield, Sparkles, ArrowRight, CheckCircle,
+   Minus, Plus, Camera, Gem, Award, Loader2, ScrollText,
+   Maximize2, BadgeCheck, X,
+   CreditCard, Smartphone, Landmark, Upload
  } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
@@ -55,32 +50,19 @@ const DEFAULT_REVIEWS = [
 ];
 
 const DEFAULT_AMENITIES = [
-  { icon: Wifi, label: 'Free High-Speed Wi-Fi' },
-  { icon: Tv, label: '65" OLED Smart TV' },
-  { icon: Wind, label: 'Premium Climate Control' },
-  { icon: Coffee, label: 'Espresso & Tea Bar' },
-  { icon: Bath, label: 'Luxury En-suite Bathroom' },
-  { icon: Utensils, label: '24/7 Room Service' },
-  { icon: Shield, label: 'Personal Butler Service' },
-  { icon: Monitor, label: 'Dedicated Workstation' },
-  { icon: Music, label: 'Sonic Sound System' },
-  { icon: Sun, label: 'Panoramic City Views' },
+  { label: 'Free High-Speed Wi-Fi' },
+  { label: '65" OLED Smart TV' },
+  { label: 'Premium Climate Control' },
+  { label: 'Espresso & Tea Bar' },
+  { label: 'Luxury En-suite Bathroom' },
+  { label: '24/7 Room Service' },
+  { label: 'Personal Butler Service' },
+  { label: 'Dedicated Workstation' },
+  { label: 'Sonic Sound System' },
+  { label: 'Panoramic City Views' },
 ];
 
-const AMENITY_ICON_MAP = {
-  'wifi': Wifi, 'tv': Tv, 'ac': Wind, 'coffee': Coffee, 'bath': Bath,
-  'utensils': Utensils, 'butler': Shield, 'desk': Monitor, 'music': Music,
-  'view': Sun, 'bed': Bed, 'sofa': Sofa, 'garden': Trees, 'pool': Waves,
-  'gym': Dumbbell, 'parking': Car, 'laundry': Shirt, 'lamp': Lamp,
-  'fridge': Refrigerator, 'armchair': Armchair, 'fan': Fan, 'door': DoorOpen,
-  'library': Library, 'kitchen': Soup, 'dining': UtensilsCrossed,
-};
-
-function getAmenityIcon(label) {
-  const key = label.toLowerCase().replace(/[^a-z0-9]/g, '');
-  for (const [k, Icon] of Object.entries(AMENITY_ICON_MAP)) {
-    if (key.includes(k)) return Icon;
-  }
+function getAmenityIcon(_label) {
   return Gem;
 }
 
@@ -344,6 +326,7 @@ function AnimatedGradientBorder({ children, className = '', active = true }) {
 }
 
 function BookingSuccessModal({ show, onClose, bookingDetails }) {
+  const { t } = useTranslation();
   const [confetti, setConfetti] = useState([]);
 
   useEffect(() => {
@@ -438,8 +421,8 @@ function BookingSuccessModal({ show, onClose, bookingDetails }) {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-                <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Reservation Confirmed!</h3>
-                <p className="mt-1.5 text-sm text-indigo-400/60 dark:text-indigo-300/50">Your premium experience has been secured</p>
+                <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">{t('reserve.confirmed')}</h3>
+                <p className="mt-1.5 text-sm text-indigo-400/60 dark:text-indigo-300/50">{t('reserve.secured')}</p>
               </motion.div>
 
               {bookingDetails && (
@@ -451,19 +434,19 @@ function BookingSuccessModal({ show, onClose, bookingDetails }) {
                 >
                   {bookingDetails.checkIn && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-indigo-400/60 dark:text-indigo-300/40">Check In</span>
+                      <span className="text-indigo-400/60 dark:text-indigo-300/40">{t('reserve.checkIn')}</span>
                       <span className="font-bold text-gray-900 dark:text-white">{bookingDetails.checkIn}</span>
                     </div>
                   )}
                   {bookingDetails.checkOut && (
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-indigo-400/60 dark:text-indigo-300/40">Check Out</span>
+                      <span className="text-indigo-400/60 dark:text-indigo-300/40">{t('reserve.checkOut')}</span>
                       <span className="font-bold text-gray-900 dark:text-white">{bookingDetails.checkOut}</span>
                     </div>
                   )}
                   {bookingDetails.guests && (
                     <div className="flex items-center justify-between text-sm pt-2 border-t border-indigo-200/30 dark:border-indigo-700/20">
-                      <span className="text-indigo-400/60 dark:text-indigo-300/40">Total Guests</span>
+                      <span className="text-indigo-400/60 dark:text-indigo-300/40">{t('reserve.totalGuests')}</span>
                       <span className="font-bold text-gray-900 dark:text-white">{bookingDetails.guests}</span>
                     </div>
                   )}
@@ -480,7 +463,7 @@ function BookingSuccessModal({ show, onClose, bookingDetails }) {
                     animate={{ x: ['-100%', '200%'] }}
                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
                   />
-                  <span className="relative z-10">Done</span>
+                  <span className="relative z-10">{t('common.done')}</span>
                 </MagneticButton>
               </motion.div>
             </div>
@@ -579,13 +562,11 @@ function ImageLightbox({ images, initialIndex, onClose }) {
   );
 }
 
-function HeroGallery({ images, roomName, rd, isRoomBooking }) {
+function HeroGallery({ images }) {
+  const { t } = useTranslation();
   const galleryImages = images?.length ? images : DEFAULT_IMAGES;
   const [activeIndex, setActiveIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
-  const displayedName = isRoomBooking ? (rd.name || roomName) : 'Grand Dining Hall';
-  const displayedPrice = isRoomBooking ? `$${rd.price || '0'}` : 'ETB 3,500';
-  const displayedCapacity = isRoomBooking ? (rd.capacity || '6') : '6';
 
   return (
     <>
@@ -634,12 +615,12 @@ function HeroGallery({ images, roomName, rd, isRoomBooking }) {
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
               className="overflow-hidden rounded-full border border-white/20 bg-white/12 px-3 py-1.5 backdrop-blur-xl shadow-lg"
             >
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">{isRoomBooking ? 'Premium Room' : 'Premium Dining'}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">{t('reserve.premiumDining')}</span>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}
               className="overflow-hidden rounded-full border border-indigo-400/30 bg-gradient-to-r from-indigo-500/50 to-violet-500/40 px-3 py-1.5 backdrop-blur-xl shadow-lg"
             >
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white">Featured</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-white">{t('reserve.featured')}</span>
             </motion.div>
           </div>
 
@@ -654,11 +635,11 @@ function HeroGallery({ images, roomName, rd, isRoomBooking }) {
 
           <div className="absolute bottom-4 left-4 right-4 z-20">
             <motion.div key={activeIndex} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}>
-              <h2 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-white drop-shadow-lg">{displayedName}</h2>
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-extrabold text-white drop-shadow-lg">{t('reserve.grandDiningHall')}</h2>
               <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-white/70">
-                <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-indigo-300" /> City View</span>
-                <span className="flex items-center gap-1"><Users className="h-3 w-3 text-indigo-300" /> Up to {displayedCapacity}</span>
-                <span className="flex items-center gap-1"><Sparkles className="h-3 w-3 text-indigo-300" /> {displayedPrice}</span>
+                <span className="flex items-center gap-1"><MapPin className="h-3 w-3 text-indigo-300" /> {t('reserve.cityView')}</span>
+                <span className="flex items-center gap-1"><Users className="h-3 w-3 text-indigo-300" /> {t('reserve.upTo')} 6</span>
+                <span className="flex items-center gap-1"><Sparkles className="h-3 w-3 text-indigo-300" /> {t('reserve.priceDisplay')}</span>
               </div>
             </motion.div>
           </div>
@@ -667,7 +648,7 @@ function HeroGallery({ images, roomName, rd, isRoomBooking }) {
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-md border border-white/10 pointer-events-none">
           <Maximize2 className="h-3 w-3 text-white/70" />
           <span className="text-[10px] font-medium text-white/90">{activeIndex + 1}<span className="text-white/40">/{galleryImages.length}</span></span>
-          <span className="text-[9px] text-white/50 ml-1">Click to expand</span>
+          <span className="text-[9px] text-white/50 ml-1">{t('reserve.clickToExpand')}</span>
         </div>
 
         <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 pointer-events-auto">
@@ -694,9 +675,9 @@ function ElementImages({ images }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Camera className="h-4 w-4 text-indigo-500" />
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Room Details</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">{t('reserve.diningDetails')}</span>
         </div>
-        <span className="text-[10px] text-indigo-400/50">{elementImages.length} photos</span>
+        <span className="text-[10px] text-indigo-400/50">{elementImages.length} {t('reserve.photos')}</span>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-2">
         {elementImages.map((img, i) => (
@@ -755,16 +736,8 @@ function ElementImages({ images }) {
   );
 }
 
-function RoomInfoCard({ rd, roomName, isRoomBooking }) {
-  const price = isRoomBooking ? (rd.price ? `$${rd.price}` : 'ETB 3,500') : 'ETB 3,500';
-  const name = isRoomBooking ? (rd.name || roomName) : 'Grand Dining Hall';
-  const desc = isRoomBooking
-    ? rd.description || 'Experience unparalleled luxury in this meticulously designed space.'
-    : 'Step into our magnificent Grand Dining Hall, where contemporary elegance meets timeless sophistication.';
-  const capacity = isRoomBooking ? (rd.capacity || '6') : '6';
-  const badge = isRoomBooking ? (rd.capacity ? `Up to ${rd.capacity} Guests` : 'Premium Room') : 'Premium Dining';
-
-  const [countCapacity] = useCountUp(parseInt(capacity) || 6, 1500);
+function InfoCard() {
+  const { t } = useTranslation();
   const [countRating] = useCountUp(49, 1200);
   const [countReviews] = useCountUp(89, 1400);
 
@@ -774,21 +747,21 @@ function RoomInfoCard({ rd, roomName, isRoomBooking }) {
         <div className="flex-1 min-w-[200px]">
           <div className="flex flex-wrap items-center gap-2 mb-2.5">
             <span className="rounded-full border border-indigo-200/50 bg-gradient-to-r from-indigo-100 to-indigo-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:border-indigo-700/30 dark:from-indigo-900/40 dark:to-indigo-900/20 dark:text-indigo-300">
-              {badge}
+              {t('reserve.premiumDining')}
             </span>
             <span className="rounded-full border border-violet-200/50 bg-gradient-to-r from-violet-50 to-violet-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-violet-600 dark:border-violet-700/30 dark:from-violet-900/20 dark:to-violet-900/10 dark:text-violet-400">
-              Featured
+              {t('reserve.featured')}
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{name}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-indigo-300/70">{desc}</p>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{t('reserve.grandDiningHall')}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-indigo-300/70">{t('reserve.grandDiningDesc')}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="text-[10px] uppercase tracking-wider text-indigo-400/40 dark:text-indigo-300/35">Starting From</p>
+          <p className="text-[10px] uppercase tracking-wider text-indigo-400/40 dark:text-indigo-300/35">{t('reserve.startingFrom')}</p>
           <p className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-pink-600 dark:from-indigo-400 dark:via-violet-400 dark:to-pink-400">
-            {price}
+            ETB 3,500
           </p>
-          <p className="text-[10px] text-indigo-400/35 dark:text-indigo-300/35">{isRoomBooking ? '/ night' : 'per person'}</p>
+          <p className="text-[10px] text-indigo-400/35 dark:text-indigo-300/35">{t('reserve.perPerson')}</p>
         </div>
       </div>
 
@@ -798,17 +771,17 @@ function RoomInfoCard({ rd, roomName, isRoomBooking }) {
             <Star key={s} className={`h-3.5 w-3.5 ${s <= 4 ? 'fill-indigo-400 text-indigo-400 drop-shadow-sm' : 'text-indigo-200 dark:text-indigo-700'}`} />
           ))}
           <span className="ml-1 text-sm font-bold text-indigo-700 dark:text-indigo-300">{(countRating / 10).toFixed(1)}</span>
-          <span className="text-xs text-indigo-400/40 dark:text-indigo-300/35">({countReviews} reviews)</span>
+          <span className="text-xs text-indigo-400/40 dark:text-indigo-300/35">({countReviews} {t('reserve.reviews')})</span>
         </div>
         <div className="flex items-center gap-1.5 text-sm text-indigo-400 dark:text-indigo-300/70">
           <Users className="h-4 w-4" />
-          <span>Up to <span className="font-bold text-indigo-600 dark:text-indigo-300">{countCapacity}</span> guests</span>
+          <span>{t('reserve.upTo')} <span className="font-bold text-indigo-600 dark:text-indigo-300">6</span> {t('reserve.guests')}</span>
         </div>
         <div className="flex items-center gap-1.5 text-sm text-indigo-400 dark:text-indigo-300/70">
-          <MapPin className="h-4 w-4" /><span>City View</span>
+          <MapPin className="h-4 w-4" /><span>{t('reserve.cityView')}</span>
         </div>
         <div className="flex items-center gap-1.5 text-sm text-indigo-400 dark:text-indigo-300/70">
-          <Clock className="h-4 w-4" /><span>Open 24/7</span>
+          <Clock className="h-4 w-4" /><span>{t('reserve.open247')}</span>
         </div>
       </div>
     </div>
@@ -816,6 +789,7 @@ function RoomInfoCard({ rd, roomName, isRoomBooking }) {
 }
 
 function AmenitiesGrid({ amenities }) {
+  const { t } = useTranslation();
   const [showAll, setShowAll] = useState(false);
   const raw = amenities?.length ? amenities : DEFAULT_AMENITIES;
   const items = raw.map((a) => (typeof a === 'string' ? { label: a } : a));
@@ -826,7 +800,7 @@ function AmenitiesGrid({ amenities }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Award className="h-4 w-4 text-indigo-500" />
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Amenities & Services</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">{t('reserve.amenities')}</span>
         </div>
         {items.length > 6 && (
           <button onClick={() => setShowAll(!showAll)}
@@ -866,6 +840,7 @@ function AmenitiesGrid({ amenities }) {
 }
 
 function GuestReviews({ reviews }) {
+  const { t } = useTranslation();
   const reviewData = reviews?.length ? reviews : DEFAULT_REVIEWS;
   return (
     <section className="relative overflow-hidden py-16">
@@ -877,10 +852,10 @@ function GuestReviews({ reviews }) {
         >
           <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 dark:bg-indigo-900/30 mb-3">
             <Star className="h-3 w-3 fill-indigo-500 text-indigo-500 dark:fill-indigo-300 dark:text-indigo-300" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Testimonials</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">{t('reserve.testimonials')}</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">What Our Guests Say</h2>
-          <p className="mt-1.5 text-sm text-indigo-400/50 dark:text-indigo-300/45">Real experiences from our valued guests</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">{t('reserve.whatGuestsSay')}</h2>
+          <p className="mt-1.5 text-sm text-indigo-400/50 dark:text-indigo-300/45">{t('reserve.realExperiences')}</p>
         </motion.div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence mode="popLayout">
@@ -939,183 +914,27 @@ function GuestReviews({ reviews }) {
   );
 }
 
-function SimilarExperiences({ rooms, currentRoomId }) {
-  const navigate = useNavigate();
-  const displayRooms = useMemo(() => {
-    if (!rooms?.length) return [];
-    return rooms.filter((r) => r._id !== currentRoomId && r.isActive !== false).slice(0, 4);
-  }, [rooms, currentRoomId]);
-
-  if (!displayRooms.length) return null;
-
-  return (
-    <section className="relative overflow-hidden py-16">
-      <MorphingBlob color="rgba(168,85,247,0.04)" size={320} top="-15%" right="-10%" delay={2} duration={16} blur={100} />
-      <MorphingBlob color="rgba(59,130,246,0.03)" size={260} bottom="-15%" left="-10%" delay={7} duration={14} blur={100} />
-      <div className="relative">
-        <motion.div initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} className="mb-8"
-        >
-          <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 dark:bg-indigo-900/30 mb-3">
-            <Zap className="h-3 w-3 text-indigo-500 dark:text-indigo-300" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Curated For You</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Similar Experiences</h2>
-          <p className="mt-1.5 text-sm text-indigo-400/50 dark:text-indigo-300/45">Discover more premium offerings</p>
-        </motion.div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          <AnimatePresence mode="popLayout">
-            {displayRooms.map((room, i) => {
-              const d = room.data || {};
-              return (
-                <motion.div key={room._id} layout
-                  initial={{ opacity: 0, y: 30, scale: 0.92 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.85, y: -25 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ delay: i * 0.07, type: 'spring', stiffness: 180, damping: 22 }}
-                >
-                  <TiltCard intensity={6}>
-                    <motion.div whileHover={{ y: -6 }}
-                      className="group overflow-hidden rounded-2xl border border-white/30 bg-white/60 backdrop-blur-2xl shadow-sm transition-all hover:border-indigo-300/30 hover:shadow-xl hover:shadow-indigo-500/15 dark:border-white/[0.06] dark:bg-slate-900/60 dark:hover:border-indigo-500/20"
-                    >
-                      <div className="relative h-40 overflow-hidden">
-                        <img src={d.image} alt={d.name} className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110" draggable={false} />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-                        <div className="absolute left-3 top-3 flex gap-2">
-                          <span className="overflow-hidden rounded-full px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider shadow-lg bg-gradient-to-r from-indigo-500/90 to-violet-500/90 text-white">
-                            {d.featured ? 'Featured' : 'Premium'}
-                          </span>
-                        </div>
-                        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2 py-0.5 backdrop-blur-md border border-white/10">
-                          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-                          <span className="text-[9px] font-bold text-white">{(4 + (i % 5) * 0.2).toFixed(1)}</span>
-                        </div>
-                        <div className="absolute bottom-3 left-3">
-                          <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-semibold backdrop-blur-md border bg-emerald-500/30 border-emerald-400/30 text-emerald-200">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                            Available
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-3.5">
-                        <h4 className="text-sm font-bold text-gray-900 dark:text-white">{d.name}</h4>
-                        <p className="mb-2 text-[11px] text-indigo-400/50 dark:text-indigo-300/45">{d.capacity ? `Up to ${d.capacity} Guests` : 'Premium Room'}</p>
-                        <div className="flex flex-wrap gap-1 mb-2.5">
-                          {(d.amenities || []).slice(0, 3).map((a) => (
-                            <span key={a} className="rounded-md bg-gradient-to-r from-indigo-50 to-violet-50 px-2 py-0.5 text-[9px] font-medium text-indigo-500 dark:from-indigo-900/30 dark:to-violet-900/30 dark:text-indigo-300">{a}</span>
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-between pt-2 border-t border-white/10 dark:border-white/[0.04]">
-                          <span className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">{d.price || 'Contact Us'}</span>
-                          <button
-                            onClick={() => navigate('/reserve', { state: { roomName: d.name, roomId: room._id } })}
-                            className="flex items-center gap-1 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 px-3.5 py-1.5 text-[9px] font-bold text-white shadow-lg shadow-indigo-500/20 transition-all hover:shadow-xl hover:shadow-indigo-500/30"
-                          >
-                            Book Now <ArrowRight className="h-2.5 w-2.5" />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </TiltCard>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuccess }) {
+function ReservationFormSidebar({ onSuccess }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('19:00');
+  const [guests, setGuests] = useState(2);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
-  const [alreadyBooked, setAlreadyBooked] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
   const [bookingDetails, setBookingDetails] = useState(null);
-  const [ripple, setRipple] = useState(false);
-   const [availability, setAvailability] = useState({ checking: false, available: true, message: '', conflicts: [] });
-   const [bookedDates, setBookedDates] = useState([]);
-   const [paymentMethod, setPaymentMethod] = useState('');
-   const [selectedBank, setSelectedBank] = useState('');
-   const [transactionRef, setTransactionRef] = useState('');
-   const [paymentProof, setPaymentProof] = useState(null);
-   const [paymentProofName, setPaymentProofName] = useState('');
-
-   const BANK_INFO = {
-     cbe: { name: 'Commercial Bank of Ethiopia (CBE)', account: '1000012345678', accountName: 'Nile Food Hotel' },
-     awash: { name: 'Awash Bank', account: '0123456789012', accountName: 'Nile Food Hotel' },
-     abyssinia: { name: 'Abyssinia Bank', account: '2000098765432', accountName: 'Nile Food Hotel' },
-     coop: { name: 'Cooperative Bank of Oromia (Coop)', account: '3000011223344', accountName: 'Nile Food Hotel' },
-     siinqee: { name: 'Siinqee Bank', account: '4000055667788', accountName: 'Nile Food Hotel' }
-   };
-
-   const TELEBIRR_INFO = {
-     phoneNumber: '+251 91 234 5678',
-     accountName: 'Nile Food Hotel',
-     shortCode: '123456'
-   };
-
-  useEffect(() => {
-    if (roomId) {
-      axios.get(`${API_BASE}/api/reservations/availability/room/${roomId}`)
-        .then((res) => {
-          setBookedDates(res.data.data?.bookedDates || []);
-        })
-        .catch(() => {});
-    }
-  }, [roomId]);
-
-   useEffect(() => {
-     if (roomId && checkIn) {
-       const checkAvailability = async () => {
-         try {
-           const params = new URLSearchParams({ roomId, checkIn });
-           if (checkOut) params.append('checkOut', checkOut);
-           const res = await axios.get(`${API_BASE}/api/reservations/availability/check?${params.toString()}`);
-           const data = res.data?.data || {};
-           setAvailability({
-             checking: false,
-             available: data.available !== false,
-             message: data.message || '',
-             conflicts: data.conflicts || []
-           });
-         } catch (err) {
-           setAvailability({ checking: false, available: true, message: '', conflicts: [] });
-         }
-       };
-
-       const timer = setTimeout(checkAvailability, 500);
-       return () => clearTimeout(timer);
-     }
-   }, [roomId, checkIn, checkOut]);
-
-  useEffect(() => {
-    if (user?.email) {
-      axios.get(`${API_BASE}/api/reservations/my`)
-        .then((res) => {
-          const bookings = res.data.data || [];
-          const today = new Date(); today.setHours(0, 0, 0, 0);
-          setAlreadyBooked(bookings.some((r) => r.status === 'confirmed' && r.paymentMethod && r.paymentMethod !== 'pay_hotel' && r.date && new Date(r.date) >= today));
-        })
-        .catch(() => {});
-    }
-  }, [user]);
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [selectedBank, setSelectedBank] = useState('');
+  const [transactionRef, setTransactionRef] = useState('');
+  const [paymentProof, setPaymentProof] = useState(null);
+  const [paymentProofName, setPaymentProofName] = useState('');
 
   const validate = () => {
     const errs = {};
-    if (!checkIn) errs.checkIn = 'Required';
-    if (!checkOut) errs.checkOut = 'Required';
-    if (checkIn && checkOut && new Date(checkOut) <= new Date(checkIn)) errs.checkOut = 'Must be after check-in';
-    if (!availability.available && !availability.checking) errs.availability = 'Room is not available for these dates';
+    if (!date) errs.date = 'Required';
+    if (!time) errs.time = 'Required';
     if (!form.name.trim()) errs.name = 'Required';
     if (!form.email.trim()) errs.email = 'Required';
     else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = 'Invalid';
@@ -1125,62 +944,49 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
     return Object.keys(errs).length === 0;
   };
 
-   const handleSubmit = async (e) => {
-     e.preventDefault();
-     if (!validate()) return;
-     setSubmitting(true);
-     setRipple(true);
-     try {
-       const formData = new FormData();
-       formData.append('name', form.name);
-       formData.append('email', form.email);
-       formData.append('phone', form.phone);
-       formData.append('date', checkIn);
-       formData.append('time', '19:00');
-       formData.append('guests', adults + children);
-       formData.append('notes', form.notes || '');
-       formData.append('status', 'confirmed');
-       formData.append('roomName', roomName || 'Reserve Experience');
-       formData.append('roomId', roomId || '');
-       formData.append('checkIn', checkIn);
-       formData.append('checkOut', checkOut || '');
-       formData.append('paymentMethod', paymentMethod || 'pay_hotel');
-       if (selectedBank) formData.append('selectedBank', selectedBank);
-       if (transactionRef) formData.append('paymentReference', transactionRef);
-       if (paymentProof) formData.append('paymentProof', paymentProof);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('email', form.email);
+      formData.append('phone', form.phone);
+      formData.append('date', date);
+      formData.append('time', time);
+      formData.append('guests', guests);
+      formData.append('notes', form.notes || '');
+      formData.append('status', 'confirmed');
+      formData.append('paymentMethod', paymentMethod || '');
+      if (selectedBank) formData.append('selectedBank', selectedBank);
+      if (transactionRef) formData.append('paymentReference', transactionRef);
+      if (paymentProof) formData.append('paymentProof', paymentProof);
 
-       await axios.post(`${API_BASE}/api/reservations`, formData, {
-         headers: { 'Content-Type': 'multipart/form-data' }
-       });
-       setBookingDetails({ checkIn, checkOut, guests: adults + children, paymentMethod });
-       setShowSuccess(true);
-       if (onSuccess) onSuccess();
-     } catch (err) {
-       if (err.response?.status === 409) {
-         setErrors({ availability: err.response.data?.message || 'Room is no longer available' });
-         setAvailability({ checking: false, available: false, message: err.response.data?.message || 'Room unavailable', conflicts: err.response.data?.data?.conflicts || [] });
-       } else {
-         setErrors({ submit: err.response?.data?.message || 'Failed to submit' });
-       }
-     } finally {
-       setSubmitting(false);
-       setTimeout(() => setRipple(false), 800);
-     }
-   };
-
-  const inpCls = (f) => `w-full bg-transparent text-sm text-gray-900 placeholder-gray-400 focus:outline-none dark:text-white dark:placeholder-gray-500`;
+      await axios.post(`${API_BASE}/api/reservations`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setBookingDetails({ date, time, guests, paymentMethod });
+      setShowSuccess(true);
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      setErrors({ submit: err.response?.data?.message || 'Failed to submit' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative">
       <BookingSuccessModal show={showSuccess} onClose={() => setShowSuccess(false)} bookingDetails={bookingDetails} />
 
-       <motion.div
-         initial={{ opacity: 0, y: 20 }}
-         animate={{ opacity: 1, y: 0 }}
-         transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
-         className="relative overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-800 border border-gray-100 dark:border-slate-700"
-       >
-         <div className="relative p-6 sm:p-7 bg-white dark:bg-slate-800">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
+        className="relative overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-slate-800 border border-gray-100 dark:border-slate-700"
+      >
+        <div className="relative p-6 sm:p-7 bg-white dark:bg-slate-800">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1188,49 +994,19 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
             className="mb-6"
           >
             <div className="flex items-center gap-3 mb-3">
-               <motion.div
-                 initial={{ scale: 0 }}
-                 animate={{ scale: 1 }}
-                 transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                 className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 dark:bg-indigo-500 shadow-lg shadow-indigo-500/20"
-               >
-                 <CalendarDays className="h-5 w-5 text-white" />
-               </motion.div>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 dark:bg-indigo-500 shadow-lg shadow-indigo-500/20"
+              >
+                <CalendarDays className="h-5 w-5 text-white" />
+              </motion.div>
               <div>
-                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">Book Your Stay</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Complete your reservation in seconds</p>
+                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">{t('reserve.title')}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('reserve.completeReservation')}</p>
               </div>
             </div>
-
-             {checkIn && checkOut && (
-               <motion.div
-                 initial={{ opacity: 0, height: 0 }}
-                 animate={{ opacity: 1, height: 'auto' }}
-                 className="mt-3 overflow-hidden"
-               >
-                 <div className="flex items-center justify-between rounded-2xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 px-4 py-3">
-                  <div className="text-center">
-                    <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Check In</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{checkIn}</p>
-                  </div>
-                  <motion.div
-                    animate={{ x: [0, 4, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-slate-700 shadow-sm"
-                  >
-                    <ArrowRight className="h-4 w-4 text-indigo-500" />
-                  </motion.div>
-                  <div className="text-center">
-                    <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Check Out</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{checkOut}</p>
-                  </div>
-                  <div className="text-center pl-3 border-l border-indigo-200/50 dark:border-indigo-800/50">
-                    <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Guests</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{adults + children}</p>
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </motion.div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -1243,124 +1019,62 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
                   <CalendarDays className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Dates</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('reserve.dateTime')}</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <motion.div whileFocus={{ scale: 1.01 }} className="group">
-                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Check In</label>
-                   <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
-                     errors.checkIn
-                       ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
-                       : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
-                   }`}>
-                    <input type="date" value={checkIn}
-                      onChange={(e) => { setCheckIn(e.target.value); setErrors((p) => ({ ...p, checkIn: '' })); }}
+                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.selectDate')}</label>
+                  <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                    errors.date
+                      ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
+                  }`}>
+                    <input type="date" value={date}
+                      onChange={(e) => { setDate(e.target.value); setErrors((p) => ({ ...p, date: '' })); }}
                       className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none"
                       min={new Date().toISOString().split('T')[0]} />
                   </div>
-                  {errors.checkIn && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[10px] text-red-500 mt-1 ml-1">{errors.checkIn}</motion.p>}
+                  {errors.date && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[10px] text-red-500 mt-1 ml-1">{errors.date}</motion.p>}
                 </motion.div>
                 <motion.div whileFocus={{ scale: 1.01 }} className="group">
-                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Check Out</label>
-                   <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
-                     errors.checkOut
-                       ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
-                       : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
-                   }`}>
-                    <input type="date" value={checkOut}
-                      onChange={(e) => { setCheckOut(e.target.value); setErrors((p) => ({ ...p, checkOut: '' })); }}
-                      className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none"
-                      min={checkIn || new Date().toISOString().split('T')[0]} />
+                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.selectTime')}</label>
+                  <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                    errors.time
+                      ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
+                  }`}>
+                    <input type="time" value={time}
+                      onChange={(e) => { setTime(e.target.value); setErrors((p) => ({ ...p, time: '' })); }}
+                      className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none" />
                   </div>
-                  {errors.checkOut && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[10px] text-red-500 mt-1 ml-1">{errors.checkOut}</motion.p>}
+                  {errors.time && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[10px] text-red-500 mt-1 ml-1">{errors.time}</motion.p>}
                 </motion.div>
-               </div>
-             </motion.div>
+              </div>
+            </motion.div>
 
-             {checkIn && (
-               <motion.div
-                 initial={{ opacity: 0, height: 0 }}
-                 animate={{ opacity: 1, height: 'auto' }}
-                 transition={{ delay: 0.15, duration: 0.3 }}
-               >
-                 <div className={`flex items-center gap-3 rounded-xl px-4 py-3 ${
-                   availability.checking
-                     ? 'bg-gray-100/80 dark:bg-slate-700/50'
-                     : availability.available
-                     ? 'bg-emerald-50/80 dark:bg-emerald-900/20'
-                     : 'bg-red-50/80 dark:bg-red-900/20'
-                 }`}>
-                   {availability.checking ? (
-                     <>
-                       <Loader2 className="h-4 w-4 text-gray-500 dark:text-gray-400 animate-spin" />
-                       <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Checking availability...</span>
-                     </>
-                   ) : availability.available ? (
-                     <>
-                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
-                         <CheckCircle className="h-3.5 w-3.5 text-white" />
-                       </div>
-                       <div>
-                         <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400">Room Available</span>
-                         {bookedDates.length > 0 && (
-                           <p className="text-[10px] text-emerald-600/70 dark:text-emerald-400/60">{bookedDates.length} dates already booked this month</p>
-                         )}
-                       </div>
-                     </>
-                   ) : (
-                     <>
-                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
-                         <X className="h-3.5 w-3.5 text-white" />
-                       </div>
-                       <div>
-                         <span className="text-xs font-bold text-red-700 dark:text-red-400">Room Unavailable</span>
-                         <p className="text-[10px] text-red-600/70 dark:text-red-400/60">{availability.message || 'Please select different dates'}</p>
-                       </div>
-                     </>
-                   )}
-                 </div>
-               </motion.div>
-             )}
-
-             <motion.div
-               initial={{ opacity: 0, x: -15 }}
-               animate={{ opacity: 1, x: 0 }}
-               transition={{ delay: 0.2, duration: 0.4 }}
-             >
-               <div className="flex items-center gap-2 mb-2.5">
-                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
-                   <Users className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
-                 </div>
-                 <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Guests</span>
-               </div>
-              <div className="grid grid-cols-2 gap-3">
-                 <div className="flex items-center justify-between rounded-xl border-2 border-gray-200 bg-white px-3.5 py-2.5 dark:border-slate-600 dark:bg-slate-700">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Adults</span>
-                  <div className="flex items-center gap-2">
-                    <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
-                      onClick={() => setAdults(Math.max(1, adults - 1))}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-400 transition-all"
-                    ><Minus className="h-3.5 w-3.5" /></motion.button>
-                    <AnimatedNumber className="w-7 text-center text-base font-black text-gray-900 dark:text-white">{adults}</AnimatedNumber>
-                     <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
-                       onClick={() => setAdults(Math.min(20, adults + 1))}
-                       className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white shadow-md transition-all hover:shadow-lg hover:shadow-indigo-500/20"
-                     ><Plus className="h-3.5 w-3.5" /></motion.button>
-                  </div>
+            <motion.div
+              initial={{ opacity: 0, x: -15 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+            >
+              <div className="flex items-center gap-2 mb-2.5">
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
+                  <Users className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                 <div className="flex items-center justify-between rounded-xl border-2 border-gray-200 bg-white px-3.5 py-2.5 dark:border-slate-600 dark:bg-slate-700">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Children</span>
-                  <div className="flex items-center gap-2">
-                    <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
-                      onClick={() => setChildren(Math.max(0, children - 1))}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-400 transition-all"
-                    ><Minus className="h-3.5 w-3.5" /></motion.button>
-                    <AnimatedNumber className="w-7 text-center text-base font-black text-gray-900 dark:text-white">{children}</AnimatedNumber>
-                     <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
-                       onClick={() => setChildren(Math.min(20, children + 1))}
-                       className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white shadow-md transition-all hover:shadow-lg hover:shadow-indigo-500/20"
-                     ><Plus className="h-3.5 w-3.5" /></motion.button>
-                  </div>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('reserve.guestsSection')}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-xl border-2 border-gray-200 bg-white px-3.5 py-2.5 dark:border-slate-600 dark:bg-slate-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('reserve.guests')}</span>
+                <div className="flex items-center gap-2">
+                  <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
+                    onClick={() => setGuests(Math.max(1, guests - 1))}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-white text-gray-600 shadow-sm hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-600 dark:text-gray-300 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-400 transition-all"
+                  ><Minus className="h-3.5 w-3.5" /></motion.button>
+                  <AnimatedNumber className="w-7 text-center text-base font-black text-gray-900 dark:text-white">{guests}</AnimatedNumber>
+                  <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.05 }} type="button"
+                    onClick={() => setGuests(Math.min(20, guests + 1))}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 dark:bg-indigo-500 text-white shadow-md transition-all hover:shadow-lg hover:shadow-indigo-500/20"
+                  ><Plus className="h-3.5 w-3.5" /></motion.button>
                 </div>
               </div>
             </motion.div>
@@ -1375,17 +1089,17 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
                   <ScrollText className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Your Details</span>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('reserve.yourDetails')}</span>
               </div>
 
               <div className="group">
-                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Full Name</label>
-                 <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
-                   errors.name
-                     ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
-                     : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
-                 }`}>
-                  <input type="text" placeholder="John Doe" value={form.name}
+                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.fullName')}</label>
+                <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                  errors.name
+                    ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
+                    : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
+                }`}>
+                  <input type="text" placeholder={t('checkout.fullName')} value={form.name}
                     onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors((p) => ({ ...p, name: '' })); }}
                     className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" />
                 </div>
@@ -1394,26 +1108,26 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="group">
-                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Email</label>
-                 <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
-                   errors.email
-                     ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
-                     : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
-                 }`}>
-                    <input type="email" placeholder="email@example.com" value={form.email}
+                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.email')}</label>
+                  <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                    errors.email
+                      ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
+                  }`}>
+                    <input type="email" placeholder={t('reserve.emailPlaceholder')} value={form.email}
                       onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors((p) => ({ ...p, email: '' })); }}
                       className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" />
                   </div>
                   {errors.email && <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[10px] text-red-500 mt-1 ml-1">{errors.email}</motion.p>}
                 </div>
                 <div className="group">
-                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Phone</label>
-                 <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
-                   errors.phone
-                     ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
-                     : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
-                 }`}>
-                    <input type="tel" placeholder="+1 234 567" value={form.phone}
+                  <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.phone')}</label>
+                  <div className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 ${
+                    errors.phone
+                      ? 'border-red-300 bg-red-50 dark:border-red-700/50 dark:bg-red-900/30'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 focus-within:border-indigo-500'
+                  }`}>
+                    <input type="tel" placeholder={t('auth.phone')} value={form.phone}
                       onChange={(e) => { setForm({ ...form, phone: e.target.value }); setErrors((p) => ({ ...p, phone: '' })); }}
                       className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" />
                   </div>
@@ -1422,288 +1136,158 @@ function ReservationFormSidebar({ roomData, roomName, roomId, contentType, onSuc
               </div>
 
               <div className="group">
-                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">Special Requests <span className="text-gray-400 dark:text-gray-500">(Optional)</span></label>
-                 <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 transition-all duration-300 focus-within:border-indigo-500">
-                  <textarea rows={2} placeholder="Any special requirements or notes..."
+                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.specialRequests')} <span className="text-gray-400 dark:text-gray-500">{t('common.optional')}</span></label>
+                <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 transition-all duration-300 focus-within:border-indigo-500">
+                  <textarea rows={2} placeholder={t('reserve.specialRequestsPlaceholder')}
                     value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
                     className="w-full resize-none bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" />
                 </div>
               </div>
-             </motion.div>
+            </motion.div>
 
-             <motion.div
-               initial={{ opacity: 0, x: -15 }}
-               animate={{ opacity: 1, x: 0 }}
-               transition={{ delay: 0.3, duration: 0.4 }}
-               className="space-y-3"
-             >
-               <div className="flex items-center gap-2 mb-2.5">
-                 <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
-                   <CreditCard className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
-                 </div>
-                 <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Payment Method</span>
-               </div>
+            <motion.div
+              initial={{ opacity: 0, x: -15 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
+              className="space-y-3"
+            >
+              <div className="flex items-center gap-2 mb-2.5">
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
+                  <CreditCard className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">{t('reserve.paymentMethod')}</span>
+              </div>
 
-               <div className="grid grid-cols-3 gap-2">
-                 <button
-                   type="button"
-                   onClick={() => { setPaymentMethod('pay_hotel'); setSelectedBank(''); }}
-                   className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
-                     paymentMethod === 'pay_hotel' || paymentMethod === ''
-                       ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
-                       : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
-                   }`}
-                 >
-                   <Building2 className={`h-5 w-5 ${
-                     paymentMethod === 'pay_hotel' || paymentMethod === ''
-                       ? 'text-indigo-600 dark:text-indigo-400'
-                       : 'text-gray-400 dark:text-gray-500'
-                   }`} />
-                   <span className={`text-[10px] font-bold ${
-                     paymentMethod === 'pay_hotel' || paymentMethod === ''
-                       ? 'text-indigo-700 dark:text-indigo-300'
-                       : 'text-gray-500 dark:text-gray-400'
-                   }`}>Pay at Hotel</span>
-                 </button>
-
-                 <button
-                   type="button"
-                   onClick={() => { setPaymentMethod('telebirr'); setSelectedBank(''); }}
-                   className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
-                     paymentMethod === 'telebirr'
-                       ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
-                       : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
-                   }`}
-                 >
-                   <Smartphone className={`h-5 w-5 ${
-                     paymentMethod === 'telebirr'
-                       ? 'text-indigo-600 dark:text-indigo-400'
-                       : 'text-gray-400 dark:text-gray-500'
-                   }`} />
-                   <span className={`text-[10px] font-bold ${
-                     paymentMethod === 'telebirr'
-                       ? 'text-indigo-700 dark:text-indigo-300'
-                       : 'text-gray-500 dark:text-gray-400'
-                   }`}>Telebirr</span>
-                 </button>
-
-                 <button
-                   type="button"
-                   onClick={() => setPaymentMethod('bank')}
-                   className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
-                     paymentMethod === 'bank'
-                       ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
-                       : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
-                   }`}
-                 >
-                   <Landmark className={`h-5 w-5 ${
-                     paymentMethod === 'bank'
-                       ? 'text-indigo-600 dark:text-indigo-400'
-                       : 'text-gray-400 dark:text-gray-500'
-                   }`} />
-                   <span className={`text-[10px] font-bold ${
-                     paymentMethod === 'bank'
-                       ? 'text-indigo-700 dark:text-indigo-300'
-                       : 'text-gray-500 dark:text-gray-400'
-                   }`}>Bank</span>
-                 </button>
-               </div>
-
-               {paymentMethod === 'telebirr' && (
-                 <motion.div
-                   initial={{ opacity: 0, height: 0 }}
-                   animate={{ opacity: 1, height: 'auto' }}
-                   className="overflow-hidden space-y-3"
-                 >
-                   <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 p-4">
-                     <div className="flex items-center gap-2 mb-3">
-                       <Smartphone className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                       <p className="text-[11px] font-bold text-blue-700 dark:text-blue-300">Telebirr Payment Details</p>
-                     </div>
-                     <div className="space-y-2">
-                       <div className="flex justify-between items-center py-1.5 border-b border-blue-100 dark:border-blue-800/30">
-                         <span className="text-[10px] text-blue-600/70 dark:text-blue-400/60">Phone Number</span>
-                         <span className="text-[11px] font-bold text-blue-800 dark:text-blue-200">{TELEBIRR_INFO.phoneNumber}</span>
-                       </div>
-                       <div className="flex justify-between items-center py-1.5 border-b border-blue-100 dark:border-blue-800/30">
-                         <span className="text-[10px] text-blue-600/70 dark:text-blue-400/60">Account Name</span>
-                         <span className="text-[11px] font-bold text-blue-800 dark:text-blue-200">{TELEBIRR_INFO.accountName}</span>
-                       </div>
-                       <div className="flex justify-between items-center py-1.5">
-                         <span className="text-[10px] text-blue-600/70 dark:text-blue-400/60">Short Code</span>
-                         <span className="text-[11px] font-bold text-blue-800 dark:text-blue-200">{TELEBIRR_INFO.shortCode}</span>
-                       </div>
-                     </div>
-                   </div>
-                 </motion.div>
-               )}
-
-               {paymentMethod === 'bank' && (
-                 <motion.div
-                   initial={{ opacity: 0, height: 0 }}
-                   animate={{ opacity: 1, height: 'auto' }}
-                   className="overflow-hidden space-y-3"
-                 >
-                   <div className="group">
-                     <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
-                       Select Bank
-                     </label>
-                     <select
-                       value={selectedBank}
-                       onChange={(e) => setSelectedBank(e.target.value)}
-                       className="w-full rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-all duration-300"
-                     >
-                       <option value="">Select a bank...</option>
-                       <option value="cbe">Commercial Bank of Ethiopia (CBE)</option>
-                       <option value="awash">Awash Bank</option>
-                       <option value="abyssinia">Abyssinia Bank</option>
-                       <option value="coop">Cooperative Bank of Oromia (Coop)</option>
-                       <option value="siinqee">Siinqee Bank</option>
-                     </select>
-                   </div>
-
-                   {selectedBank && BANK_INFO[selectedBank] && (
-                     <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/30 p-4">
-                       <div className="flex items-center gap-2 mb-3">
-                         <Landmark className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                         <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300">{BANK_INFO[selectedBank].name}</p>
-                       </div>
-                       <div className="space-y-2">
-                         <div className="flex justify-between items-center py-1.5 border-b border-emerald-100 dark:border-emerald-800/30">
-                           <span className="text-[10px] text-emerald-600/70 dark:text-emerald-400/60">Account Number</span>
-                           <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-200 font-mono">{BANK_INFO[selectedBank].account}</span>
-                         </div>
-                         <div className="flex justify-between items-center py-1.5">
-                           <span className="text-[10px] text-emerald-600/70 dark:text-emerald-400/60">Account Name</span>
-                           <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-200">{BANK_INFO[selectedBank].accountName}</span>
-                         </div>
-                       </div>
-                     </div>
-                   )}
-                 </motion.div>
-               )}
-
-               {(paymentMethod === 'telebirr' || paymentMethod === 'bank') && (
-                 <motion.div
-                   initial={{ opacity: 0 }}
-                   animate={{ opacity: 1 }}
-                   className="space-y-3"
-                 >
-                   <div className="group">
-                     <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
-                       Transaction Reference <span className="text-gray-400 dark:text-gray-500">(Optional)</span>
-                     </label>
-                     <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 transition-all duration-300 focus-within:border-indigo-500">
-                       <input 
-                         type="text" 
-                         placeholder="Enter transaction ID or reference..."
-                         value={transactionRef}
-                         onChange={(e) => setTransactionRef(e.target.value)}
-                         className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" 
-                       />
-                     </div>
-                   </div>
-
-                   <div className="group">
-                     <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
-                       Upload Payment Proof <span className="text-gray-400 dark:text-gray-500">(Screenshot, PDF)</span>
-                     </label>
-                     <div className="relative">
-                       <input
-                         type="file"
-                         id="payment-proof-upload"
-                         accept="image/*,.pdf"
-                         onChange={(e) => {
-                           const file = e.target.files?.[0];
-                           if (file) {
-                             setPaymentProof(file);
-                             setPaymentProofName(file.name);
-                           }
-                         }}
-                         className="hidden"
-                       />
-                       <label
-                         htmlFor="payment-proof-upload"
-                         className="flex flex-col items-center justify-center gap-2 py-4 px-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200"
-                       >
-                         <Upload className="h-6 w-6 text-gray-400 dark:text-gray-500" />
-                         {paymentProofName ? (
-                           <div className="text-center">
-                             <p className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">{paymentProofName}</p>
-                             <p className="text-[9px] text-gray-400 dark:text-gray-500">Click to change file</p>
-                           </div>
-                         ) : (
-                           <div className="text-center">
-                             <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">Click to upload payment proof</p>
-                             <p className="text-[9px] text-gray-400 dark:text-gray-500">JPG, PNG, PDF (Max 10MB)</p>
-                           </div>
-                         )}
-                       </label>
-                     </div>
-                   </div>
-                 </motion.div>
-               )}
-             </motion.div>
-
-             {errors.submit && (
-               <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                 className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/20 px-3.5 py-2.5 border border-red-200 dark:border-red-800/30">
-                 <X className="h-4 w-4 text-red-500 shrink-0" />
-                 <p className="text-xs text-red-600 dark:text-red-400">{errors.submit}</p>
-               </motion.div>
-             )}
-
-               <div className="pt-2">
-                {alreadyBooked ? (
-                  <div className="w-full rounded-2xl bg-emerald-500 py-3.5 text-center mb-3">
-                    <span className="flex items-center justify-center gap-2 text-sm font-bold text-white">
-                      <CheckCircle className="h-4 w-4" /> Already Reserved
-                    </span>
-                  </div>
-                ) : checkIn && !availability.checking && !availability.available ? (
-                  <div className="w-full rounded-2xl bg-amber-50 py-3 px-4 text-center mb-3 border border-amber-200">
-                    <span className="flex items-center justify-center gap-2 text-sm font-bold text-amber-700">
-                      <X className="h-4 w-4" /> Room Unavailable - Please select different dates
-                    </span>
-                  </div>
-                ) : null}
-                
-                <button 
-                  type="submit" 
-                  disabled={submitting || availability.checking || alreadyBooked}
-                  className="w-full rounded-2xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {submitting ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-5 w-5" />
-                    )}
-                    <span className="text-base">
-                      {submitting ? 'Reserving...' : 'Confirm Reservation'}
-                    </span>
-                    {!submitting && <ArrowRight className="h-5 w-5" />}
-                  </span>
+              <div className="grid grid-cols-3 gap-2">
+                <button type="button" onClick={() => { setPaymentMethod(''); setSelectedBank(''); }}
+                  className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
+                    paymentMethod === ''
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
+                  }`}>
+                  <span className={`text-[10px] font-bold ${paymentMethod === '' ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400'}`}>{t('reserve.payLater')}</span>
+                </button>
+                <button type="button" onClick={() => { setPaymentMethod('telebirr'); setSelectedBank(''); }}
+                  className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
+                    paymentMethod === 'telebirr'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
+                  }`}>
+                  <Smartphone className={`h-5 w-5 ${paymentMethod === 'telebirr' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                   <span className={`text-[10px] font-bold ${paymentMethod === 'telebirr' ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400'}`}>{t('reserve.telebirr')}</span>
+                </button>
+                <button type="button" onClick={() => setPaymentMethod('bank')}
+                  className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 transition-all duration-200 ${
+                    paymentMethod === 'bank'
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-md'
+                      : 'border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 hover:border-gray-300 dark:hover:border-slate-500'
+                  }`}>
+                  <Landmark className={`h-5 w-5 ${paymentMethod === 'bank' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-500'}`} />
+                  <span className={`text-[10px] font-bold ${paymentMethod === 'bank' ? 'text-indigo-700 dark:text-indigo-300' : 'text-gray-500 dark:text-gray-400'}`}>{t('reserve.bank')}</span>
                 </button>
               </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.4 }}
-              className="flex items-center justify-center gap-6 pt-1"
-            >
+              {paymentMethod === 'telebirr' && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="overflow-hidden space-y-3">
+                  <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 p-4">
+                    <p className="text-[11px] font-bold text-blue-700 dark:text-blue-300">{t('reserve.payViaTelebirr')}</p>
+                  </div>
+                </motion.div>
+              )}
+
+              {paymentMethod === 'bank' && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="overflow-hidden space-y-3">
+                  <div className="group">
+                    <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">{t('reserve.selectBank')}</label>
+                    <select value={selectedBank} onChange={(e) => setSelectedBank(e.target.value)}
+                      className="w-full rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-all duration-300">
+                      <option value="">Select a bank...</option>
+                      <option value="cbe">CBE</option>
+                      <option value="awash">Awash Bank</option>
+                      <option value="abyssinia">Abyssinia Bank</option>
+                      <option value="coop">Coop Bank</option>
+                      <option value="siinqee">Siinqee Bank</option>
+                    </select>
+                  </div>
+                </motion.div>
+              )}
+
+              {(paymentMethod === 'telebirr' || paymentMethod === 'bank') && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                  <div className="group">
+                    <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
+                      {t('reserve.transactionRef')} <span className="text-gray-400 dark:text-gray-500">{t('common.optional')}</span>
+                    </label>
+                    <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700 transition-all duration-300 focus-within:border-indigo-500">
+                      <input type="text" placeholder={t('reserve.transactionPlaceholder')}
+                        value={transactionRef} onChange={(e) => setTransactionRef(e.target.value)}
+                        className="w-full bg-transparent px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 dark:text-white dark:placeholder-gray-500 focus:outline-none" />
+                    </div>
+                  </div>
+                  <div className="group">
+                    <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 ml-1">
+                      {t('reserve.uploadProof')} <span className="text-gray-400 dark:text-gray-500">{t('common.optional')}</span>
+                    </label>
+                    <div className="relative">
+                      <input type="file" id="payment-proof-upload" accept="image/*,.pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) { setPaymentProof(file); setPaymentProofName(file.name); }
+                        }}
+                        className="hidden" />
+                      <label htmlFor="payment-proof-upload"
+                        className="flex flex-col items-center justify-center gap-2 py-4 px-4 rounded-xl border-2 border-dashed border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-700/50 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all duration-200">
+                        <Upload className="h-6 w-6 text-gray-400 dark:text-gray-500" />
+                        {paymentProofName ? (
+                          <div className="text-center">
+                            <p className="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">{paymentProofName}</p>
+                            <p className="text-[9px] text-gray-400 dark:text-gray-500">{t('reserve.changeFile')}</p>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">{t('reserve.uploadClick')}</p>
+                            <p className="text-[9px] text-gray-400 dark:text-gray-500">{t('reserve.allowedFormats')}</p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {errors.submit && (
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/20 px-3.5 py-2.5 border border-red-200 dark:border-red-800/30">
+                <X className="h-4 w-4 text-red-500 shrink-0" />
+                <p className="text-xs text-red-600 dark:text-red-400">{errors.submit}</p>
+              </motion.div>
+            )}
+
+            <div className="pt-2">
+              <button type="submit" disabled={submitting}
+                className="w-full rounded-2xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span className="flex items-center justify-center gap-2">
+                  {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+                  <span className="text-base">{submitting ? t('reserve.reserving') : t('reserve.bookNow')}</span>
+                  {!submitting && <ArrowRight className="h-5 w-5" />}
+                </span>
+              </button>
+            </div>
+
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 0.4 }}
+              className="flex items-center justify-center gap-6 pt-1">
               <div className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">Secure</span>
+                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">{t('reserve.secure')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <BadgeCheck className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">Verified</span>
+                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">{t('reserve.verified')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">24/7 Support</span>
+                <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">{t('reserve.support247')}</span>
               </div>
             </motion.div>
           </form>
@@ -1738,51 +1322,25 @@ function SkeletonLoader() {
 export default function Reserve() {
   const { darkMode, toggleDarkMode } = useTheme();
   const location = useLocation();
-  const roomName = location.state?.roomName || '';
-  const roomId = location.state?.roomId || '';
   const contentType = location.state?.contentType || 'reserve_page';
-  const isRoomBooking = !!(roomName && roomId);
   const [content, setContent] = useState(null);
-  const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
   const [galleryImages, setGalleryImages] = useState(null);
   const [elementImages, setElementImages] = useState(null);
   const [reviews, setReviews] = useState(null);
-  const [rooms, setRooms] = useState(null);
   const formRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const fetchData = async () => {
       try {
-        const [roomsRes, contentRes] = await Promise.all([
-          axios.get(`${API_BASE}/api/listings/room`).catch(() => null),
-          isRoomBooking ? Promise.resolve(null) : axios.get(`${API_BASE}/api/content/${contentType}`).catch(() => null),
-        ]);
-
-        const allRooms = roomsRes?.data?.data || [];
-        setRooms(allRooms);
-
-        if (isRoomBooking) {
-          const found = allRooms.find((r) => r._id === roomId);
-          if (found) {
-            setRoom(found);
-            const d = found.data || {};
-            if (d.images) setElementImages(d.images);
-          }
-        } else {
-          if (contentRes?.data?.data?.value) {
-            const data = contentRes.data.data.value;
-            setContent(data);
-            if (data.gallery) setGalleryImages(data.gallery);
-            if (data.elementImages) setElementImages(data.elementImages);
-            if (data.reviews) setReviews(data.reviews);
-          }
-
-          if (allRooms.length) {
-            const featured = allRooms.find((r) => r.isActive && r.data?.featured);
-            if (featured) setRoom(featured);
-          }
+        const contentRes = await axios.get(`${API_BASE}/api/content/${contentType}`).catch(() => null);
+        if (contentRes?.data?.data?.value) {
+          const data = contentRes.data.data.value;
+          setContent(data);
+          if (data.gallery) setGalleryImages(data.gallery);
+          if (data.elementImages) setElementImages(data.elementImages);
+          if (data.reviews) setReviews(data.reviews);
         }
       } catch {
         setContent(null);
@@ -1791,9 +1349,7 @@ export default function Reserve() {
       }
     };
     fetchData();
-  }, [isRoomBooking, roomId, contentType]);
-
-  const rd = room?.data || {};
+  }, [contentType]);
 
   if (loading) return <SkeletonLoader />;
 
@@ -1803,31 +1359,26 @@ export default function Reserve() {
       <Navbar darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
 
       <div className="w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        {/* Two-column layout: Left = Room content, Right = Reservation Form */}
+        {/* Two-column layout: Left = Images & Info, Right = Reservation Form */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT COLUMN: Room Images & Information */}
+          {/* LEFT COLUMN: Images & Information */}
           <div className="lg:col-span-2 space-y-5">
-            {/* Hero Gallery */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-              <HeroGallery images={galleryImages} roomName={roomName} rd={rd} isRoomBooking={isRoomBooking} />
+              <HeroGallery images={galleryImages} />
             </motion.div>
 
-            {/* Room Element Images */}
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <ElementImages images={elementImages} />
             </motion.div>
 
-            {/* Room Info Card */}
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-              <RoomInfoCard rd={rd} roomName={roomName} isRoomBooking={isRoomBooking} />
+              <InfoCard />
             </motion.div>
 
-            {/* Amenities & Services */}
             <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <AmenitiesGrid amenities={content?.amenities || rd.amenities} />
+              <AmenitiesGrid amenities={content?.amenities} />
             </motion.div>
 
-            {/* Description Quote */}
              {content?.description && (
                <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
                  className="rounded-2xl border border-indigo-100/40 bg-gradient-to-br from-indigo-50/90 via-violet-50/60 to-transparent p-6 backdrop-blur-2xl shadow-lg dark:border-indigo-700/20 dark:from-indigo-900/20 dark:via-violet-900/10"
@@ -1844,23 +1395,14 @@ export default function Reserve() {
                </motion.div>
              )}
 
-             {/* Guest Reviews / Testimonials */}
              <GuestReviews reviews={reviews} />
-
-             {/* Similar Experiences */}
-             <SimilarExperiences rooms={rooms} currentRoomId={roomId} />
            </div>
 
           {/* RIGHT COLUMN: Sticky Reservation Form */}
           <div className="lg:col-span-1" ref={formRef}>
             <div className="lg:sticky lg:top-24">
               <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-                <ReservationFormSidebar
-                  roomData={room}
-                  roomName={roomName}
-                  roomId={roomId}
-                  contentType={contentType}
-                />
+                <ReservationFormSidebar />
               </motion.div>
             </div>
           </div>

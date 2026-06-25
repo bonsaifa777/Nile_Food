@@ -753,9 +753,9 @@ export default function Menu() {
                           </motion.button>
                         </div>
                         <div className="pt-2 border-t border-white/5">
-                          <label className={LABEL_CLASS}>Extras (name + price + image URL)</label>
+                          <label className={LABEL_CLASS}>Extras (name + price + image)</label>
                           {formData.extras.map((extra, i) => (
-                            <div key={i} className="flex gap-2 mb-2">
+                            <div key={i} className="flex gap-2 mb-2 items-start">
                               <input
                                 type="text"
                                 value={extra.name}
@@ -778,17 +778,68 @@ export default function Menu() {
                                 className={`${INPUT_CLASS} w-24`}
                                 placeholder="Price"
                               />
-                              <input
-                                type="text"
-                                value={extra.image || ''}
-                                onChange={(e) => {
-                                  const extras = [...formData.extras];
-                                  extras[i].image = e.target.value;
-                                  setFormData({ ...formData, extras });
-                                }}
-                                className={INPUT_CLASS}
-                                placeholder="Image URL"
-                              />
+                              <div className="flex gap-1 items-center">
+                                <input
+                                  type="text"
+                                  value={extra.image || ''}
+                                  onChange={(e) => {
+                                    const extras = [...formData.extras];
+                                    extras[i].image = e.target.value;
+                                    setFormData({ ...formData, extras });
+                                  }}
+                                  className={`${INPUT_CLASS} w-28`}
+                                  placeholder="Image URL"
+                                />
+                                <label className="cursor-pointer p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      if (!file.type.startsWith('image/')) {
+                                        toast.error('Please select an image file');
+                                        return;
+                                      }
+                                      const reader = new FileReader();
+                                      reader.onload = (ev) => {
+                                        const extras = [...formData.extras];
+                                        extras[i].image = ev.target.result;
+                                        setFormData({ ...formData, extras });
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }}
+                                  />
+                                  <FiUpload size={14} className="text-gray-400 hover:text-white" />
+                                </label>
+                                {extra.image && (
+                                  <div className="relative group/image">
+                                    <img
+                                      src={extra.image}
+                                      alt=""
+                                      className="w-8 h-8 rounded-lg object-cover border border-white/10"
+                                      onError={() => {
+                                        const extras = [...formData.extras];
+                                        extras[i].image = '';
+                                        setFormData({ ...formData, extras });
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const extras = [...formData.extras];
+                                        extras[i].image = '';
+                                        setFormData({ ...formData, extras });
+                                      }}
+                                      className="absolute -top-1 -right-1 w-3.5 h-3.5 flex items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover/image:opacity-100 transition-opacity"
+                                      style={{ fontSize: 8 }}
+                                    >
+                                      <FiX size={8} />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                               <motion.button
                                 type="button"
                                 whileTap={{ scale: 0.9 }}
@@ -815,7 +866,7 @@ export default function Menu() {
                       <motion.div key="ingredients" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                         <label className={LABEL_CLASS}>Ingredients (name + amount + image)</label>
                         {formData.ingredients.map((ing, i) => (
-                          <div key={i} className="flex gap-2 mb-2">
+                          <div key={i} className="flex gap-2 mb-2 items-start">
                             <input
                               type="text"
                               value={ing.name}
@@ -838,17 +889,68 @@ export default function Menu() {
                               className={`${INPUT_CLASS} w-24`}
                               placeholder="Amount"
                             />
-                            <input
-                              type="text"
-                              value={ing.image || ''}
-                              onChange={(e) => {
-                                const ingredients = [...formData.ingredients];
-                                ingredients[i].image = e.target.value;
-                                setFormData({ ...formData, ingredients });
-                              }}
-                              className={INPUT_CLASS}
-                              placeholder="Image URL"
-                            />
+                            <div className="flex gap-1 items-center">
+                              <input
+                                type="text"
+                                value={ing.image || ''}
+                                onChange={(e) => {
+                                  const ingredients = [...formData.ingredients];
+                                  ingredients[i].image = e.target.value;
+                                  setFormData({ ...formData, ingredients });
+                                }}
+                                className={`${INPUT_CLASS} w-28`}
+                                placeholder="Image URL"
+                              />
+                              <label className="cursor-pointer p-2 hover:bg-white/10 rounded-lg transition-colors">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    if (!file.type.startsWith('image/')) {
+                                      toast.error('Please select an image file');
+                                      return;
+                                    }
+                                    const reader = new FileReader();
+                                    reader.onload = (ev) => {
+                                      const ingredients = [...formData.ingredients];
+                                      ingredients[i].image = ev.target.result;
+                                      setFormData({ ...formData, ingredients });
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }}
+                                />
+                                <FiUpload size={14} className="text-gray-400 hover:text-white" />
+                              </label>
+                              {ing.image && (
+                                <div className="relative group/image">
+                                  <img
+                                    src={ing.image}
+                                    alt=""
+                                    className="w-8 h-8 rounded-lg object-cover border border-white/10"
+                                    onError={() => {
+                                      const ingredients = [...formData.ingredients];
+                                      ingredients[i].image = '';
+                                      setFormData({ ...formData, ingredients });
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const ingredients = [...formData.ingredients];
+                                      ingredients[i].image = '';
+                                      setFormData({ ...formData, ingredients });
+                                    }}
+                                    className="absolute -top-1 -right-1 w-3.5 h-3.5 flex items-center justify-center rounded-full bg-red-500 text-white opacity-0 group-hover/image:opacity-100 transition-opacity"
+                                    style={{ fontSize: 8 }}
+                                  >
+                                    <FiX size={8} />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                             <motion.button
                               type="button"
                               whileTap={{ scale: 0.9 }}

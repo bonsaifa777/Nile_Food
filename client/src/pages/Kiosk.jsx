@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import {
   FiShoppingCart, FiPlus, FiMinus, FiX, FiMaximize, FiMinimize,
   FiSearch, FiClock, FiStar, FiChevronLeft, FiChevronRight
@@ -27,6 +28,7 @@ function useIdleTimer(timeout, onIdle) {
 }
 
 export default function Kiosk() {
+  const { t } = useTranslation();
   const [foods, setFoods] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -146,7 +148,7 @@ export default function Kiosk() {
               Nile Food
             </h1>
             <span className="hidden md:inline-flex text-xs text-white/40 border border-white/10 rounded-full px-3 py-1">
-              Tablet Menu
+              {t('kiosk.badge')}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -186,7 +188,7 @@ export default function Kiosk() {
               onChange={e => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              placeholder="Search dishes..."
+              placeholder={t('kiosk.search')}
               className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-3 md:py-4 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all text-base md:text-lg"
             />
             {searchQuery && (
@@ -209,7 +211,7 @@ export default function Kiosk() {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               <button onClick={() => setSelectedCategory('')}
                 className={`snap-start shrink-0 px-5 py-2.5 md:px-6 md:py-3 rounded-full text-sm md:text-base font-medium transition-all whitespace-nowrap ${!selectedCategory ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'}`}>
-                All Items
+                {t('menu.all')}
               </button>
               {categories.map(cat => (
                 <button key={cat._id} onClick={() => setSelectedCategory(cat._id)}
@@ -241,7 +243,7 @@ export default function Kiosk() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-white/40 text-lg">No dishes found</p>
+              <p className="text-white/40 text-lg">{t('common.noResults')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
@@ -277,7 +279,7 @@ export default function Kiosk() {
                     </div>
                     <div className="p-3 md:p-4">
                       <h3 className="font-semibold text-sm md:text-base mb-1 leading-tight line-clamp-1">{food.name}</h3>
-                      <p className="text-white/40 text-xs md:text-sm line-clamp-1 mb-3">{food.description || 'Delicious dish'}</p>
+                      <p className="text-white/40 text-xs md:text-sm line-clamp-1 mb-3">{food.description || t('kiosk.deliciousDish')}</p>
                       <AnimatePresence mode="wait">
                         {inCart ? (
                           <motion.div
@@ -308,7 +310,7 @@ export default function Kiosk() {
                             whileTap={{ scale: 0.95 }}
                             className={`w-full py-2.5 md:py-3 rounded-xl font-medium text-sm md:text-base transition-all duration-200 ${addedItem === food._id ? 'bg-emerald-500/30 border border-emerald-500/50 text-emerald-400' : 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/30'} `}
                           >
-                            {addedItem === food._id ? 'Added!' : 'Add to Order'}
+                            {addedItem === food._id ? t('kiosk.added') : t('kiosk.addToCart')}
                           </motion.button>
                         )}
                       </AnimatePresence>
@@ -333,7 +335,7 @@ export default function Kiosk() {
             className="fixed bottom-6 right-6 z-30 bg-indigo-500 border border-indigo-400/50 shadow-2xl shadow-indigo-500/30 rounded-2xl px-5 py-3.5 md:px-6 md:py-4 flex items-center gap-3 hover:bg-indigo-600 transition-colors"
           >
             <FiShoppingCart size={22} />
-            <span className="font-bold text-base md:text-lg">{cartCount} item{cartCount !== 1 ? 's' : ''}</span>
+            <span className="font-bold text-base md:text-lg">{cartCount} {cartCount === 1 ? t('kiosk.item') : t('kiosk.items')}</span>
             <span className="text-white/70">•</span>
             <span className="font-bold">ETB {total.toFixed(0)}</span>
           </motion.button>
@@ -360,8 +362,8 @@ export default function Kiosk() {
             >
               <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10">
                 <div>
-                  <h2 className="text-xl md:text-2xl font-bold">Your Order</h2>
-                  <p className="text-white/40 text-sm">{cartCount} item{cartCount !== 1 ? 's' : ''}</p>
+                  <h2 className="text-xl md:text-2xl font-bold">{t('cart.title')}</h2>
+                  <p className="text-white/40 text-sm">{cartCount} {cartCount === 1 ? t('kiosk.item') : t('kiosk.items')}</p>
                 </div>
                 <button onClick={() => setShowCart(false)}
                   className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors">
@@ -371,7 +373,7 @@ export default function Kiosk() {
 
               <div className="overflow-y-auto px-4 md:px-6 py-4 space-y-3 max-h-[40vh]">
                 {cart.length === 0 ? (
-                  <p className="text-center text-white/40 py-10">Cart is empty</p>
+                  <p className="text-center text-white/40 py-10">{t('cart.empty')}</p>
                 ) : (
                   cart.map(item => (
                     <div key={item.food._id} className="flex items-center gap-3 md:gap-4 bg-white/5 rounded-2xl p-3 md:p-4">
@@ -400,10 +402,10 @@ export default function Kiosk() {
               {cart.length > 0 && (
                 <div className="border-t border-white/10 p-4 md:p-6 space-y-4">
                   <div className="space-y-1 text-sm md:text-base">
-                    <div className="flex justify-between text-white/60"><span>Subtotal</span><span>ETB {subtotal.toFixed(2)}</span></div>
-                    <div className="flex justify-between text-white/60"><span>Tax (15%)</span><span>ETB {tax.toFixed(2)}</span></div>
+                    <div className="flex justify-between text-white/60"><span>{t('cart.subtotal')}</span><span>ETB {subtotal.toFixed(2)}</span></div>
+                    <div className="flex justify-between text-white/60"><span>{t('cart.tax')} (15%)</span><span>ETB {tax.toFixed(2)}</span></div>
                     <div className="flex justify-between text-lg md:text-xl font-bold pt-2 border-t border-white/10">
-                      <span>Total</span><span className="text-indigo-400">ETB {total.toFixed(2)}</span>
+                      <span>{t('cart.total')}</span><span className="text-indigo-400">ETB {total.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -413,7 +415,7 @@ export default function Kiosk() {
                       whileTap={{ scale: 0.98 }}
                       className="w-full py-3.5 md:py-4 bg-indigo-500 hover:bg-indigo-600 rounded-2xl font-bold text-base md:text-lg transition-colors"
                     >
-                      Proceed to Order
+                      {t('kiosk.checkout')}
                     </motion.button>
                   ) : (
                     <motion.div
@@ -422,19 +424,19 @@ export default function Kiosk() {
                       className="space-y-3"
                     >
                       <input type="text" value={guestName} onChange={e => setGuestName(e.target.value)}
-                        placeholder="Your Name"
+                        placeholder={t('auth.name')}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/50 text-base md:text-lg" />
                       <input type="tel" value={guestPhone} onChange={e => setGuestPhone(e.target.value)}
-                        placeholder="Phone Number"
+                        placeholder={t('auth.phone')}
                         className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/50 text-base md:text-lg" />
                       <div className="flex gap-3">
                         <button onClick={() => setShowCheckout(false)}
                           className="flex-1 py-3.5 border border-white/20 rounded-2xl font-medium hover:bg-white/5 transition-colors text-base">
-                          Back
+                          {t('common.back')}
                         </button>
                         <button onClick={placeOrder} disabled={placingOrder}
                           className="flex-1 py-3.5 md:py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 rounded-2xl font-bold text-base md:text-lg transition-colors">
-                          {placingOrder ? 'Placing...' : 'Place Order'}
+                          {placingOrder ? t('common.loading') : t('kiosk.placeOrder')}
                         </button>
                       </div>
                     </motion.div>
@@ -462,13 +464,13 @@ export default function Kiosk() {
               className="bg-slate-900 border border-white/10 rounded-3xl p-8 text-center max-w-sm mx-4"
             >
               <h2 className="text-2xl font-bold mb-2">Nile Food</h2>
-              <p className="text-white/60 mb-6">Tap to start ordering</p>
+              <p className="text-white/60 mb-6">{t('kiosk.tapToStart')}</p>
               <motion.button
                 onClick={resetKiosk}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-3 bg-indigo-500 rounded-2xl font-bold text-lg"
               >
-                Start
+                {t('kiosk.start')}
               </motion.button>
             </motion.div>
           </motion.div>

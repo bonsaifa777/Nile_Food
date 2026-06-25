@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiUser, FiPhone, FiArrowRight, FiCheck, FiSun, FiMoon } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import toast from 'react-hot-toast';
 
 const features = [
@@ -13,6 +15,7 @@ const features = [
 ];
 
 export default function Auth() {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -82,7 +85,7 @@ export default function Auth() {
       }
       if (isLogin) navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'An error occurred');
+      setError(err.response?.data?.message || err.message || t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -155,8 +158,7 @@ export default function Auth() {
               transition={{ delay: 0.4 }}
               className={`text-3xl lg:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}
             >
-              Delicious Food,<br />
-              <span className="text-indigo-600">Delivered Fast</span>
+              {t('auth.heroText')}
             </motion.h1>
             
             <motion.p
@@ -165,7 +167,7 @@ export default function Auth() {
               transition={{ delay: 0.6 }}
               className={`text-sm lg:text-base max-w-md mx-auto mb-10 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
             >
-              Order from your favorite local restaurants with just a few clicks. Fast, fresh, and hassle-free.
+              {t('auth.heroText')}
             </motion.p>
 
             {/* Feature cards */}
@@ -219,7 +221,12 @@ export default function Auth() {
             </div>
             <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nile Food</span>
           </div>
-          <motion.button
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher
+              dark={darkMode}
+              btnBase={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${darkMode ? 'bg-slate-800 text-gray-300 hover:bg-slate-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            />
+            <motion.button
             onClick={toggleDarkMode}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -227,16 +234,17 @@ export default function Auth() {
           >
             {darkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
           </motion.button>
+          </div>
         </div>
 
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-md">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <h2 className={`text-2xl lg:text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                {isLogin ? 'Welcome Back!' : 'Create Account'}
+                {isLogin ? t('auth.welcomeBack') : t('auth.createAccount')}
               </h2>
               <p className={`mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {isLogin ? 'Sign in to continue your food journey' : 'Join us for amazing food experiences'}
+                {isLogin ? t('auth.signIn') : t('auth.createAccount')}
               </p>
 
               {/* Toggle */}
@@ -247,7 +255,7 @@ export default function Auth() {
                     isLogin ? 'bg-indigo-600 text-white shadow-md' : darkMode ? 'text-gray-400 hover:bg-slate-700' : 'text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  Login
+                  {t('auth.signIn')}
                 </button>
                 <button
                   onClick={() => { setIsLogin(false); navigate('/register'); }}
@@ -255,7 +263,7 @@ export default function Auth() {
                     !isLogin ? 'bg-indigo-600 text-white shadow-md' : darkMode ? 'text-gray-400 hover:bg-slate-700' : 'text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  Register
+                  {t('auth.signUp')}
                 </button>
               </div>
 
@@ -301,7 +309,7 @@ export default function Auth() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                     >
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Full Name</label>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('checkout.fullName')}</label>
                       <div className="relative">
                         <FiUser className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                         <input
@@ -315,7 +323,7 @@ export default function Auth() {
                   )}
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Email Address</label>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.email')}</label>
                     <div className="relative">
                       <FiMail className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                       <input
@@ -333,7 +341,7 @@ export default function Auth() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                     >
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Phone Number</label>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.phone')}</label>
                       <div className="relative">
                         <FiPhone className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                         <input
@@ -347,7 +355,7 @@ export default function Auth() {
                   )}
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Password</label>
+                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.password')}</label>
                     <div className="relative">
                       <FiLock className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                       <input
@@ -368,7 +376,7 @@ export default function Auth() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                     >
-                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Confirm Password</label>
+                      <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{t('auth.confirmPassword')}</label>
                       <div className="relative">
                         <FiLock className={`absolute left-4 top-1/2 -translate-y-1/2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} size={18} />
                         <input
@@ -390,7 +398,7 @@ export default function Auth() {
                         <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
                         <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Remember me</span>
                       </label>
-                      <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">Forgot password?</Link>
+                      <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500 font-medium">{t('auth.forgotPassword')}</Link>
                     </div>
                   )}
 
@@ -403,7 +411,7 @@ export default function Auth() {
                       <motion.div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity }} />
                     ) : (
                       <>
-                        {isLogin ? 'Sign In' : 'Create Account'}
+                        {isLogin ? t('auth.signIn') : t('auth.createAccount')}
                         <FiArrowRight size={18} />
                       </>
                     )}
@@ -415,7 +423,7 @@ export default function Auth() {
               <div className="mt-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className={`flex-1 h-px ${darkMode ? 'bg-slate-700' : 'bg-gray-200'}`} />
-                  <span className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>or continue with</span>
+                  <span className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>{t('auth.orContinueWith')}</span>
                   <div className={`flex-1 h-px ${darkMode ? 'bg-slate-700' : 'bg-gray-200'}`} />
                 </div>
 
@@ -434,12 +442,12 @@ export default function Auth() {
               </div>
 
               <p className={`mt-6 text-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {isLogin ? "Don't have an account? " : "Already have an account? "}
+                {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
                 <button
                   onClick={() => { setIsLogin(!isLogin); navigate(isLogin ? '/register' : '/login'); }}
                   className="text-indigo-600 hover:text-indigo-500 font-semibold"
                 >
-                  {isLogin ? 'Sign Up' : 'Sign In'}
+                  {isLogin ? t('auth.signUp') : t('auth.signIn')}
                 </button>
               </p>
             </motion.div>

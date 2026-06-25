@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/common/Footer';
@@ -10,6 +11,7 @@ export default function Gallery() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [active, setActive] = useState('All');
   const [selected, setSelected] = useState(null);
 
@@ -29,15 +31,17 @@ export default function Gallery() {
       <main className="pt-28 pb-20">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">Our <span className="text-primary-500">Gallery</span></h1>
-            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">A glimpse into the Nile Food experience</p>
+            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">{t('gallery.title').split(' ').map((word, i, arr) =>
+                i === arr.length - 1 ? <span key={i} className="text-primary-500">{word}</span> : word + ' '
+              )}</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto">{t('gallery.subtitle')}</p>
           </motion.div>
 
           {categories.length > 1 && (
             <div className="flex justify-center gap-2 mb-10">
               {categories.map(cat => (
                 <button key={cat} onClick={() => setActive(cat)}
-                  className={`px-5 py-2 text-sm font-semibold rounded-full transition-all ${active === cat ? 'bg-primary-500 text-white shadow-lg' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>{cat}</button>
+                  className={`px-5 py-2 text-sm font-semibold rounded-full transition-all ${active === cat ? 'bg-primary-500 text-white shadow-lg' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700'}`}>{cat === 'All' ? t('menu.all') : cat}</button>
               ))}
             </div>
           )}

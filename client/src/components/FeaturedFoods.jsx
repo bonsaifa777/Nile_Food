@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiHeart, FiStar } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 
 function ProductCard({ food, index = 0 }) {
+  const { t } = useTranslation();
   const { addToCart } = useCart();
   const [isFavorite, setIsFavorite] = useState(false);
   const [imgAttempt, setImgAttempt] = useState(0);
@@ -14,7 +16,7 @@ function ProductCard({ food, index = 0 }) {
     e.preventDefault();
     e.stopPropagation();
     addToCart(food, 1);
-    toast.success(`${food.name} added to cart!`);
+    toast.success(`${food.name} ${t('cart.addToCart')}`);
   };
 
   const discount = food.originalPrice

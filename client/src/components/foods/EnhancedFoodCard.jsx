@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { FiShoppingCart, FiHeart, FiStar, FiClock, FiCheck } from 'react-icons/fi';
 import { useCart } from '../../context/CartContext';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function EnhancedFoodCard({ food, index = 0 }) {
   const { addToCart, cart } = useCart();
@@ -11,6 +12,7 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
   const [isHovered, setIsHovered] = useState(false);
   const [imgAttempt, setImgAttempt] = useState(0);
   const [added, setAdded] = useState(false);
+  const { t } = useTranslation();
 
   const inCart = cart?.some((item) => item.food === food._id);
 
@@ -19,7 +21,7 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
     e.stopPropagation();
     addToCart(food, 1);
     setAdded(true);
-    toast.success(`${food.name} added!`);
+    toast.success(t('foodCard.addedToCart', { name: food.name }));
     setTimeout(() => setAdded(false), 1500);
   };
 
@@ -90,7 +92,7 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
                 transition={{ delay: 0.1 }}
                 className="absolute top-3 right-3 px-2.5 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg shadow-lg z-10"
               >
-                Chef's Pick
+                {t('foodCard.chefsPick')}
               </motion.span>
             )}
 
@@ -128,9 +130,9 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
                 }`}
               >
                 {added || inCart ? (
-                  <><FiCheck size={16} /> Added</>
+                  <><FiCheck size={16} /> {t('foodCard.added')}</>
                 ) : (
-                  <><FiShoppingCart size={16} /> Add to Cart</>
+                  <><FiShoppingCart size={16} /> {t('foodCard.addToCart')}</>
                 )}
               </motion.button>
             </motion.div>

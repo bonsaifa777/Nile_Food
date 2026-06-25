@@ -7,6 +7,6 @@ RUN npm install --prefix server --omit=dev
 
 COPY server/ server/
 
-EXPOSE 5001
+EXPOSE 5002
 
 CMD ["node", "server/index.js"]

@@ -12,6 +12,7 @@ import {
   FiXCircle, FiAlertCircle, FiChevronRight, FiShoppingBag,
   FiCalendar, FiDollarSign, FiBell
 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../context/ThemeContext';
 
 const STATUS_CONFIG = {
@@ -158,6 +159,7 @@ function OrderProgressBar({ status }) {
 }
 
 function OrderCard({ order, index, d }) {
+  const { t } = useTranslation();
   const statusConfig = STATUS_CONFIG[order.status];
   const { Icon } = statusConfig || { Icon: FiPackage };
   const isActive = !['delivered', 'cancelled'].includes(order.status);
@@ -221,7 +223,7 @@ function OrderCard({ order, index, d }) {
               </motion.div>
               <div>
                 <h3 className={`font-bold text-base ${d ? 'text-white' : 'text-gray-900'}`}>
-                  Order #{order.orderId}
+                  {t('orders.orderId')} #{order.orderId}
                 </h3>
                 <div className="flex items-center gap-2 mt-0.5">
                   <FiCalendar size={11} className="text-white/40" />
@@ -246,9 +248,9 @@ function OrderCard({ order, index, d }) {
           {/* Info Grid */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              { label: 'Type', value: order.type?.replace('_', ' '), icon: FiPackage },
-              { label: 'Items', value: `${order.items?.length || 0} items`, icon: FiShoppingBag },
-              { label: 'Total', value: `${order.total?.toFixed(2)} ETB`, icon: FiDollarSign, highlight: true },
+              { label: t('orders.status'), value: order.type?.replace('_', ' '), icon: FiPackage },
+              { label: t('orders.status'), value: `${order.items?.length || 0} ${t('cart.quantity')}`, icon: FiShoppingBag },
+              { label: t('orders.total'), value: `${order.total?.toFixed(2)} ETB`, icon: FiDollarSign, highlight: true },
             ].map((info, i) => {
               const InfoIcon = info.icon;
               return (
@@ -304,7 +306,7 @@ function OrderCard({ order, index, d }) {
               animate={isActive ? { opacity: [1, 0.5, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              {isActive ? 'Track Order' : 'View Details'}
+              {isActive ? t('orders.trackOrder') : t('orders.details')}
             </motion.span>
             <FiArrowRight
               size={14}
@@ -318,6 +320,7 @@ function OrderCard({ order, index, d }) {
 }
 
 function EmptyOrders({ d }) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -351,7 +354,7 @@ function EmptyOrders({ d }) {
         transition={{ delay: 0.4 }}
         className={`text-2xl font-bold mb-2 ${d ? 'text-white' : 'text-gray-900'}`}
       >
-        No orders yet
+        {t('orders.noOrders')}
       </motion.h3>
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -359,7 +362,7 @@ function EmptyOrders({ d }) {
         transition={{ delay: 0.5 }}
         className="text-white/50 mb-8 max-w-sm mx-auto"
       >
-        Looks like you haven&apos;t placed any orders yet. Browse our menu and order your favorite meal!
+        {t('orders.noOrdersMessage')}
       </motion.p>
 
       <motion.div
@@ -372,7 +375,7 @@ function EmptyOrders({ d }) {
           className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all duration-300 hover:scale-105 active:scale-95"
         >
           <FiShoppingBag size={18} />
-          Browse Menu
+          {t('dashboard.browseMenu')}
           <FiChevronRight size={16} />
         </Link>
       </motion.div>
@@ -381,9 +384,10 @@ function EmptyOrders({ d }) {
 }
 
 function FilterPill({ status, active, onClick, d }) {
+  const { t } = useTranslation();
   const config = STATUS_CONFIG[status];
-  const label = status === 'all' ? 'All Orders' :
-    status === 'active' ? 'Active' :
+  const label = status === 'all' ? t('orders.title') :
+    status === 'active' ? t('orders.status') :
     config?.label || status.replace('_', ' ');
   const Icon = status === 'all' ? FiPackage : status === 'active' ? FiClock : config?.Icon || FiPackage;
   const isActiveOrder = status === 'active' || (status !== 'all' && status !== 'delivered' && status !== 'cancelled');
@@ -454,6 +458,7 @@ function OrderSkeleton({ d }) {
 }
 
 export default function Orders() {
+  const { t } = useTranslation();
   const { darkMode } = useTheme();
   const d = darkMode;
   const [orders, setOrders] = useState([]);
@@ -563,19 +568,19 @@ export default function Orders() {
               transition={{ delay: 0.2 }}
             >
               <FiPackage size={12} />
-              Order History
+              {t('orders.title')}
             </motion.div>
 
             <h1 className={`text-4xl sm:text-5xl font-black mb-3 ${
               d ? 'text-white' : 'text-gray-900'
             }`}>
               <span className="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-500 dark:from-primary-400 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-                My Orders
+                {t('orders.title')}
               </span>
             </h1>
 
             <p className={`text-base ${d ? 'text-white/50' : 'text-gray-500'}`}>
-              Track, manage, and review all your orders in one place
+              {t('orders.title')}
             </p>
 
             {/* Stats bar */}
@@ -591,7 +596,7 @@ export default function Orders() {
                 <div className="flex items-center gap-2">
                   <FiShoppingBag size={14} className="text-primary-500" />
                   <span className={`text-sm ${d ? 'text-white/70' : 'text-gray-600'}`}>
-                    <strong className={d ? 'text-white' : 'text-gray-900'}>{orders.length}</strong> Total
+                    <strong className={d ? 'text-white' : 'text-gray-900'}>{orders.length}</strong> {t('orders.total')}
                   </span>
                 </div>
                 <div className="w-px bg-white/10" />
@@ -600,7 +605,7 @@ export default function Orders() {
                   <span className={`text-sm ${d ? 'text-white/70' : 'text-gray-600'}`}>
                     <strong className={d ? 'text-white' : 'text-gray-900'}>
                       {orders.filter(o => !['delivered', 'cancelled'].includes(o.status)).length}
-                    </strong> Active
+                    </strong> {t('orders.status')}
                   </span>
                 </div>
                 <div className="w-px bg-white/10" />
@@ -609,7 +614,7 @@ export default function Orders() {
                   <span className={`text-sm ${d ? 'text-white/70' : 'text-gray-600'}`}>
                     <strong className={d ? 'text-white' : 'text-gray-900'}>
                       {orders.reduce((sum, o) => sum + (o.total || 0), 0).toFixed(0)}
-                    </strong> ETB Spent
+                    </strong> {t('orders.total')}
                   </span>
                 </div>
               </motion.div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
@@ -11,17 +12,9 @@ import HeroProfile from '../components/dashboard/HeroProfile';
 import OrderHistory from '../components/dashboard/OrderHistory';
 import WalletSection from '../components/dashboard/WalletSection';
 import FavoritesSection from '../components/dashboard/FavoritesSection';
-import RoomStatus from '../components/dashboard/RoomStatus';
 import MessagesSection from '../components/dashboard/MessagesSection';
 import AIAssistant from '../components/dashboard/AIAssistant';
 import { FiMenu, FiSearch, FiGrid, FiShoppingBag, FiHeart, FiBell, FiCheckCircle } from 'react-icons/fi';
-
-const mobileNav = [
-  { id: 'overview', icon: FiGrid, label: 'Home' },
-  { id: 'orders', icon: FiShoppingBag, label: 'Orders' },
-  { id: 'room-status', icon: FiGrid, label: 'Rooms' },
-  { id: 'favorites', icon: FiHeart, label: 'Favs' },
-];
 
 const STATUS_ICONS = {
   pending: '⏳',
@@ -70,9 +63,16 @@ function FloatingParticles({ d }) {
 }
 
 export default function CustomerDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { darkMode } = useTheme();
   const d = darkMode;
+
+  const mobileNav = [
+    { id: 'overview', icon: FiGrid, label: t('dashboard.home') },
+    { id: 'orders', icon: FiShoppingBag, label: t('dashboard.orders') },
+    { id: 'favorites', icon: FiHeart, label: t('dashboard.favs') },
+  ];
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -171,7 +171,7 @@ export default function CustomerDashboard() {
         favorites: favoritesRes.data.data || [],
       });
     } catch (error) {
-      toast.error('Failed to load dashboard data');
+      toast.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -187,7 +187,6 @@ export default function CustomerDashboard() {
       </div>
     ),
     orders: <OrderHistory orders={data.orders} />,
-    'room-status': <RoomStatus />,
     wallet: <WalletSection />,
     favorites: <FavoritesSection favorites={data.favorites} />,
     messages: <MessagesSection />,
@@ -230,7 +229,7 @@ export default function CustomerDashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`text-xl md:text-2xl font-bold capitalize ${d ? 'text-white' : 'text-gray-900'}`}
                 >
-                  {activeSection === 'overview' ? 'Dashboard' : activeSection}
+                  {activeSection === 'overview' ? t('dashboard.dashboard') : activeSection}
                 </motion.h1>
                 <p className={`text-xs ${d ? 'text-white/40' : 'text-gray-500'}`}>
                   {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
@@ -244,7 +243,7 @@ export default function CustomerDashboard() {
               }`}>
                 <FiSearch className={d ? 'text-white/30' : 'text-gray-400'} size={16} />
                 <input
-                  placeholder="Search..."
+                  placeholder={t('dashboard.search')}
                   className={`bg-transparent text-sm focus:outline-none w-32 ${
                     d ? 'text-white placeholder-white/30' : 'text-gray-900 placeholder-gray-400'
                   }`}
@@ -292,7 +291,7 @@ export default function CustomerDashboard() {
                       <div className={`flex items-center justify-between p-4 ${d ? 'border-b border-white/10' : 'border-b border-gray-200'}`}>
                         <div className="flex items-center gap-2">
                           <h3 className={`font-semibold text-sm ${d ? 'text-white' : 'text-gray-900'}`}>
-                            Notifications
+                            {t('dashboard.notifications')}
                           </h3>
                           {notifCount > 0 && (
                             <motion.span
@@ -310,7 +309,7 @@ export default function CustomerDashboard() {
                             onClick={clearAll}
                             className={`text-xs font-medium ${d ? 'text-white/50 hover:text-white' : 'text-gray-500 hover:text-gray-700'}`}
                           >
-                            Clear all
+                            {t('dashboard.clearAll')}
                           </button>
                         )}
                       </div>
@@ -323,7 +322,7 @@ export default function CustomerDashboard() {
                             >
                               <FiBell size={24} className={`mx-auto mb-2 ${d ? 'text-white/30' : 'text-gray-400'}`} />
                             </motion.div>
-                            <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>No notifications</p>
+                            <p className={`text-sm ${d ? 'text-white/40' : 'text-gray-500'}`}>{t('dashboard.noNotifications')}</p>
                           </div>
                         ) : (
                           notifications.map((notif, index) => (

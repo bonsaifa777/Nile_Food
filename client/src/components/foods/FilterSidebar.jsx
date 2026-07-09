@@ -1,60 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FiChevronDown, FiX, FiSliders } from 'react-icons/fi';
-
-const filterGroups = [
-  {
-    id: 'foodType',
-    label: 'Food Type',
-    options: ['Burger', 'Pizza', 'Pasta', 'Chicken', 'Vegan', 'Seafood', 'Desserts', 'Drinks'],
-  },
-  {
-    id: 'cuisine',
-    label: 'Cuisine',
-    options: ['Ethiopian', 'Italian', 'Chinese', 'Indian', 'Arabic', 'American', 'Korean', 'Mexican'],
-  },
-  {
-    id: 'spice',
-    label: 'Spice Level',
-    options: ['Mild', 'Medium', 'Hot', 'Extra Hot'],
-  },
-  {
-    id: 'dietary',
-    label: 'Dietary Preferences',
-    options: ['Vegetarian', 'Vegan', 'Halal', 'Gluten Free', 'Keto'],
-  },
-  {
-    id: 'mealTime',
-    label: 'Meal Time',
-    options: ['Breakfast', 'Lunch', 'Dinner', 'Late Night'],
-  },
-  {
-    id: 'priceRange',
-    label: 'Price Range',
-    options: ['Budget', 'Standard', 'Premium', 'Luxury'],
-  },
-  {
-    id: 'deliveryTime',
-    label: 'Delivery Time',
-    options: ['Under 15 min', 'Under 30 min', 'Under 45 min'],
-  },
-  {
-    id: 'ratings',
-    label: 'Ratings',
-    options: ['5 stars', '4+ stars', '3+ stars'],
-  },
-  {
-    id: 'offers',
-    label: 'Offers',
-    options: ['Free Delivery', 'Buy 1 Get 1', 'Discounted', 'Combo Meals'],
-  },
-  {
-    id: 'ingredients',
-    label: 'Ingredients',
-    options: ['Cheese', 'Chicken', 'Beef', 'Fish', 'Organic'],
-  },
-];
+import axios from 'axios';
 
 const SHOW_MORE_THRESHOLD = 5;
 
@@ -64,54 +12,6 @@ function FilterSection({ group, activeFilters, onToggle }) {
   const [showAll, setShowAll] = useState(false);
   const options = showAll ? group.options : group.options.slice(0, SHOW_MORE_THRESHOLD);
   const hasMore = group.options.length > SHOW_MORE_THRESHOLD;
-  const filterOptKeys = {
-    'Burger': 'filters.optBurger',
-    'Pizza': 'filters.optPizza',
-    'Pasta': 'filters.optPasta',
-    'Chicken': 'filters.optChicken',
-    'Vegan': 'filters.optVegan',
-    'Seafood': 'filters.optSeafood',
-    'Desserts': 'filters.optDesserts',
-    'Drinks': 'filters.optDrinks',
-    'Ethiopian': 'filters.optEthiopian',
-    'Italian': 'filters.optItalian',
-    'Chinese': 'filters.optChinese',
-    'Indian': 'filters.optIndian',
-    'Arabic': 'filters.optArabic',
-    'American': 'filters.optAmerican',
-    'Korean': 'filters.optKorean',
-    'Mexican': 'filters.optMexican',
-    'Mild': 'filters.optMild',
-    'Medium': 'filters.optMedium',
-    'Hot': 'filters.optHot',
-    'Extra Hot': 'filters.optExtraHot',
-    'Vegetarian': 'filters.optVegetarian',
-    'Halal': 'filters.optHalal',
-    'Gluten Free': 'filters.optGlutenFree',
-    'Keto': 'filters.optKeto',
-    'Breakfast': 'categories.breakfast',
-    'Lunch': 'categories.lunch',
-    'Dinner': 'categories.dinner',
-    'Late Night': 'filters.optLateNight',
-    'Budget': 'filters.optBudget',
-    'Standard': 'filters.optStandard',
-    'Premium': 'filters.optPremium',
-    'Luxury': 'filters.optLuxury',
-    'Under 15 min': 'filters.optUnder15min',
-    'Under 30 min': 'filters.optUnder30min',
-    'Under 45 min': 'filters.optUnder45min',
-    '5 stars': 'filters.opt5stars',
-    '4+ stars': 'filters.opt4plus',
-    '3+ stars': 'filters.opt3plus',
-    'Free Delivery': 'filters.optFreeDelivery',
-    'Buy 1 Get 1': 'filters.optBuy1Get1',
-    'Discounted': 'filters.optDiscounted',
-    'Combo Meals': 'filters.optComboMeals',
-    'Cheese': 'filters.optCheese',
-    'Beef': 'filters.optBeef',
-    'Fish': 'filters.optFish',
-    'Organic': 'filters.optOrganic',
-  };
 
   return (
     <div className="border-b border-gray-100 dark:border-slate-700/50 last:border-0">
@@ -119,7 +19,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between py-3.5 px-1 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
       >
-        <span>{t(`filters.${group.id}`)}</span>
+        <span>{group.name}</span>
         <motion.span
           animate={{ rotate: expanded ? 180 : 0 }}
           transition={{ duration: 0.2 }}
@@ -140,11 +40,12 @@ function FilterSection({ group, activeFilters, onToggle }) {
           >
             <div className="pb-3 px-1 space-y-1">
               {options.map((option) => {
-                const isActive = activeFilters[group.id]?.includes(option);
+                const optName = option.name || option;
+                const isActive = activeFilters[group._id]?.includes(optName);
                 return (
                   <label
-                    key={option}
-                    onClick={() => onToggle(group.id, option)}
+                    key={optName}
+                    onClick={() => onToggle(group._id, optName)}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150 ${
                       isActive
                         ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300'
@@ -172,7 +73,7 @@ function FilterSection({ group, activeFilters, onToggle }) {
                         </motion.svg>
                       )}
                     </div>
-                    <span className="text-sm font-medium">{t(filterOptKeys[option])}</span>
+                    <span className="text-sm font-medium">{optName}</span>
                   </label>
                 );
               })}
@@ -194,6 +95,25 @@ function FilterSection({ group, activeFilters, onToggle }) {
 
 export default function FilterSidebar({ activeFilters, onToggleFilter, onClearAll }) {
   const { t } = useTranslation();
+  const [filterGroups, setFilterGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFilterGroups();
+  }, []);
+
+  const fetchFilterGroups = async () => {
+    try {
+      const { data } = await axios.get('/api/filter-groups');
+      const all = data.data || [];
+      setFilterGroups(all.filter(g => g.showInMenu !== false));
+    } catch {
+      setFilterGroups([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const totalActive = Object.values(activeFilters).reduce((acc, arr) => acc + arr.length, 0);
 
   return (
@@ -220,14 +140,33 @@ export default function FilterSidebar({ activeFilters, onToggleFilter, onClearAl
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin px-5">
-        {filterGroups.map((group) => (
-          <FilterSection
-            key={group.id}
-            group={group}
-            activeFilters={activeFilters}
-            onToggle={onToggleFilter}
-          />
-        ))}
+        {loading ? (
+          <div className="space-y-4 py-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/2 mb-3" />
+                <div className="space-y-2">
+                  {[1, 2, 3].map((j) => (
+                    <div key={j} className="h-8 bg-gray-100 dark:bg-slate-700/50 rounded-lg" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filterGroups.length === 0 ? (
+          <div className="py-8 text-center text-sm text-gray-400">
+            No filters available
+          </div>
+        ) : (
+          filterGroups.map((group) => (
+            <FilterSection
+              key={group._id}
+              group={group}
+              activeFilters={activeFilters}
+              onToggle={onToggleFilter}
+            />
+          ))
+        )}
       </div>
 
       {totalActive > 0 && (

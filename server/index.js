@@ -36,6 +36,7 @@ import reportRoutes from './routes/reports.js';
 import cashierRoutes from './routes/cashier.js';
 import cashDrawerRoutes from './routes/cashDrawer.js';
 import chatRoutes from './routes/chat.js';
+import filterGroupRoutes from './routes/filterGroup.js';
 import { setupSocket } from './utils/socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -126,6 +127,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/cashier', cashierRoutes);
 app.use('/api/cash-drawer', cashDrawerRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/filter-groups', filterGroupRoutes);
 
 app.use('/uploads', express.static('uploads'));
 

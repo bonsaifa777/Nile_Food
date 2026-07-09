@@ -16,6 +16,7 @@ const allMenuItems = [
   { path: '/orders', label: 'Orders', icon: FiShoppingBag, roles: ['admin', 'super_admin'] },
   { path: '/menu', label: 'Menu', icon: FiMenu, roles: ['admin', 'super_admin'] },
   { path: '/categories', label: 'Categories', icon: FiGrid, roles: ['admin', 'super_admin'] },
+  { path: '/filters', label: 'Filters', icon: FiLayers, roles: ['admin', 'super_admin'] },
   { path: '/tables', label: 'Tables', icon: FiDollarSign, roles: ['admin', 'super_admin'] },
   { path: '/bookings', label: 'Bookings', icon: FiBookmark, roles: ['admin', 'super_admin'] },
   { separator: true, label: 'CASHIER', roles: ['admin', 'super_admin', 'cashier', 'waiter'] },

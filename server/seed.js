@@ -7,6 +7,7 @@ import User from './models/User.js';
 import Category from './models/Category.js';
 import Food from './models/Food.js';
 import Table from './models/Table.js';
+import FilterGroup from './models/FilterGroup.js';
 import { hashPassword } from './shared/utils.js';
 import { ROLES } from './shared/constants.js';
 
@@ -21,23 +22,90 @@ if (fs.existsSync(lanEnv)) {
 }
 
 const categories = [
-  { name: 'Fast Food', description: 'Quick and tasty fast food options', color: '#eab308' },
-  { name: 'Burgers', description: 'Juicy burgers with premium ingredients', color: '#f97316' },
-  { name: 'Pizza', description: 'Authentic Italian pizzas', color: '#ef4444' },
-  { name: 'Chicken', description: 'Delicious chicken dishes', color: '#d97706' },
-  { name: 'Traditional', description: 'Traditional and authentic cuisine', color: '#a16207' },
-  { name: 'Desserts', description: 'Sweet treats and desserts', color: '#ec4899' },
-  { name: 'Drinks', description: 'Refreshing drinks and beverages', color: '#06b6d4' },
-  { name: 'Healthy', description: 'Healthy and nutritious options', color: '#22c55e' },
-  { name: 'Breakfast', description: 'Start your day with our delicious breakfast items', color: '#f59e0b' },
-  { name: 'Lunch', description: 'Perfect lunch options for busy days', color: '#10b981' },
-  { name: 'Dinner', description: 'Evening meals to end your day', color: '#8b5cf6' },
-  { name: 'Vegan', description: 'Plant-based and vegan-friendly options', color: '#16a34a' },
-  { name: 'Seafood', description: 'Fresh seafood selections', color: '#0d9488' },
-  { name: 'BBQ & Grill', description: 'Smoky BBQ and grilled specialties', color: '#dc2626' },
-  { name: 'Hotel Specials', description: 'Exclusive hotel signature dishes', color: '#7c3aed' },
-  { name: 'Beverages', description: 'Refreshing drinks', color: '#0891b2' },
-  { name: 'Snacks', description: 'Quick bites and snacks', color: '#ca8a04' }
+  { name: 'Fast Food', description: 'Quick and tasty fast food options', color: '#eab308', icon: '🍟', subcategories: ['Burgers', 'Fries', 'Chicken', 'Wraps'] },
+  { name: 'Burgers', description: 'Juicy burgers with premium ingredients', color: '#f97316', icon: '🍔', subcategories: ['Classic', 'Cheese', 'Double', 'Chicken', 'Veggie', 'Bacon', 'Spicy', 'Special'] },
+  { name: 'Pizza', description: 'Authentic Italian pizzas', color: '#ef4444', icon: '🍕', subcategories: ['Margherita', 'Pepperoni', 'BBQ Chicken', 'Veggie', 'Hawaiian', 'Supreme', 'Cheese', 'Gluten-Free'] },
+  { name: 'Chicken', description: 'Delicious chicken dishes', color: '#d97706', icon: '🍗' },
+  { name: 'Traditional', description: 'Traditional and authentic cuisine', color: '#a16207', icon: '🥘' },
+  { name: 'Desserts', description: 'Sweet treats and desserts', color: '#ec4899', icon: '🍰', subcategories: ['Cakes', 'Ice Cream', 'Pudding', 'Cookies', 'Pastries', 'Fruit', 'Chocolate', 'Special'] },
+  { name: 'Drinks', description: 'Refreshing drinks and beverages', color: '#06b6d4', icon: '🥤', subcategories: ['Soft Drinks', 'Juices', 'Coffee', 'Tea', 'Smoothies', 'Milkshakes', 'Water', 'Energy Drinks'] },
+  { name: 'Healthy', description: 'Healthy and nutritious options', color: '#22c55e', icon: '🥗' },
+  { name: 'Breakfast', description: 'Start your day with our delicious breakfast items', color: '#f59e0b', icon: '🌅' },
+  { name: 'Lunch', description: 'Perfect lunch options for busy days', color: '#10b981', icon: '☀️' },
+  { name: 'Dinner', description: 'Evening meals to end your day', color: '#8b5cf6', icon: '🌙' },
+  { name: 'Vegan', description: 'Plant-based and vegan-friendly options', color: '#16a34a', icon: '🌱' },
+  { name: 'Seafood', description: 'Fresh seafood selections', color: '#0d9488', icon: '🦐' },
+  { name: 'BBQ & Grill', description: 'Smoky BBQ and grilled specialties', color: '#dc2626', icon: '🔥' },
+  { name: 'Hotel Specials', description: 'Exclusive hotel signature dishes', color: '#7c3aed', icon: '⭐' },
+  { name: 'Beverages', description: 'Refreshing drinks', color: '#0891b2', icon: '🧃' },
+  { name: 'Snacks', description: 'Quick bites and snacks', color: '#ca8a04', icon: '🍿' }
+];
+
+const filterGroups = [
+  {
+    name: 'Food Type',
+    description: 'Type of food item',
+    order: 1,
+    options: [
+      { name: 'Burger', order: 1 },
+      { name: 'Pizza', order: 2 },
+      { name: 'Pasta', order: 3 },
+      { name: 'Chicken', order: 4 },
+      { name: 'Vegan', order: 5 },
+      { name: 'Seafood', order: 6 },
+      { name: 'Desserts', order: 7 },
+      { name: 'Drinks', order: 8 }
+    ]
+  },
+  {
+    name: 'Cuisine',
+    description: 'Type of cuisine',
+    order: 2,
+    options: [
+      { name: 'Ethiopian', order: 1 },
+      { name: 'Italian', order: 2 },
+      { name: 'Chinese', order: 3 },
+      { name: 'Indian', order: 4 },
+      { name: 'Arabic', order: 5 },
+      { name: 'American', order: 6 },
+      { name: 'Korean', order: 7 },
+      { name: 'Mexican', order: 8 }
+    ]
+  },
+  {
+    name: 'Spice Level',
+    description: 'Spiciness level',
+    order: 3,
+    options: [
+      { name: 'Mild', order: 1 },
+      { name: 'Medium', order: 2 },
+      { name: 'Hot', order: 3 },
+      { name: 'Extra Hot', order: 4 }
+    ]
+  },
+  {
+    name: 'Dietary Preferences',
+    description: 'Dietary requirements',
+    order: 4,
+    options: [
+      { name: 'Vegetarian', order: 1 },
+      { name: 'Vegan', order: 2 },
+      { name: 'Halal', order: 3 },
+      { name: 'Gluten Free', order: 4 },
+      { name: 'Keto', order: 5 }
+    ]
+  },
+  {
+    name: 'Price Range',
+    description: 'Price category',
+    order: 5,
+    options: [
+      { name: 'Budget', order: 1 },
+      { name: 'Standard', order: 2 },
+      { name: 'Premium', order: 3 },
+      { name: 'Luxury', order: 4 }
+    ]
+  }
 ];
 
 const foods = [
@@ -291,6 +359,10 @@ async function seed() {
     }));
     await Food.insertMany(foodDocs);
     console.log(`Created ${foods.length} food items`);
+
+    await FilterGroup.deleteMany({});
+    const filterGroupDocs = await FilterGroup.insertMany(filterGroups);
+    console.log(`Created ${filterGroupDocs.length} filter groups`);
 
     await Table.deleteMany({});
     const tableDocs = tables.map(t => ({ ...t, status: 'available' }));

@@ -2,27 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiChevronRight, FiTrendingUp, FiStar, FiClock, FiZap } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
-
-const categories = [
-  { id: '', name: 'All Foods', icon: '🍽️' },
-  { id: 'Fast Food', name: 'Fast Food', icon: '🍟' },
-  { id: 'Burgers', name: 'Burgers', icon: '🍔' },
-  { id: 'Pizza', name: 'Pizza', icon: '🍕' },
-  { id: 'Chicken', name: 'Chicken', icon: '🍗' },
-  { id: 'Traditional', name: 'Traditional', icon: '🥘' },
-  { id: 'Desserts', name: 'Desserts', icon: '🍰' },
-  { id: 'Drinks', name: 'Drinks', icon: '🥤' },
-  { id: 'Healthy', name: 'Healthy', icon: '🥗' },
-  { id: 'Breakfast', name: 'Breakfast', icon: '🌅' },
-  { id: 'Lunch', name: 'Lunch', icon: '☀️' },
-  { id: 'Dinner', name: 'Dinner', icon: '🌙' },
-  { id: 'Vegan', name: 'Vegan', icon: '🌱' },
-  { id: 'Seafood', name: 'Seafood', icon: '🦐' },
-  { id: 'BBQ & Grill', name: 'BBQ & Grill', icon: '🔥' },
-  { id: 'Hotel Specials', name: 'Hotel Specials', icon: '⭐' },
-  { id: 'Beverages', name: 'Beverages', icon: '🧃' },
-  { id: 'Snacks', name: 'Snacks', icon: '🍿' },
-];
+import axios from 'axios';
 
 const megaItems = [
   { label: 'Popular Near You', icon: FiZap, color: 'from-indigo-500 to-purple-600' },
@@ -31,35 +11,38 @@ const megaItems = [
   { label: 'Frequently Ordered', icon: FiClock, color: 'from-blue-500 to-indigo-500' },
 ];
 
-const subcategories = {
-  'Pizza': ['Margherita', 'Pepperoni', 'BBQ Chicken', 'Veggie', 'Hawaiian', 'Supreme', 'Cheese', 'Gluten-Free'],
-  'Burgers': ['Classic', 'Cheese', 'Double', 'Chicken', 'Veggie', 'Bacon', 'Spicy', 'Special'],
-  'Drinks': ['Soft Drinks', 'Juices', 'Coffee', 'Tea', 'Smoothies', 'Milkshakes', 'Water', 'Energy Drinks'],
-  'Desserts': ['Cakes', 'Ice Cream', 'Pudding', 'Cookies', 'Pastries', 'Fruit', 'Chocolate', 'Special'],
-};
-
 export default function CategoryNav({ selectedCategory, onSelectCategory }) {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeCat, setActiveCat] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const timeoutRef = useRef(null);
   const { t } = useTranslation();
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get('/api/categories');
+      const all = data.data || [];
+      const visible = all.filter(c => c.showInMenu !== false);
+      setCategories([
+        { _id: '', name: 'All Foods', icon: '🍽️' },
+        ...visible
+      ]);
+    } catch {
+      setCategories([
+        { _id: '', name: 'All Foods', icon: '🍽️' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const catKeys = {
     '': 'categories.allFoods',
-    'Fast Food': 'categories.fastFood',
-    'Burgers': 'categories.burgers',
-    'Chicken': 'categories.chicken',
-    'Traditional': 'categories.traditional',
-    'Healthy': 'categories.healthy',
-    'Breakfast': 'categories.breakfast',
-    'Lunch': 'categories.lunch',
-    'Dinner': 'categories.dinner',
-    'Vegan': 'categories.vegan',
-    'Seafood': 'categories.seafood',
-    'BBQ & Grill': 'categories.bbqGrill',
-    'Hotel Specials': 'categories.hotelSpecials',
-    'Beverages': 'categories.beverages',
-    'Snacks': 'categories.snacks',
   };
 
   const megaKeys = {
@@ -88,7 +71,18 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
     };
   }, []);
 
-  const subs = subcategories[activeCat];
+  const activeCategory = categories.find(c => c._id === activeCat);
+  const subs = activeCategory?.subcategories || null;
+
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-10 w-24 bg-gray-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -97,13 +91,14 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
         onMouseLeave={handleMouseLeave}
       >
         {categories.map((cat) => {
-          const isActive = selectedCategory === cat.id;
-          const isHovered = activeCat === cat.id;
+          const catId = cat._id || '';
+          const isActive = selectedCategory === catId;
+          const isHovered = activeCat === catId;
           return (
             <motion.button
-              key={cat.id}
-              onClick={() => onSelectCategory(cat.id)}
-              onMouseEnter={() => handleMouseEnter(cat.id)}
+              key={catId}
+              onClick={() => onSelectCategory(catId)}
+              onMouseEnter={() => handleMouseEnter(catId)}
               layout
               className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                 isActive
@@ -125,9 +120,9 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="relative z-10">{cat.icon}</span>
-              <span className="relative z-10">{t(catKeys[cat.id])}</span>
-              {cat.id && (
+              <span className="relative z-10">{cat.icon || '🍽️'}</span>
+              <span className="relative z-10">{catKeys[catId] ? t(catKeys[catId]) : cat.name}</span>
+              {catId && subs && (
                 <FiChevronDown
                   size={12}
                   className={`relative z-10 transition-transform duration-200 ${isHovered ? 'rotate-180' : ''}`}
@@ -155,7 +150,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
             <div className="flex">
               <div className="w-64 p-6 bg-gray-50 dark:bg-slate-800/50 border-r border-gray-100 dark:border-slate-700">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-{t('categories.subcategories')}
+                  {t('categories.subcategories')}
                 </h4>
                 <div className="space-y-1">
                   {subs.map((sub) => (
@@ -180,7 +175,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
 
               <div className="flex-1 p-6">
                 <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
-{t('categories.discover')}
+                  {t('categories.discover')}
                 </h4>
                 <div className="grid grid-cols-2 gap-4">
                   {megaItems.map((item) => (
@@ -198,7 +193,7 @@ export default function CategoryNav({ selectedCategory, onSelectCategory }) {
                         <item.icon size={16} className="text-white" />
                       </div>
                       <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-orange-500 transition-colors">
-{t(megaKeys[item.label])}
+                        {t(megaKeys[item.label])}
                       </span>
                     </motion.button>
                   ))}

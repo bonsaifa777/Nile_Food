@@ -13,6 +13,7 @@ const Delivery = lazy(() => import('./pages/Delivery'));
 const Operations = lazy(() => import('./pages/Operations'));
 const Menu = lazy(() => import('./pages/Menu'));
 const Categories = lazy(() => import('./pages/Categories'));
+const Filters = lazy(() => import('./pages/Filters'));
 const Tables = lazy(() => import('./pages/Tables'));
 const Users = lazy(() => import('./pages/Users'));
 const Analytics = lazy(() => import('./pages/Analytics'));
@@ -176,6 +177,14 @@ function App() {
         <AdminRoute>
           <AppLayout>
             <Categories />
+          </AppLayout>
+        </AdminRoute>
+      } />
+
+      <Route path="/filters" element={
+        <AdminRoute>
+          <AppLayout>
+            <Filters />
           </AppLayout>
         </AdminRoute>
       } />

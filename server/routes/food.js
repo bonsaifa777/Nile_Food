@@ -20,7 +20,7 @@ router.get('/', optionalAuth, async (req, res) => {
       ];
     }
     const foods = await Food.find(query)
-      .populate('category', 'name color')
+      .populate('category', 'name color icon')
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
@@ -85,7 +85,7 @@ router.get('/most-ordered', async (req, res) => {
 router.get('/featured', async (req, res) => {
   try {
     const foods = await Food.find({ isActive: true, featured: true })
-      .populate('category', 'name color')
+      .populate('category', 'name color icon')
       .limit(10);
     res.json(apiResponse(true, '', foods));
   } catch (error) {
@@ -102,7 +102,7 @@ router.get('/:id/similar', async (req, res) => {
       category: food.category,
       isActive: true
     })
-      .populate('category', 'name color')
+      .populate('category', 'name color icon')
       .limit(6);
     res.json(apiResponse(true, '', similar));
   } catch (error) {
@@ -121,7 +121,7 @@ router.get('/search', async (req, res) => {
         { description: { $regex: q, $options: 'i' } }
       ]
     })
-      .populate('category', 'name color')
+      .populate('category', 'name color icon')
       .limit(10);
     res.json(apiResponse(true, '', foods));
   } catch (error) {
@@ -131,7 +131,7 @@ router.get('/search', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const food = await Food.findById(req.params.id).populate('category', 'name color');
+    const food = await Food.findById(req.params.id).populate('category', 'name color icon');
     if (!food) {
       return res.status(404).json(apiResponse(false, 'Food not found'));
     }

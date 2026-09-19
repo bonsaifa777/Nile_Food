@@ -172,16 +172,16 @@ export default function FoodDetails() {
       <Header />
 
       <main className={`pt-28 pb-20 transition-colors duration-300 ${d ? 'bg-slate-950' : 'bg-gray-50'}`}>
-        <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Image + Details side by side */}
-          <div className="grid lg:grid-cols-2 gap-8 xl:gap-12 mb-16">
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-8 xl:gap-12 mb-16">
             {/* Left: Image */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              className="relative sticky top-28 self-start"
+              className="relative lg:sticky lg:top-28 lg:self-start"
             >
-              <div className={`aspect-square rounded-3xl overflow-hidden shadow-2xl ${d ? 'shadow-black/30' : 'shadow-primary-500/10'}`}>
+              <div className={`aspect-[4/3] md:aspect-square max-h-[460px] sm:max-h-[520px] lg:max-h-[640px] w-full mx-auto lg:mx-0 rounded-3xl overflow-hidden shadow-2xl ${d ? 'shadow-black/30' : 'shadow-primary-500/10'}`}>
                 <img
                   src={food.image || '/placeholder-food.jpg'}
                   alt={tl(food, 'name')}
@@ -193,7 +193,7 @@ export default function FoodDetails() {
                 <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
                   {food.images.map((img, i) => (
                     <img key={i} src={img} alt={`${tl(food, 'name')} ${i + 1}`}
-                      className="w-20 h-20 rounded-xl object-cover flex-shrink-0 border-2 border-transparent hover:border-primary-500 transition-all cursor-pointer"
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover flex-shrink-0 border-2 border-transparent hover:border-primary-500 transition-all cursor-pointer"
                     />
                   ))}
                 </div>
@@ -214,7 +214,7 @@ export default function FoodDetails() {
                   }`}>
                     {food.category?.name}
                   </span>
-                  <h1 className={`text-3xl lg:text-4xl font-black mb-2 ${d ? 'text-white' : 'text-gray-900'}`}>
+                  <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-black mb-2 ${d ? 'text-white' : 'text-gray-900'}`}>
                     {tl(food, 'name')}
                   </h1>
                   <div className="flex items-center gap-4">
@@ -431,21 +431,21 @@ export default function FoodDetails() {
 
               {/* Qty + Add to Cart */}
               <motion.div {...fadeUp} transition={{ delay: 0.35 }}
-                className={`flex items-center justify-between p-4 rounded-2xl ${
+                className={`flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl ${
                   d ? 'bg-white/5 border border-white/10' : 'bg-white border border-gray-200 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${d ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
+                    className={`w-10 h-10 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${d ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
                   ><FiMinus size={16} /></motion.button>
-                  <span className={`text-lg font-bold w-6 text-center ${d ? 'text-white' : 'text-gray-900'}`}>{quantity}</span>
+                  <span className={`text-lg font-bold w-7 text-center ${d ? 'text-white' : 'text-gray-900'}`}>{quantity}</span>
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQuantity(quantity + 1)}
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${d ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
+                    className={`w-10 h-10 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-colors ${d ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
                   ><FiPlus size={16} /></motion.button>
                 </div>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleAddToCart}
-                  className="btn-primary flex items-center gap-2 text-sm"
+                  className="btn-primary flex items-center justify-center gap-2 text-sm flex-1 sm:flex-none"
                 ><FiShoppingCart size={16} /> {t('foodDetails.addToCart')}</motion.button>
               </motion.div>
 
@@ -461,36 +461,36 @@ export default function FoodDetails() {
               </motion.div>
 
               {/* 3 Action Buttons */}
-              <motion.div {...fadeUp} transition={{ delay: 0.45 }} className="grid grid-cols-3 gap-3 pt-2">
+              <motion.div {...fadeUp} transition={{ delay: 0.45 }} className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={handleDineIn}
-                  className={`flex flex-col items-center gap-1.5 py-4 px-3 rounded-2xl font-semibold text-sm transition-all ${
+                  className={`flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-1.5 py-3.5 sm:py-4 px-4 sm:px-3 rounded-2xl font-semibold text-sm transition-all ${
                     d ? 'bg-primary-500/10 text-primary-300 border border-primary-500/20 hover:bg-primary-500/20' : 'bg-primary-50 text-primary-700 border border-primary-200 hover:bg-primary-100'
                   }`}
                 >
-                  <FiMapPin size={22} />
-                  {t('foodDetails.dineHere')}
+                  <FiMapPin size={22} className="flex-shrink-0" />
+                  <span>{t('foodDetails.dineHere')}</span>
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={handleTakeaway}
-                  className={`flex flex-col items-center gap-1.5 py-4 px-3 rounded-2xl font-semibold text-sm transition-all ${
+                  className={`flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-1.5 py-3.5 sm:py-4 px-4 sm:px-3 rounded-2xl font-semibold text-sm transition-all ${
                     d ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20 hover:bg-amber-500/20' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
                   }`}
                 >
-                  <FiPackage size={22} />
-                  {t('foodDetails.takeAway')}
+                  <FiPackage size={22} className="flex-shrink-0" />
+                  <span>{t('foodDetails.takeAway')}</span>
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   onClick={handleDelivery}
-                  className={`flex flex-col items-center gap-1.5 py-4 px-3 rounded-2xl font-semibold text-sm transition-all ${
+                  className={`flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-1.5 py-3.5 sm:py-4 px-4 sm:px-3 rounded-2xl font-semibold text-sm transition-all ${
                     d ? 'bg-green-500/10 text-green-300 border border-green-500/20 hover:bg-green-500/20' : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
                   }`}
                 >
-                  <FiTruck size={22} />
-                  {t('foodDetails.delivery')}
+                  <FiTruck size={22} className="flex-shrink-0" />
+                  <span>{t('foodDetails.delivery')}</span>
                 </motion.button>
               </motion.div>
             </motion.div>

@@ -64,7 +64,7 @@ export default function About() {
               <img src={data.story?.image} alt={t('about.alt')} className="w-full h-full object-cover" />
             </div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-              className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 lg:p-8 text-center max-w-lg w-[90%]">
+              className="absolute -bottom-10 left-0 right-0 mx-auto bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 lg:p-8 text-center max-w-lg w-[calc(100%-3rem)] sm:w-[90%]">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('about.ourStory')}</h3>
               <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{data.story?.text}</p>
               <Link to={data.story?.ctaLink || '/menu'} className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-lg transition-colors text-sm">

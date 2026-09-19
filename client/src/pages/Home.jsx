@@ -48,19 +48,19 @@ function CountdownTimer({ countdown }) {
   }, [countdown?.days, countdown?.hours, countdown?.minutes, countdown?.seconds]);
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-3">
       {[
         { value: time.days, label: 'Days' },
         { value: time.hours, label: 'Hrs' },
         { value: time.minutes, label: 'Min' },
         { value: time.seconds, label: 'Sec' },
       ].map((item, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-2 text-center shadow-sm">
-            <span className="text-primary-500 font-bold text-lg block leading-none">{item.value}</span>
-            <span className="text-gray-500 dark:text-gray-400 text-[10px] uppercase">{item.label}</span>
+        <div key={i} className="flex items-center gap-1.5 sm:gap-2">
+          <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl px-2.5 sm:px-4 py-1.5 sm:py-2 text-center shadow-sm min-w-[48px] sm:min-w-0">
+            <span className="text-primary-500 font-bold text-base sm:text-lg block leading-none">{item.value}</span>
+            <span className="text-gray-500 dark:text-gray-400 text-[9px] sm:text-[10px] uppercase">{item.label}</span>
           </div>
-          {i < 3 && <span className="text-gray-400 dark:text-gray-500 font-bold text-lg">:</span>}
+          {i < 3 && <span className="text-gray-400 dark:text-gray-500 font-bold text-base sm:text-lg">:</span>}
         </div>
       ))}
     </div>

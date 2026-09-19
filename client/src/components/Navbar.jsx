@@ -308,7 +308,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 transition={{ duration: 0.6, ease: 'easeInOut' }}
               />
             </motion.div>
-            <div className={`leading-tight transition-all duration-500 ${isScrolled ? 'scale-90 origin-left' : ''}`}>
+            <div className={`leading-tight transition-all duration-500 hidden sm:block ${isScrolled ? 'scale-90 origin-left' : ''}`}>
               <span className={`font-black text-xl leading-none block ${d ? 'text-white' : 'text-gray-900'}`}>
                 Nile
               </span>
@@ -557,7 +557,7 @@ const Navbar = ({ darkMode, onToggleDarkMode }) => {
                 </Link>
               </motion.div>
             ) : (
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="hidden sm:flex">
                 <ShimmerButton href="/login" dark={d}>
                   <FiUser size={15} />
                   {t('nav.signIn')}

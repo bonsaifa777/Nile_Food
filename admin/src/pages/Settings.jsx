@@ -33,9 +33,8 @@ export default function Settings() {
       if (data.data) {
         setSettings(prev => ({ ...prev, ...data.data }));
       }
-    } catch (error) {
-      toast.error('Failed to load settings');
-    } finally {
+    } catch (error) { 
+      toast.error('Failed to load settings'); 
       setLoading(false);
     }
   };

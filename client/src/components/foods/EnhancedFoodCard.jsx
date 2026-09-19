@@ -14,6 +14,9 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
   const [added, setAdded] = useState(false);
   const { t } = useTranslation();
 
+  const isTouch = typeof window !== 'undefined' &&
+    window.matchMedia?.('(hover: none), (pointer: coarse)').matches;
+
   const inCart = cart?.some((item) => item.food === food._id);
 
   const handleAddToCart = (e) => {
@@ -115,7 +118,7 @@ export default function EnhancedFoodCard({ food, index = 0 }) {
 
             <motion.div
               initial={{ y: 20, opacity: 0 }}
-              animate={{ y: isHovered ? 0 : 20, opacity: isHovered ? 1 : 0 }}
+              animate={{ y: isHovered || isTouch ? 0 : 20, opacity: isHovered || isTouch ? 1 : 0 }}
               transition={{ duration: 0.2 }}
               className="absolute bottom-3 left-3 right-3 z-10"
             >

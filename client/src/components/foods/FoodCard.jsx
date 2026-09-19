@@ -20,6 +20,9 @@ export default function FoodCard({ food, index = 0 }) {
   const [cartBounce, setCartBounce] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
+  const isTouch = typeof window !== 'undefined' &&
+    window.matchMedia?.('(hover: none), (pointer: coarse)').matches;
+
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -150,7 +153,7 @@ export default function FoodCard({ food, index = 0 }) {
             {/* Add to cart overlay */}
             <motion.div
               initial={{ y: 30, opacity: 0 }}
-              animate={{ y: isHovered ? 0 : 30, opacity: isHovered ? 1 : 0 }}
+              animate={{ y: isHovered || isTouch ? 0 : 30, opacity: isHovered || isTouch ? 1 : 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="absolute bottom-4 left-4 right-4 z-10"
             >

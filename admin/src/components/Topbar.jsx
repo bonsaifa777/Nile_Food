@@ -6,23 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { DataService } from '../services/dataService';
 import { EventBus, Events } from '../services/eventBus';
-
-function playNotificationSound() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.3);
-  } catch {}
-}
+import { playNotificationSound } from '../utils/notificationSound';
 
 export default function Topbar({ toggleSidebar, sidebarOpen }) {
   const { darkMode, toggleDarkMode } = useTheme();
@@ -58,17 +42,18 @@ export default function Topbar({ toggleSidebar, sidebarOpen }) {
   }, [notifications]);
 
   useEffect(() => {
-    if (!import.meta.env.DEV && !import.meta.env.VITE_LAN_MODE) return;
-
     let socket;
     (async () => {
       const token = localStorage.getItem('adminToken');
       if (!token) return;
       const { io } = await import('socket.io-client');
-      socket = io(import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin, {
-        auth: { token },
-        transports: ['websocket', 'polling'],
-      });
+      socket = io(
+        import.meta.env.VITE_SOCKET_URL || (import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin),
+        {
+          auth: { token },
+          transports: ['websocket', 'polling'],
+        }
+      );
 
       socket.on('new_order', (order) => {
         addNotif(`New order ${order?.orderId || ''} received`, 'new_order');

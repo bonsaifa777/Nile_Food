@@ -21,6 +21,7 @@ import AICoPilot from '../components/AICoPilot';
 import { useSound } from '../hooks/useSound';
 import { computeTodayMenu } from '../services/analytics';
 import { connectKitchenSocket, disconnectKitchenSocket } from '../services/socketClient';
+import { playNotificationSound } from '../utils/notificationSound';
 
 const navItems = [
   { key: 'overview', label: 'Dashboard', icon: FiHome, color: '#6366f1' },
@@ -120,55 +121,43 @@ export default function Kitchen() {
   }, []);
 
   useEffect(() => {
-    const unsub = EventBus.on(Events.ORDER_CREATED, () => playNotificationSound());
+    const unsub = EventBus.on(Events.ORDER_CREATED, () => beep());
     return unsub;
   }, [soundEnabled]);
 
   useEffect(() => {
-    const unsub = EventBus.on(Events.NOTIFICATION_SENT, () => playNotificationSound());
+    const unsub = EventBus.on(Events.NOTIFICATION_SENT, () => beep());
     return unsub;
   }, [soundEnabled]);
 
-  function playNotificationSound() {
+  function beep() {
     if (!soundEnabled) return;
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.setValueAtTime(660, ctx.currentTime);
-      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
-    } catch {}
+    playNotificationSound();
   }
 
   const handleAccept = useCallback((orderId) => {
     DataSvc.acceptOrder(orderId, user?.name || 'Staff');
-    playNotificationSound();
+    beep();
   }, [user, DataSvc, soundEnabled]);
 
   const handleReject = useCallback((orderId) => {
     DataSvc.rejectOrder(orderId);
-    playNotificationSound();
+    beep();
   }, [DataSvc, soundEnabled]);
 
   const handleComplete = useCallback((orderId) => {
     DataSvc.completeOrder(orderId);
-    playNotificationSound();
+    beep();
   }, [DataSvc, soundEnabled]);
 
   const handleAssign = useCallback((orderId) => {
     DataSvc.assignChef(orderId, user?.name || 'Staff');
-    playNotificationSound();
+    beep();
   }, [user, DataSvc, soundEnabled]);
 
   const handleStatusChange = useCallback((orderId, newStatus) => {
     DataSvc.updateOrderStatus(orderId, newStatus);
-    playNotificationSound();
+    beep();
   }, [DataSvc, soundEnabled]);
 
   const handlePrint = useCallback((orderId) => {

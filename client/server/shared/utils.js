@@ -51,6 +51,14 @@ export const calculateDeliveryFee = (distance, baseFee = 50, perKm = 10) => {
   return baseFee + (distance * perKm);
 };
 
+export const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+export const calculateInvoice = (grossSubtotal, deliveryFee = 0, discount = 0) => {
+  const base = round2(grossSubtotal / 1.15);
+  const tax = round2(grossSubtotal - base);
+  return { subtotal: base, tax, total: round2(base + tax + deliveryFee - discount) };
+};
+
 export const generateTableQRCode = (tableId, restaurantId) => {
   return Buffer.from(JSON.stringify({ tableId, restaurantId })).toString('base64');
 };

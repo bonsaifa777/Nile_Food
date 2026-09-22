@@ -33,9 +33,25 @@ router.get('/dashboard', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN)
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    const day = new Date().getDay();
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - (day === 0 ? 6 : day - 1));
+    weekStart.setHours(0, 0, 0, 0);
+
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+
+    const yearStart = new Date();
+    yearStart.setMonth(0, 1);
+    yearStart.setHours(0, 0, 0, 0);
+
+    const orderProjection = 'orderId createdAt total status paymentStatus type guestName table';
     
     const [
       totalUsers,
+      totalCustomers,
       totalOrders,
       totalRevenueArr,
       todayOrders,
@@ -43,9 +59,14 @@ router.get('/dashboard', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN)
       pendingOrders,
       totalFoods,
       totalCategories,
-      popularFoods
+      popularFoods,
+      todayPeriod,
+      weekPeriod,
+      monthPeriod,
+      yearPeriod
     ] = await Promise.all([
       User.countDocuments(),
+      User.countDocuments({ role: ROLES.CUSTOMER }),
       Order.countDocuments(),
       Order.aggregate([
         { $match: { paymentStatus: 'paid' } },
@@ -64,6 +85,34 @@ router.get('/dashboard', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN)
         { $group: { _id: '$items.food', name: { $first: '$items.name' }, count: { $sum: '$items.quantity' } } },
         { $sort: { count: -1 } },
         { $limit: 5 }
+      ]),
+      Promise.all([
+        Order.find({ createdAt: { $gte: today } }).select(orderProjection).sort({ createdAt: -1 }), 
+        Order.aggregate([
+          { $match: { createdAt: { $gte: today } } },
+          { $group: { _id: null, revenue: { $sum: '$total' }, count: { $sum: 1 } } }
+        ])
+      ]),
+      Promise.all([
+        Order.find({ createdAt: { $gte: weekStart } }).select(orderProjection).sort({ createdAt: -1 }), 
+        Order.aggregate([
+          { $match: { createdAt: { $gte: weekStart } } },
+          { $group: { _id: null, revenue: { $sum: '$total' }, count: { $sum: 1 } } }
+        ])
+      ]),
+      Promise.all([
+        Order.find({ createdAt: { $gte: monthStart } }).select(orderProjection).sort({ createdAt: -1 }), 
+        Order.aggregate([
+          { $match: { createdAt: { $gte: monthStart } } },
+          { $group: { _id: null, revenue: { $sum: '$total' }, count: { $sum: 1 } } }
+        ])
+      ]),
+      Promise.all([
+        Order.find({ createdAt: { $gte: yearStart } }).select(orderProjection).sort({ createdAt: -1 }), 
+        Order.aggregate([
+          { $match: { createdAt: { $gte: yearStart } } },
+          { $group: { _id: null, revenue: { $sum: '$total' }, count: { $sum: 1 } } }
+        ])
       ])
     ]);
 
@@ -73,9 +122,15 @@ router.get('/dashboard', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN)
       .sort({ createdAt: -1 })
       .limit(10);
 
+    const periodPayload = (list, agg) => {
+      const totals = agg[0] || {};
+      return { orders: list, count: totals.count || 0, revenue: totals.revenue || 0 };
+    };
+
     res.json(apiResponse(true, '', {
       stats: {
         totalUsers,
+        totalCustomers,
         totalOrders,
         totalRevenue: totalRevenueArr[0]?.total || 0,
         todayOrders,
@@ -85,7 +140,11 @@ router.get('/dashboard', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN)
         totalCategories
       },
       popularFoods,
-      recentOrders
+      recentOrders,
+      today: periodPayload(todayPeriod[0], todayPeriod[1]),
+      week: periodPayload(weekPeriod[0], weekPeriod[1]),
+      month: periodPayload(monthPeriod[0], monthPeriod[1]),
+      year: periodPayload(yearPeriod[0], yearPeriod[1])
     }));
   } catch (error) {
     res.status(500).json(apiResponse(false, 'Failed to fetch dashboard data'));

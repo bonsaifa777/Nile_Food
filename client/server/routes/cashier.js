@@ -5,7 +5,7 @@ import Table from '../models/Table.js';
 import User from '../models/User.js';
 import CashDrawer from '../models/CashDrawer.js';
 import Category from '../models/Category.js';
-import { apiResponse, generateOrderId } from '../shared/utils.js';
+import { apiResponse, generateOrderId, calculateInvoice } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { ROLES, ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, PAYMENT_METHOD, POS_SOCKET_EVENTS } from '../shared/constants.js';
 
@@ -128,7 +128,7 @@ router.post('/orders', async (req, res) => {
     }
 
     const discountAmount = discount || 0;
-    const total = subtotal - discountAmount;
+    const invoice = calculateInvoice(subtotal, 0, discountAmount);
 
     const order = new Order({
       orderId: await generateOrderId(),
@@ -137,10 +137,10 @@ router.post('/orders', async (req, res) => {
       table: table?._id,
       guestName,
       guestPhone,
-      subtotal,
+      subtotal: invoice.subtotal,
       discount: discountAmount,
-      tax: 0,
-      total,
+      tax: invoice.tax,
+      total: invoice.total,
       paymentMethod: paymentMethod || PAYMENT_METHOD.CASH,
       paymentStatus: PAYMENT_STATUS.PAID,
       status: ORDER_STATUS.CONFIRMED

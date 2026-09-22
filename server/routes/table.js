@@ -1,15 +1,32 @@
 import express from 'express';
 import Table from '../models/Table.js';
+import Order from '../models/Order.js';
 import QRCode from 'qrcode';
 import { apiResponse, generateTableQRCode } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
-import { ROLES } from '../shared/constants.js';
+import { ROLES, ORDER_STATUS } from '../shared/constants.js';
 
 const router = express.Router();
+
+const CLOSED_ORDER_STATUSES = [ORDER_STATUS.SERVED, ORDER_STATUS.DELIVERED, ORDER_STATUS.CANCELLED];
 
 router.get('/', async (req, res) => {
   try {
     const { status } = req.query;
+
+    if (status === 'available') {
+      const busyTables = await Table.find({ isActive: true, status: { $in: ['occupied', 'billing'] } });
+      await Promise.all(busyTables.map(async (table) => {
+        const [totalOrders, activeOrders] = await Promise.all([
+          Order.countDocuments({ table: table._id }),
+          Order.countDocuments({ table: table._id, status: { $nin: CLOSED_ORDER_STATUSES } })
+        ]);
+        if (totalOrders > 0 && activeOrders === 0) {
+          await Table.findByIdAndUpdate(table._id, { status: 'available', currentOrder: null });
+        }
+      }));
+    }
+
     const query = { isActive: true };
     if (status) query.status = status;
     const tables = await Table.find(query).sort({ tableNumber: 1 });

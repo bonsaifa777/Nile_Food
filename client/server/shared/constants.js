@@ -13,6 +13,7 @@ export const ORDER_STATUS = {
   CONFIRMED: 'confirmed',
   PREPARING: 'preparing',
   READY: 'ready',
+  SERVED: 'served',
   ON_WAY: 'on_the_way',
   DELIVERED: 'delivered',
   CANCELLED: 'cancelled'

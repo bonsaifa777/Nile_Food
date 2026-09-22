@@ -93,6 +93,10 @@ router.put('/kitchen/orders/:id/status', authenticate, authorize(...STAFF_MANAGE
     order.status = status;
     await order.save();
 
+    if ([ORDER_STATUS.SERVED, ORDER_STATUS.DELIVERED].includes(status) && order.table) {
+      await Table.findByIdAndUpdate(order.table, { status: 'available', currentOrder: null });
+    }
+
     if (req.io) {
       req.io.to(order.orderId).emit(SOCKET_EVENTS.ORDER_UPDATE, order);
       req.io.emit('order_update', order);
@@ -200,7 +204,7 @@ router.put('/delivery/orders/:id/status', authenticate, authorize(...STAFF_DELIV
     order.status = status;
     await order.save();
 
-    if (status === ORDER_STATUS.DELIVERED && order.table) {
+    if ([ORDER_STATUS.SERVED, ORDER_STATUS.DELIVERED].includes(status) && order.table) {
       await Table.findByIdAndUpdate(order.table, { status: 'available', currentOrder: null });
     }
 

@@ -5,7 +5,7 @@ import Table from '../models/Table.js';
 import User from '../models/User.js';
 import Coupon from '../models/Coupon.js';
 import Settings from '../models/Settings.js';
-import { apiResponse, generateOrderId } from '../shared/utils.js';
+import { apiResponse, generateOrderId, calculateInvoice } from '../shared/utils.js';
 import { ORDER_STATUS, ORDER_TYPE, PAYMENT_STATUS, SOCKET_EVENTS } from '../shared/constants.js';
 import { authenticate, optionalAuth } from '../middleware/auth.js';
 
@@ -137,10 +137,10 @@ router.post('/', optionalAuth, async (req, res) => {
     }
 
     const settings = await Settings.findOne() || {};
-    const taxRate = (settings.taxRate || 15) / 100;
     const baseDeliveryFee = settings.deliveryFee || 50;
-    const tax = subtotal * taxRate;
     const deliveryFee = orderType === ORDER_TYPE.DELIVERY ? baseDeliveryFee : 0;
+    const invoice = calculateInvoice(subtotal, deliveryFee, discount);
+    const tax = invoice.tax;
     let loyaltyPointsEarned = Math.floor(subtotal / 10);
     if (loyaltyPointsUsed) loyaltyPointsEarned = Math.max(0, loyaltyPointsEarned - loyaltyPointsUsed);
 
@@ -152,11 +152,11 @@ router.post('/', optionalAuth, async (req, res) => {
       items: orderItems,
       type: orderType,
       table: table?._id,
-      subtotal,
+      subtotal: invoice.subtotal,
       deliveryFee,
       discount,
       tax,
-      total: subtotal + deliveryFee + tax - discount,
+      total: invoice.total,
       paymentMethod,
       paymentStatus: paymentMethod === 'cash' ? PAYMENT_STATUS.PAID : PAYMENT_STATUS.PENDING,
       deliveryAddress,
@@ -228,7 +228,7 @@ router.put('/:id/status', authenticate, async (req, res) => {
       });
     }
 
-    if (order.table && status === ORDER_STATUS.DELIVERED) {
+    if (order.table && [ORDER_STATUS.SERVED, ORDER_STATUS.DELIVERED].includes(status)) {
       await Table.findByIdAndUpdate(order.table, { status: 'available', currentOrder: null });
     }
 

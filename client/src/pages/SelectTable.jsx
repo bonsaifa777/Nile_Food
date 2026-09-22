@@ -466,7 +466,7 @@ export default function SelectTable() {
                             <p className="text-xs text-gray-400">{item.quantity}x</p>
                           </div>
                           <span className="text-sm font-bold text-indigo-400 flex-shrink-0">
-                            {(item.price * item.quantity).toFixed(2)}
+                            {(item.price).toFixed(2)}
                           </span>
                         </motion.div>
                       ))}

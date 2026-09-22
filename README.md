@@ -95,11 +95,48 @@ cd admin && npm run dev
 
 - **Client App**: http://localhost:5173
 - **Admin Panel**: http://localhost:3000/admin
-- **API**: http://localhost:5000
+- **API**: http://localhost:5002
 
 Default admin login:
 - Email: admin@foodapp.com
 - Password: Admin@123
+
+## LAN Mode (offline)
+
+Run everything from the project root with one command:
+
+```bash
+npm run lan:start
+```
+
+Open `http://<your-mac-ip>:5002` on any device on the same network.
+
+### "Works one day, doesn't work the next" — the IP keeps changing
+
+Your Mac gets a new IP address from the router/phone every time it reconnects
+(DHCP), so old bookmarks/QR codes with the old IP stop working. Two fixes:
+
+1. **Use the stable URL** (never changes, even when the IP does) — the server prints it at startup:
+   ```
+   http://<your-mac-hostname>.local:5002
+   ```
+   e.g. `http://macintoshdemacbook-pro.local:5002`
+
+2. **Lock the IP permanently** so `http://192.168.x.x:5002` always works:
+   ```bash
+   npm run lan:static-ip
+   ```
+   This sets a fixed IP for the Mac's current network. (It will need your
+   password for `sudo`.) Re-run it if you switch networks.
+
+Other useful commands:
+
+```bash
+npm run lan:setup        # full install + build + seed (first time only)
+npm run lan:build        # rebuild frontend apps
+npm run lan:firewall     # allow Node through the macOS firewall
+npm run lan:seed         # (re)seed the database
+```
 
 ## Key Features
 

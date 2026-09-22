@@ -3,11 +3,12 @@ import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { 
   FiShoppingBag, FiUsers, FiDollarSign, FiTrendingUp, 
   FiClock, FiArrowUp, FiArrowDown, FiBox, FiCoffee,
-  FiActivity, FiBarChart2, FiRefreshCw
+  FiActivity, FiBarChart2, FiRefreshCw, FiDownload, FiCalendar, FiFileText, FiAward
 } from 'react-icons/fi';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Cell } from 'recharts';
 import { format } from 'date-fns';
+import { exportOrdersPdf } from '../utils/pdfReport';
 
 const ORDER_STATUS = {
   pending: 'Pending',
@@ -267,6 +268,31 @@ function CustomTooltip({ active, payload, label, isRevenue }) {
   return null;
 }
 
+const REPORT_TYPE_LABELS = {
+  delivery: 'Delivery',
+  dine_in: 'Dine-in',
+  pickup: 'Pickup'
+};
+
+const REPORT_STATUS_LABELS = {
+  pending: 'Pending',
+  confirmed: 'Confirmed',
+  preparing: 'Preparing',
+  ready: 'Ready',
+  served: 'Served',
+  on_the_way: 'On the way',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled'
+};
+
+function weekRangeLabel() {
+  const d = new Date();
+  const day = d.getDay();
+  const start = new Date(d);
+  start.setDate(start.getDate() - (day === 0 ? 6 : day - 1));
+  return `${format(start, 'MMM d')} - ${format(d, 'MMM d, yyyy')}`;
+}
+
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
@@ -274,13 +300,25 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [popularFoods, setPopularFoods] = useState([]);
   const [barChartKey, setBarChartKey] = useState(0);
+  const [reports, setReports] = useState({
+    today: { orders: [], count: 0, revenue: 0 },
+    week: { orders: [], count: 0, revenue: 0 },
+    month: { orders: [], count: 0, revenue: 0 },
+    year: { orders: [], count: 0, revenue: 0 }
+  });
+  const [activeReport, setActiveReport] = useState('today');
 
   useEffect(() => {
     fetchAll();
   }, []);
 
-  const fetchAll = async () => {
-    setLoading(true);
+  useEffect(() => {
+    const id = setInterval(() => fetchAll(true), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const fetchAll = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [dashRes, analyticsRes] = await Promise.all([
         axios.get('/api/admin/dashboard'),
@@ -289,6 +327,12 @@ export default function Dashboard() {
       setStats(dashRes.data.data.stats);
       setRecentOrders(dashRes.data.data.recentOrders || []);
       setPopularFoods(dashRes.data.data.popularFoods || []);
+      setReports({
+        today: dashRes.data.data.today || { orders: [], count: 0, revenue: 0 },
+        week: dashRes.data.data.week || { orders: [], count: 0, revenue: 0 },
+        month: dashRes.data.data.month || { orders: [], count: 0, revenue: 0 },
+        year: dashRes.data.data.year || { orders: [], count: 0, revenue: 0 }
+      });
       const data = analyticsRes.data.data.salesByDay.map(d => ({
         name: d._id ? new Date(d._id).toLocaleDateString('en-US', { weekday: 'short' }) : d._id,
         orders: d.orders || 0,
@@ -299,14 +343,33 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
+  };
+
+  const reportTabs = [
+    { key: 'today', label: 'Today', icon: FiClock, periodLabel: `Today, ${format(new Date(), 'MMMM d, yyyy')}` },
+    { key: 'week', label: 'This Week', icon: FiTrendingUp, periodLabel: `This Week (${weekRangeLabel()})` },
+    { key: 'month', label: 'This Month', icon: FiCalendar, periodLabel: format(new Date(), 'MMMM yyyy') },
+    { key: 'year', label: 'This Year', icon: FiAward, periodLabel: format(new Date(), 'yyyy') }
+  ];
+
+  const handleExportPdf = (key) => {
+    const report = reports[key];
+    const tab = reportTabs.find(t => t.key === key);
+    exportOrdersPdf({
+      title: tab.label,
+      periodLabel: tab.periodLabel,
+      orders: report.orders,
+      count: report.count,
+      revenue: report.revenue
+    });
   };
 
   const statCards = [
     { title: 'Total Orders', value: stats?.totalOrders || 0, change: '+12%', up: true, icon: FiShoppingBag, gradient: gradientColors[0] },
     { title: 'Revenue', value: stats?.totalRevenue || 0, change: '+8%', up: true, prefix: 'ETB ', icon: FiDollarSign, gradient: gradientColors[1] },
-    { title: 'Customers', value: stats?.totalUsers || 0, change: '+15%', up: true, icon: FiUsers, gradient: gradientColors[2] },
+    { title: 'Customers', value: stats?.totalCustomers || stats?.totalUsers || 0, change: '+15%', up: true, icon: FiUsers, gradient: gradientColors[2] },
     { title: 'Active Foods', value: stats?.totalFoods || 0, change: '', up: true, icon: FiCoffee, gradient: gradientColors[3] }
   ];
 
@@ -556,6 +619,140 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </motion.div>
         </div>
+
+        <motion.div variants={itemVariants} className="glass-card overflow-hidden">
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <FiFileText size={16} className="text-indigo-400" />
+                Order Reports
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">Daily, weekly and monthly order lists with totals</p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {reportTabs.map(tab => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveReport(tab.key)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all"
+                  style={activeReport === tab.key ? {
+                    background: 'rgba(99, 102, 241, 0.15)',
+                    color: '#a5b4fc',
+                    border: '1px solid rgba(99, 102, 241, 0.25)',
+                    boxShadow: '0 4px 20px rgba(99,102,241,0.15)',
+                  } : {
+                    background: 'rgba(255,255,255,0.03)',
+                    color: '#9ca3af',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}
+                >
+                  <tab.icon size={13} />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {(() => {
+            const report = reports[activeReport] || { orders: [], count: 0, revenue: 0 };
+            const tab = reportTabs.find(t => t.key === activeReport);
+            const avg = report.count > 0 ? report.revenue / report.count : 0;
+            return (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                  <div className="flex items-center justify-between p-3.5 rounded-xl" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-gray-500">Total Orders</p>
+                      <p className="text-xl font-bold mt-1">{report.count}</p>
+                    </div>
+                    <FiShoppingBag size={18} className="text-indigo-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-3.5 rounded-xl" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.15)' }}>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-gray-500">Total Revenue</p>
+                      <p className="text-xl font-bold mt-1 text-emerald-400">ETB {report.revenue.toLocaleString()}</p>
+                    </div>
+                    <FiDollarSign size={18} className="text-emerald-400" />
+                  </div>
+                  <div className="flex items-center justify-between p-3.5 rounded-xl" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)' }}>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-widest text-gray-500">Average Order</p>
+                      <p className="text-xl font-bold mt-1 text-amber-400">ETB {avg.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                    </div>
+                    <FiBarChart2 size={18} className="text-amber-400" />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto -mx-6">
+                  <div className="overflow-y-auto" style={{ maxHeight: 360 }}>
+                    <table className="w-full">
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                          {['Order ID', 'Date & Time', 'Type', 'Status', 'Payment', 'Total'].map((header) => (
+                            <th key={header} className="text-left py-3 px-6 text-xs font-medium uppercase tracking-widest text-gray-500 sticky top-0" style={{ background: 'rgba(15,23,42,0.98)' }}>
+                              {header}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.orders.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="py-16 text-center">
+                              <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity }}>
+                                <FiBox size={32} className="mx-auto text-gray-600 mb-3" />
+                              </motion.div>
+                              <p className="text-gray-500">No orders in this period</p>
+                            </td>
+                          </tr>
+                        ) : (
+                          report.orders.map((order) => (
+                            <tr key={order._id} className="group" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                              <td className="py-3.5 px-6">
+                                <span className="font-mono text-sm font-medium">{order.orderId}</span>
+                              </td>
+                              <td className="py-3.5 px-6 text-sm text-gray-400">
+                                {format(new Date(order.createdAt), 'MMM d, h:mm a')}
+                              </td>
+                              <td className="py-3.5 px-6 text-sm text-gray-400">
+                                {REPORT_TYPE_LABELS[order.type] || order.type || '-'}
+                              </td>
+                              <td className="py-3.5 px-6">
+                                <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${statusColors[order.status] || 'text-gray-400'}`}
+                                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                                  {REPORT_STATUS_LABELS[order.status] || order.status || '-'}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-6 text-sm text-gray-400">{order.paymentStatus || '-'}</td>
+                              <td className="py-3.5 px-6 text-sm font-semibold text-emerald-400">ETB {order.total?.toLocaleString()}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02, boxShadow: '0 4px 20px rgba(99, 102, 241, 0.3)' }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => handleExportPdf(activeReport)}
+                    className="px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2"
+                    style={{
+                      background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                      color: '#fff',
+                      border: 'none',
+                    }}
+                  >
+                    <FiDownload size={15} />
+                    Export {tab.label} PDF
+                  </motion.button>
+                </div>
+              </>
+            );
+          })()}
+        </motion.div>
 
         {popularFoods.length > 0 && (
           <motion.div variants={itemVariants}>

@@ -1,17 +1,39 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { splitVat } from '../utils/price.js';
 
 const CartContext = createContext(null);
 
+const MAX_CART_IMAGE_LENGTH = 5000;
+
+const sanitizeImage = (img) => {
+  if (!img) return '';
+  return String(img).length > MAX_CART_IMAGE_LENGTH ? '' : img;
+};
+
+const sanitizeCartItem = (item) => ({
+  ...item,
+  image: sanitizeImage(item.image),
+});
+
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('cart');
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed.map(sanitizeCartItem) : [];
+    } catch {
+      return [];
+    }
   });
   const [itemAdded, setItemAdded] = useState(null);
   const [orderType, setOrderType] = useState('delivery');
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    try {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    } catch {
+      // Never crash the app when localStorage is full (e.g. oversized base64 images).
+    }
   }, [cart]);
 
   const addToCart = (food, quantity = 1, size = null, extras = [], specialInstructions = '', removedIngredients = []) => {
@@ -19,7 +41,7 @@ export const CartProvider = ({ children }) => {
       id: `${food._id}-${Date.now()}`,
       food: food._id,
       name: food.name,
-      image: food.image,
+      image: sanitizeImage(food.image),
       basePrice: food.price,
       quantity,
       size,
@@ -68,8 +90,12 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   };
 
-  const getSubtotal = () => {
+  const getGrossSubtotal = () => {
     return cart.reduce((acc, item) => acc + item.price, 0);
+  };
+
+  const getSubtotal = () => {
+    return splitVat(getGrossSubtotal()).base;
   };
 
   const getDeliveryFee = () => {
@@ -78,11 +104,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const getTax = () => {
-    return getSubtotal() * 0.15;
+    return splitVat(getGrossSubtotal()).tax;
   };
 
   const getTotal = () => {
-    return getSubtotal() + getDeliveryFee() + getTax();
+    return getGrossSubtotal() + getDeliveryFee();
   };
 
   const totalItems = () => {

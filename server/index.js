@@ -44,6 +44,13 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+const getLanHostname = () => {
+  let host = (process.env.LAN_HOSTNAME || os.hostname()).trim().toLowerCase();
+  if (!host) return 'localhost';
+  if (!host.endsWith('.local')) host = `${host}.local`;
+  return host;
+};
+
 const lanEnv = path.join(__dirname, '.env.lan');
 if (fs.existsSync(lanEnv)) {
   dotenv.config({ path: lanEnv, override: true });
@@ -178,12 +185,25 @@ if (isOffline) {
 
 setupSocket(io);
 
-mongoose.connect(MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+const connectWithRetry = (retries = 5, delay = 2000) => {
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => {
+      if (retries <= 0) {
+        console.error('MongoDB connection error:', err.message);
+        console.error('');
+        console.error('Make sure MongoDB is running before starting the server:');
+        console.error('  brew services start mongodb-community@8.0');
+        console.error('  # or:  mongod --config /usr/local/etc/mongod.conf');
+        console.error(`  # URI: ${MONGODB_URI}`);
+        process.exit(1);
+      }
+      console.warn(`MongoDB not ready yet (${retries} retries left): ${err.message} — retrying in ${delay / 1000}s...`);
+      setTimeout(() => connectWithRetry(retries - 1, delay), delay);
+    });
+};
+
+connectWithRetry();
 
 const PORT = process.env.PORT || 5002;
 
@@ -209,11 +229,13 @@ httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`  ${isOffline ? 'NILE FOOD - OFFLINE LAN MODE' : 'NILE FOOD SERVER'}`);
   console.log('========================================');
   console.log(`  Local:    http://localhost:${PORT}`);
+  console.log(`  Stable:   http://${getLanHostname()}:${PORT}  (never changes, even if the IP does)`);
   addresses.forEach(ip => {
     console.log(`  Network:  http://${ip}:${PORT}`);
   });
   if (isOffline) {
     console.log('  Admin:    http://<lan-ip>:' + PORT + '/admin');
+    console.log(`  Admin:    http://${getLanHostname()}:${PORT}/admin`);
   }
   console.log('========================================\n');
 
@@ -230,6 +252,7 @@ httpServer.listen(PORT, '0.0.0.0', () => {
     hotspotIps.forEach(ip => {
       console.log(`  ▶ http://${ip}:${PORT}/kiosk`);
     });
+    console.log(`  ▶ http://${getLanHostname()}:${PORT}/kiosk`);
     console.log('');
   }
 

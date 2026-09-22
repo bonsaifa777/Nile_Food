@@ -58,8 +58,8 @@ function FloatingParticles({ d }) {
 
 export default function Profile() {
   const { t } = useTranslation();
-  const { user, logout } = useAuth();
-  const { darkMode } = useTheme();
+  const { user, logout, updateProfile } = useAuth();
+  const { darkMode: d } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const items = menuItems(t);

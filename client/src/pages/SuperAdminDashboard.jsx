@@ -37,7 +37,7 @@ export default function SuperAdminDashboard() {
   const statCards = [
     { title: t('admin.totalOrders'), value: stats?.totalOrders || 0, icon: FiShoppingBag, color: 'from-blue-500 to-blue-600', link: '/admin/orders' },
     { title: t('admin.revenue'), value: `ETB ${(stats?.totalRevenue || 0).toLocaleString()}`, icon: FiDollarSign, color: 'from-green-500 to-green-600', link: '/admin/analytics' },
-    { title: t('admin.customers'), value: stats?.totalUsers || 0, icon: FiUsers, color: 'from-purple-500 to-purple-600', link: '/admin/users' },
+    { title: t('admin.customers'), value: stats?.totalCustomers || stats?.totalUsers || 0, icon: FiUsers, color: 'from-purple-500 to-purple-600', link: '/admin/users' },
     { title: t('admin.pending'), value: stats?.pendingOrders || 0, icon: FiClock, color: 'from-yellow-500 to-yellow-600', link: '/admin/orders?filter=pending' }
   ];
 

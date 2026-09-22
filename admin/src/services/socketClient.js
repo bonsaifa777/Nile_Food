@@ -6,16 +6,16 @@ let socket = null;
 let prevOrderCount = 0;
 
 export function connectKitchenSocket(token) {
-  // Socket.IO WebSocket not supported on Vercel serverless (skip in production unless LAN mode)
-  if (!import.meta.env.DEV && !import.meta.env.VITE_LAN_MODE) return null;
-
   if (socket?.connected) return socket;
 
   try {
-    socket = io(import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin, {
-      auth: { token },
-      transports: ['websocket', 'polling'],
-    });
+    socket = io(
+      import.meta.env.VITE_SOCKET_URL || (import.meta.env.DEV ? 'http://localhost:5002' : window.location.origin),
+      {
+        auth: { token },
+        transports: ['websocket', 'polling'],
+      }
+    );
 
     socket.on('connect', () => {
       DataService.addNotification('Real-time connection established', 'system');

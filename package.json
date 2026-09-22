@@ -8,6 +8,7 @@
     "lan:build": "bash scripts/lan-build.sh",
     "lan:start": "bash scripts/lan-start.sh",
     "lan:firewall": "bash scripts/lan-firewall.sh",
+    "lan:static-ip": "bash scripts/lan-static-ip.sh",
     "lan:seed": "cd server && node seed.js",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",

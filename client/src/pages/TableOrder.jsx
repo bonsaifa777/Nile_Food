@@ -9,6 +9,7 @@ import FoodCard from '../components/foods/FoodCard';
 import Loading from '../components/common/Loading';
 import { useTranslation } from 'react-i18next';
 import { FiSearch, FiMapPin, FiShoppingCart, FiPlus, FiMinus, FiX } from 'react-icons/fi';
+import { splitVat } from '../utils/price.js';
 
 export default function TableOrder() {
   const { t } = useTranslation();
@@ -78,9 +79,10 @@ export default function TableOrder() {
     }).filter(Boolean));
   };
 
-  const getSubtotal = () => cart.reduce((acc, item) => acc + (item.food.price * item.quantity), 0);
-  const getTax = () => getSubtotal() * 0.15;
-  const getTotal = () => getSubtotal() + getTax();
+  const getGross = () => cart.reduce((acc, item) => acc + (item.food.price * item.quantity), 0);
+  const getSubtotal = () => splitVat(getGross()).base;
+  const getTax = () => splitVat(getGross()).tax;
+  const getTotal = () => getGross();
 
   const placeOrder = async () => {
     if (!guestInfo.name || !guestInfo.phone) {
@@ -266,10 +268,12 @@ export default function TableOrder() {
                           <span className="text-white/60">{t('cart.subtotal')}</span>
                           <span>ETB {getSubtotal()}</span>
                         </div>
-                        <div className="flex justify-between mb-2">
-                          <span className="text-white/60">{t('cart.tax')} (15%)</span>
-                          <span>ETB {getTax().toFixed(2)}</span>
-                        </div>
+                        {getTax() > 0 && (
+                          <div className="flex justify-between mb-2">
+                            <span className="text-white/60">{t('cart.tax')}</span>
+                            <span>ETB {getTax().toFixed(2)}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between font-bold text-lg">
                           <span>{t('cart.total')}</span>
                           <span className="text-primary-500">ETB {getTotal().toFixed(2)}</span>

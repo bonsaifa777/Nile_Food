@@ -398,7 +398,7 @@ function StatsOverview({ stats, darkMode }) {
     },
     {
       title: t('admin.customers'),
-      value: stats?.totalUsers || 0,
+      value: stats?.totalCustomers || stats?.totalUsers || 0,
       icon: FiUsers,
       link: '/admin/users',
       gradient: 'bg-gradient-to-br from-purple-500 to-violet-500',

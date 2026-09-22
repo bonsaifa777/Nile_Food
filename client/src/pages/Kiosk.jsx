@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { splitVat } from '../utils/price.js';
 import {
   FiShoppingCart, FiPlus, FiMinus, FiX, FiMaximize, FiMinimize,
   FiSearch, FiClock, FiStar, FiChevronLeft, FiChevronRight
@@ -80,9 +81,8 @@ export default function Kiosk() {
   };
 
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
-  const subtotal = cart.reduce((s, i) => s + i.food.price * i.quantity, 0);
-  const tax = subtotal * 0.15;
-  const total = subtotal + tax;
+  const total = cart.reduce((s, i) => s + i.food.price * i.quantity, 0);
+  const { base: subtotal, tax } = splitVat(total);
 
   const placeOrder = async () => {
     if (!guestName || !guestPhone) { toast.error('Enter your name and phone'); return; }
@@ -403,7 +403,9 @@ export default function Kiosk() {
                 <div className="border-t border-white/10 p-4 md:p-6 space-y-4">
                   <div className="space-y-1 text-sm md:text-base">
                     <div className="flex justify-between text-white/60"><span>{t('cart.subtotal')}</span><span>ETB {subtotal.toFixed(2)}</span></div>
-                    <div className="flex justify-between text-white/60"><span>{t('cart.tax')} (15%)</span><span>ETB {tax.toFixed(2)}</span></div>
+                    {tax > 0 && (
+                      <div className="flex justify-between text-white/60"><span>{t('cart.tax')}</span><span>ETB {tax.toFixed(2)}</span></div>
+                    )}
                     <div className="flex justify-between text-lg md:text-xl font-bold pt-2 border-t border-white/10">
                       <span>{t('cart.total')}</span><span className="text-indigo-400">ETB {total.toFixed(2)}</span>
                     </div>

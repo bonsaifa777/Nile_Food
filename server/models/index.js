@@ -10,6 +10,7 @@ export { default as Listing } from './Listing.js';
 export { default as Reservation } from './Reservation.js';
 export { default as Settings } from './Settings.js';
 export { default as Inventory } from './Inventory.js';
+export { default as InventoryMovement } from './InventoryMovement.js';
 export { default as Attendance } from './Attendance.js';
 export { default as Shift } from './Shift.js';
 export { default as LeaveRequest } from './LeaveRequest.js';

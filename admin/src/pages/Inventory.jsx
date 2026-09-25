@@ -15,7 +15,26 @@ import {
 } from 'recharts';
 import { exportInventoryPdf } from '../utils/pdfReport';
 
-const CATEGORIES = ['Produce', 'Meat', 'Dairy', 'Dry Goods', 'Beverages', 'Other', 'Juice fruit', 'Food fruit', 'Spices', 'Coffee', 'Liquid'];
+function parseQuantity(value) {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const str = String(value).trim();
+  if (!str) return 0;
+  const mixed = str.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) return Number(mixed[1]) + Number(mixed[2]) / Number(mixed[3]);
+  const frac = str.match(/^(\d+)\/(\d+)$/);
+  if (frac) {
+    const num = Number(frac[1]);
+    const den = Number(frac[2]);
+    return den === 0 ? 0 : num / den;
+  }
+  const n = Number(str);
+  return Number.isFinite(n) ? n : 0;
+}
+
+const CATEGORIES = ['Produce', 'Meat', 'Dairy', 'Dry Goods', 'Beverages', 'Other', 'Juice fruit', 'Food fruit', 'Spices', 'Coffee', 'Liquid', 'Bread'];
+
+const UNITS = ['pcs', 'kg', 'g', 'L', 'ml', 'bag', 'box', 'pack'];
 
 const CATEGORY_COLORS = {
   Produce: '#34d399',
@@ -28,7 +47,18 @@ const CATEGORY_COLORS = {
   'Food fruit': '#f472b6',
   Spices: '#d97706',
   Coffee: '#a16207',
-  Liquid: '#06b6d4'
+  Liquid: '#06b6d4',
+  Bread: '#d4a373',
+  'Employees food': '#84cc16',
+  Commission: '#ec4899',
+  'Employee Salary': '#8b5cf6',
+  'House Rent': '#f43f5e',
+  Maintenance: '#0ea5e9',
+  'New material': '#22c55e',
+  'Material Rent': '#eab308',
+  Tax: '#f97316',
+  'Electric Bill': '#facc15',
+  'Water Bill': '#3b82f6'
 };
 
 const MOVEMENT_LABELS = {
@@ -117,7 +147,15 @@ const cardVariants = {
   })
 };
 
-export default function Inventory() {
+export default function Inventory({
+  apiBase = '/api/inventory',
+  title = 'Inventory Management',
+  badgeLabel = 'Live Inventory',
+  tableTitle = 'Inventory Items',
+  reportTitle = 'Inventory Reports',
+  categories = CATEGORIES,
+  units = UNITS
+}) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -138,7 +176,7 @@ export default function Inventory() {
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await axios.get('/api/inventory');
+      const { data } = await axios.get(`${apiBase}`);
       setItems(data.data || []);
     } catch (error) {
       toast.error('Failed to load inventory');
@@ -151,8 +189,8 @@ export default function Inventory() {
     setReportLoading(true);
     try {
       const [reportRes, movRes] = await Promise.all([
-        axios.get(`/api/inventory/report?period=${period}`),
-        axios.get(`/api/inventory/movements?period=${period}`)
+        axios.get(`${apiBase}/report?period=${period}`),
+        axios.get(`${apiBase}/movements?period=${period}`)
       ]);
       setReport(reportRes.data.data);
       setMovements(movRes.data.data || []);
@@ -174,15 +212,15 @@ export default function Inventory() {
     try {
       const payload = {
         ...formData,
-        quantity: Number(formData.quantity),
+        quantity: parseQuantity(formData.quantity),
         minStockLevel: Number(formData.minStockLevel),
         pricePerUnit: Number(formData.pricePerUnit)
       };
       if (editing) {
-        await axios.put(`/api/inventory/${editing._id}`, payload);
+        await axios.put(`${apiBase}/${editing._id}`, payload);
         toast.success('Item updated', { style: { background: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' } });
       } else {
-        await axios.post('/api/inventory', payload);
+        await axios.post(`${apiBase}`, payload);
         toast.success('Item created', { style: { background: '#0f172a', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' } });
       }
       setShowModal(false);
@@ -200,7 +238,7 @@ export default function Inventory() {
   const handleDelete = async (item) => {
     if (!confirm(`Delete ${item.name} from inventory?`)) return;
     try {
-      await axios.delete(`/api/inventory/${item._id}`);
+      await axios.delete(`${apiBase}/${item._id}`);
       toast.success('Item deleted');
       fetchItems();
       fetchReport(activePeriod);
@@ -212,7 +250,7 @@ export default function Inventory() {
   const updateStock = async (item, delta) => {
     try {
       const newQty = Math.max(0, Number(item.quantity) + delta);
-      await axios.put(`/api/inventory/${item._id}/stock`, { quantity: newQty, reason: delta > 0 ? 'Manual restock' : 'Manual deduction' });
+      await axios.put(`${apiBase}/${item._id}/stock`, { quantity: newQty, reason: delta > 0 ? 'Manual restock' : 'Manual deduction' });
       toast.success(delta > 0 ? `Restocked +${delta}` : `Deducted ${Math.abs(delta)}`);
       fetchItems();
       fetchReport(activePeriod);
@@ -253,22 +291,22 @@ export default function Inventory() {
   }, [items]);
 
   const categoryShare = useMemo(() => {
-    return CATEGORIES.map(cat => ({
+    return categories.map(cat => ({
       name: cat,
       value: items.filter(i => i.category === cat).length,
       units: items.filter(i => i.category === cat).reduce((s, i) => s + (i.quantity || 0), 0)
     })).filter(d => d.value > 0);
-  }, [items]);
+  }, [items, categories]);
 
   const categoryValue = useMemo(() => {
-    return CATEGORIES.map(cat => {
+    return categories.map(cat => {
       const rows = items.filter(i => i.category === cat);
       return {
         name: cat,
         value: Math.round(rows.reduce((s, i) => s + (i.quantity || 0) * (i.pricePerUnit || 0), 0))
       };
     }).filter(d => d.value > 0);
-  }, [items]);
+  }, [items, categories]);
 
   const stockRatio = (item) => {
     const base = Math.max(item.minStockLevel, 1);
@@ -383,11 +421,11 @@ export default function Inventory() {
             <div className="flex items-center gap-2 mb-2">
               <span className="px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5" style={{ background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.2)' }}>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot inline-block" />
-                Live Inventory
+                {badgeLabel}
               </span>
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">
-              Inventory Management
+              {title}
             </h1>
             <p className="text-sm mt-2 flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
               <FiRefreshCw size={12} className="text-indigo-400" />
@@ -572,7 +610,7 @@ export default function Inventory() {
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FiBox size={16} className="text-indigo-400" />
-              Inventory Items
+              {tableTitle}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
               {filtered.length} of {items.length} items shown
@@ -595,7 +633,7 @@ export default function Inventory() {
               className="input-glass sm:w-40 cursor-pointer"
             >
               <option value="All">All Categories</option>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              {categories.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
             <button
               onClick={() => setLowStockOnly((v) => !v)}
@@ -759,7 +797,7 @@ export default function Inventory() {
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <FiFileText size={16} className="text-indigo-400" />
-              Inventory Reports
+              {reportTitle}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
               Daily, weekly, monthly and yearly stock activity with PDF export
@@ -904,20 +942,20 @@ export default function Inventory() {
                   <div>
                     <label className="block text-sm mb-1.5 font-medium" style={{ color: 'var(--text-secondary)' }}>Category</label>
                     <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="input-glass cursor-pointer">
-                      {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                      {categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm mb-1.5 font-medium" style={{ color: 'var(--text-secondary)' }}>Unit</label>
                     <select value={formData.unit} onChange={e => setFormData({ ...formData, unit: e.target.value })} className="input-glass cursor-pointer">
-                      {['pcs', 'kg', 'g', 'L', 'ml', 'bag', 'box', 'pack'].map(u => <option key={u} value={u}>{u}</option>)}
+                      {units.map(u => <option key={u} value={u}>{u}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm mb-1.5 font-medium" style={{ color: 'var(--text-secondary)' }}>Quantity</label>
-                    <input type="number" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="input-glass" min="0" placeholder="0" />
+                    <input type="text" inputMode="decimal" value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="input-glass" placeholder="0 / 0.5 / 1/2" />
                   </div>
                   <div>
                     <label className="block text-sm mb-1.5 font-medium" style={{ color: 'var(--text-secondary)' }}>Price per Unit (ETB)</label>
@@ -929,7 +967,7 @@ export default function Inventory() {
                   <input
                     type="number"
                     readOnly
-                    value={(Number(formData.quantity) || 0) * (Number(formData.pricePerUnit) || 0)}
+                    value={(parseQuantity(formData.quantity) || 0) * (Number(formData.pricePerUnit) || 0)}
                     className="input-glass font-semibold"
                     placeholder="Auto-calculated"
                   />

@@ -18,6 +18,8 @@ const Tables = lazy(() => import('./pages/Tables'));
 const Users = lazy(() => import('./pages/Users'));
 const Analytics = lazy(() => import('./pages/Analytics'));
 const Inventory = lazy(() => import('./pages/Inventory'));
+const NileInventory = lazy(() => import('./pages/NileInventory'));
+const NileEmployees = lazy(() => import('./pages/NileEmployees'));
 const Content = lazy(() => import('./pages/Content'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Payments = lazy(() => import('./pages/Payments'));
@@ -249,6 +251,22 @@ function App() {
         <AdminRoute>
           <AppLayout>
             <Inventory />
+          </AppLayout>
+        </AdminRoute>
+      } />
+
+      <Route path="/nile-inventory" element={
+        <AdminRoute>
+          <AppLayout>
+            <NileInventory />
+          </AppLayout>
+        </AdminRoute>
+      } />
+
+      <Route path="/nile-employees" element={
+        <AdminRoute>
+          <AppLayout>
+            <NileEmployees />
           </AppLayout>
         </AdminRoute>
       } />

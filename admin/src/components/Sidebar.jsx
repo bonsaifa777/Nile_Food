@@ -40,6 +40,8 @@ const allMenuItems = [
   { path: '/users', label: 'Users', icon: FiUsers, roles: ['admin', 'super_admin'] },
   { path: '/analytics', label: 'Analytics', icon: FiBarChart2, roles: ['admin', 'super_admin'] },
   { path: '/inventory', label: 'Inventory', icon: FiPackage, roles: ['admin', 'super_admin'] },
+  { path: '/nile-inventory', label: 'Nile Inventory', icon: FiPackage, roles: ['admin', 'super_admin'] },
+  { path: '/nile-employees', label: 'Nile Employees', icon: FiUsers, roles: ['admin', 'super_admin'] },
   { path: '/payments', label: 'Payments', icon: FiCreditCard, roles: ['admin', 'super_admin'] },
   { path: '/reservations', label: 'Reservations', icon: FiCalendar, roles: ['admin', 'super_admin'] },
   { path: '/messages', label: 'Messages', icon: FiMail, roles: ['admin', 'super_admin'] },

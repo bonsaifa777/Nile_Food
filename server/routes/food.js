@@ -4,6 +4,7 @@ import Order from '../models/Order.js';
 import { apiResponse } from '../shared/utils.js';
 import { authenticate, optionalAuth, authorize } from '../middleware/auth.js';
 import { ROLES } from '../shared/constants.js';
+import { normalizeFoodImages } from '../utils/imageStorage.js';
 
 const router = express.Router();
 
@@ -143,6 +144,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', authenticate, authorize(ROLES.ADMIN, ROLES.SUPER_ADMIN), async (req, res) => {
   try {
+    normalizeFoodImages(req.body);
     const food = new Food(req.body);
     await food.save();
     res.status(201).json(apiResponse(true, 'Food created', food));

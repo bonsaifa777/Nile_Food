@@ -79,22 +79,59 @@ const MOVEMENT_COLORS = {
   updated: { color: '#818cf8', bg: 'rgba(99,102,241,0.12)', border: 'rgba(99,102,241,0.25)' }
 };
 
-function weekRangeLabel() {
-  const d = new Date();
-  const day = d.getDay();
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+function weekRangeLabel(d) {
   const start = new Date(d);
+  const day = start.getDay();
   start.setDate(start.getDate() - (day === 0 ? 6 : day - 1));
   return `${format(start, 'MMM d')} - ${format(d, 'MMM d, yyyy')}`;
 }
 
 const REPORT_TABS = [
-  { key: 'day', label: 'Daily', icon: FiClock, periodLabel: () => `Today, ${format(new Date(), 'MMMM d, yyyy')}`, accent: '#38bdf8' },
-  { key: 'week', label: 'Weekly', icon: FiTrendingUp, periodLabel: () => `This Week (${weekRangeLabel()})`, accent: '#a78bfa' },
-  { key: 'month', label: 'Monthly', icon: FiCalendar, periodLabel: () => format(new Date(), 'MMMM yyyy'), accent: '#34d399' },
-  { key: 'year', label: 'Yearly', icon: FiAward, periodLabel: () => format(new Date(), 'yyyy'), accent: '#fbbf24' }
+  {
+    key: 'day',
+    label: 'Daily',
+    icon: FiClock,
+    accent: '#38bdf8',
+    periodLabel: (a) => (isSameDay(a, new Date()) ? `Today, ${format(a, 'MMMM d, yyyy')}` : format(a, 'MMMM d, yyyy'))
+  },
+  {
+    key: 'week',
+    label: 'Weekly',
+    icon: FiTrendingUp,
+    accent: '#a78bfa',
+    periodLabel: (a) => `Week of ${weekRangeLabel(a)}`
+  },
+  {
+    key: 'month',
+    label: 'Monthly',
+    icon: FiCalendar,
+    accent: '#34d399',
+    periodLabel: (a) => format(a, 'MMMM yyyy')
+  },
+  {
+    key: 'year',
+    label: 'Yearly',
+    icon: FiAward,
+    accent: '#fbbf24',
+    periodLabel: (a) => format(a, 'yyyy')
+  }
 ];
 
-function AnimatedCounter({ value, prefix = '', suffix = '', duration = 1000 }) {
+const parseAnchor = (value) => {
+  if (!value) return null;
+  const [y, m, d] = String(value).split('-').map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+};
+
+const formatEtb = (n) =>
+  `ETB ${Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+function AnimatedCounter({ value, prefix = '', suffix = '', decimals = 0, duration = 1000 }) {
   const [display, setDisplay] = useState(0);
   const prevRef = useRef(0);
 
@@ -107,13 +144,20 @@ function AnimatedCounter({ value, prefix = '', suffix = '', duration = 1000 }) {
     const tick = (now) => {
       const progress = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.floor(from + (target - from) * eased));
+      setDisplay(from + (target - from) * eased);
       if (progress < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }, [value, duration]);
 
-  return <span>{prefix}{display.toLocaleString()}{suffix}</span>;
+  const formatted = typeof display === 'number'
+    ? display.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      })
+    : display;
+
+  return <span>{prefix}{formatted}{suffix}</span>;
 }
 
 function CustomTooltip({ active, payload, label, money = false }) {
@@ -165,6 +209,7 @@ export default function Inventory({
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [activePeriod, setActivePeriod] = useState('day');
+  const [reportDate, setReportDate] = useState('');
   const [report, setReport] = useState(null);
   const [movements, setMovements] = useState([]);
   const [reportLoading, setReportLoading] = useState(false);
@@ -185,12 +230,15 @@ export default function Inventory({
     }
   }, []);
 
-  const fetchReport = useCallback(async (period) => {
+  const fetchReport = useCallback(async () => {
     setReportLoading(true);
     try {
+      const qs = reportDate
+        ? `period=${activePeriod}&date=${reportDate}`
+        : `period=${activePeriod}`;
       const [reportRes, movRes] = await Promise.all([
-        axios.get(`${apiBase}/report?period=${period}`),
-        axios.get(`${apiBase}/movements?period=${period}`)
+        axios.get(`${apiBase}/report?${qs}`),
+        axios.get(`${apiBase}/movements?${qs}`)
       ]);
       setReport(reportRes.data.data);
       setMovements(movRes.data.data || []);
@@ -201,10 +249,32 @@ export default function Inventory({
     } finally {
       setReportLoading(false);
     }
-  }, []);
+  }, [apiBase, reportDate, activePeriod]);
 
   useEffect(() => { fetchItems(); }, [fetchItems]);
-  useEffect(() => { fetchReport(activePeriod); }, [activePeriod, fetchReport]);
+  useEffect(() => { fetchReport(); }, [fetchReport]);
+
+  const reportTab = useMemo(
+    () => REPORT_TABS.find((t) => t.key === activePeriod) || REPORT_TABS[0],
+    [activePeriod]
+  );
+
+  const anchorDate = useMemo(() => parseAnchor(reportDate) || new Date(), [reportDate]);
+
+  const reportPeriodLabel = useMemo(
+    () => reportTab.periodLabel(anchorDate),
+    [reportTab, anchorDate]
+  );
+
+  const reportRangeLabel = useMemo(() => {
+    const r = report?.range;
+    if (!r?.start || !r?.periodEnd) return reportPeriodLabel;
+    const sameDayRange = isSameDay(new Date(r.start), new Date(r.periodEnd));
+    if (sameDayRange) return reportPeriodLabel;
+    return `${format(new Date(r.start), 'MMM d, yyyy')} - ${format(new Date(r.periodEnd), 'MMM d, yyyy')}`;
+  }, [report, reportPeriodLabel]);
+
+  const snapshotItems = report?.snapshot?.items;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -227,7 +297,7 @@ export default function Inventory({
       setEditing(null);
       resetForm();
       fetchItems();
-      fetchReport(activePeriod);
+      fetchReport();
     } catch (error) {
       toast.error('Failed to save');
     } finally {
@@ -241,7 +311,7 @@ export default function Inventory({
       await axios.delete(`${apiBase}/${item._id}`);
       toast.success('Item deleted');
       fetchItems();
-      fetchReport(activePeriod);
+      fetchReport();
     } catch (error) {
       toast.error('Failed to delete');
     }
@@ -253,7 +323,7 @@ export default function Inventory({
       await axios.put(`${apiBase}/${item._id}/stock`, { quantity: newQty, reason: delta > 0 ? 'Manual restock' : 'Manual deduction' });
       toast.success(delta > 0 ? `Restocked +${delta}` : `Deducted ${Math.abs(delta)}`);
       fetchItems();
-      fetchReport(activePeriod);
+      fetchReport();
     } catch (error) {
       toast.error('Failed to update stock');
     }
@@ -320,14 +390,14 @@ export default function Inventory({
   };
 
   const handleExportPdf = () => {
-    const tab = REPORT_TABS.find(t => t.key === activePeriod);
     exportInventoryPdf({
-      title: tab.label,
-      periodLabel: tab.periodLabel(),
-      items,
+      title: reportTab.label,
+      periodLabel: reportRangeLabel,
+      items: snapshotItems?.length ? snapshotItems : items,
       movements,
       snapshot: report?.snapshot,
-      movementSummary: report?.movements
+      movementSummary: report?.movements,
+      asOfLabel: report?.snapshot?.asOf
     });
   };
 
@@ -344,7 +414,7 @@ export default function Inventory({
         <table className="w-full">
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              {['Item', 'Type', 'Change', 'Qty', 'Reason', 'By', 'Date'].map((header) => (
+              {['Item', 'Type', 'Change', 'Qty', 'Total Price', 'Reason', 'By', 'Date'].map((header) => (
                 <th key={header} className="text-left py-3 px-6 text-xs font-medium uppercase tracking-widest text-gray-500 sticky top-0" style={{ background: 'rgba(15,23,42,0.98)' }}>
                   {header}
                 </th>
@@ -354,7 +424,7 @@ export default function Inventory({
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-14 text-center">
+                <td colSpan={8} className="py-14 text-center">
                   <div className="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center" style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)' }}>
                     <FiActivity size={22} className="text-gray-500" />
                   </div>
@@ -393,6 +463,7 @@ export default function Inventory({
                       </span>
                     </td>
                     <td className="py-3 px-6 text-sm text-gray-400 tabular-nums">{m.qtyBefore} → {m.qtyAfter}</td>
+                    <td className="py-3 px-6 text-sm font-semibold tabular-nums text-emerald-400">{formatEtb(m.totalPrice)}</td>
                     <td className="py-3 px-6 text-sm text-gray-500">{m.reason || '-'}</td>
                     <td className="py-3 px-6 text-sm text-gray-500">{m.createdBy || 'System'}</td>
                     <td className="py-3 px-6 text-sm text-gray-500">{format(new Date(m.createdAt), 'MMM d, h:mm a')}</td>
@@ -824,6 +895,27 @@ export default function Inventory({
                 {tab.label}
               </button>
             ))}
+            <label className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium transition-all" style={{
+              background: reportDate ? '#38bdf81f' : 'rgba(255,255,255,0.03)',
+              color: reportDate ? '#fff' : '#9ca3af',
+              border: reportDate ? '1px solid #38bdf840' : '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <FiCalendar size={13} />
+              <span>Anchored To</span>
+              <input
+                type="date"
+                value={reportDate}
+                max={format(new Date(), 'yyyy-MM-dd')}
+                onChange={(e) => setReportDate(e.target.value)}
+                className="bg-transparent text-xs outline-none"
+                style={{ color: reportDate ? '#fff' : '#9ca3af' }}
+              />
+              {reportDate && (
+                <button onClick={() => setReportDate('')} title="Clear date" style={{ color: '#9ca3af', display: 'flex' }}>
+                  <FiX size={12} />
+                </button>
+              )}
+            </label>
           </div>
         </div>
 
@@ -834,44 +926,108 @@ export default function Inventory({
         ) : report ? (
           <>
             {(() => {
-              const tab = REPORT_TABS.find(t => t.key === activePeriod);
+              const tab = reportTab;
               const m = report.movements || {};
+              const s = report.snapshot || {};
               const netPositive = (m.netChange ?? 0) >= 0;
-              const periodCards = [
-                { label: 'Restocked', value: m.addedUnits ?? 0, suffix: ' units', icon: FiTrendingUp, color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.15)' },
-                { label: 'Consumed', value: m.consumedUnits ?? 0, suffix: ' units', icon: FiMinus, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.15)' },
-                { label: 'Net Change', value: m.netChange ?? 0, prefix: (m.netChange ?? 0) >= 0 ? '+' : '', icon: FiActivity, color: netPositive ? '#10b981' : '#ef4444', bg: netPositive ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)', border: netPositive ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)' },
-                { label: 'Movements', value: m.count ?? 0, icon: FiRefreshCw, color: '#818cf8', bg: 'rgba(99,102,241,0.08)', border: 'rgba(99,102,241,0.15)' }
+              const netValue = m.netValue ?? 0;
+              const unitCard = (label, value, icon, color) => ({
+                label,
+                value,
+                suffix: ' units',
+                icon,
+                color,
+                bg: `${color}14`,
+                border: `${color}26`
+              });
+              const valueCard = (label, value, icon, color, signed = false) => ({
+                label,
+                value,
+                prefix: signed && value >= 0 ? '+ETB ' : 'ETB ',
+                icon,
+                color,
+                bg: `${color}14`,
+                border: `${color}26`
+              });
+              const activityCards = [
+                unitCard('Restocked', m.addedUnits ?? 0, FiTrendingUp, '#10b981'),
+                unitCard('Consumed', m.consumedUnits ?? 0, FiMinus, '#ef4444'),
+                unitCard('Net Change', m.netChange ?? 0, FiActivity, netPositive ? '#10b981' : '#ef4444'),
+                { ...unitCard('Movements', m.count ?? 0, FiRefreshCw, '#818cf8'), suffix: '' }
               ];
+              const valuationCards = [
+                { ...valueCard('Total Price', m.periodValue ?? 0, FiDollarSign, tab.accent), hint: 'value handled in period' },
+                valueCard('Value In', m.addedValue ?? 0, FiTrendingUp, '#10b981'),
+                valueCard('Value Out', m.consumedValue ?? 0, FiMinus, '#ef4444'),
+                valueCard('Net Value', netValue, FiActivity, netValue >= 0 ? '#10b981' : '#ef4444', true)
+              ];
+              const stockCards = [
+                { label: 'Closing Units', value: s.totalUnits ?? 0, icon: FiLayers, color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.15)' },
+                { label: 'Stock Value', value: s.totalValue ?? 0, prefix: 'ETB ', decimals: 2, icon: FiPackage, color: '#10b981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.15)' },
+                { label: 'Items Tracked', value: s.itemCount ?? 0, icon: FiBox, color: '#6366f1', bg: 'rgba(99,102,241,0.08)', border: 'rgba(99,102,241,0.15)' },
+                { label: 'Low Stock', value: s.lowStockCount ?? 0, icon: FiAlertTriangle, color: '#ef4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.15)' }
+              ];
+              const asOfText = s.asOf ? format(new Date(s.asOf), 'MMM d, yyyy h:mm a') : '';
+              const sectionHeading = (icon, title, subtitle) => (
+                <div className="flex items-center gap-2 mb-3 mt-5">
+                  {icon}
+                  <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</span>
+                  <span className="text-xs" style={{ color: 'var(--text-muted)' }}>({subtitle})</span>
+                </div>
+              );
+              const cardGrid = (cards) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {cards.map((card) => (
+                    <motion.div
+                      key={card.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-between p-4 rounded-xl"
+                      style={{ background: card.bg, border: `1px solid ${card.border}` }}
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase tracking-widest truncate" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
+                        <p className="text-xl font-bold mt-1 tabular-nums truncate" style={{ color: card.color }}>
+                          <AnimatedCounter
+                            value={card.value}
+                            prefix={card.prefix || ''}
+                            suffix={card.suffix || ''}
+                            decimals={card.decimals || 0}
+                          />
+                        </p>
+                        {card.hint && (
+                          <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>{card.hint}</p>
+                        )}
+                      </div>
+                      <card.icon size={18} className="shrink-0" style={{ color: card.color }} />
+                    </motion.div>
+                  ))}
+                </div>
+              );
               return (
                 <>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                    {periodCards.map((card) => (
-                      <motion.div
-                        key={card.label}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex items-center justify-between p-4 rounded-xl"
-                        style={{ background: card.bg, border: `1px solid ${card.border}` }}
-                      >
-                        <div>
-                          <p className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>{card.label}</p>
-                          <p className="text-xl font-bold mt-1 tabular-nums" style={{ color: card.color }}>
-                            <AnimatedCounter value={card.value} prefix={card.prefix || ''} suffix={card.suffix || ''} />
-                          </p>
-                        </div>
-                        <card.icon size={18} style={{ color: card.color }} />
-                      </motion.div>
-                    ))}
-                  </div>
+                  {sectionHeading(<FiActivity size={14} style={{ color: tab.accent }} />, `${tab.label} Movement`, reportRangeLabel)}
+                  {cardGrid(activityCards)}
 
-                  <div className="flex items-center justify-between mb-3">
+                  {sectionHeading(<FiDollarSign size={14} style={{ color: tab.accent }} />, `${tab.label} Total Price`, reportRangeLabel)}
+                  {cardGrid(valuationCards)}
+
+                  {sectionHeading(<FiBox size={14} style={{ color: tab.accent }} />, `${tab.label} Closing Stock`, reportPeriodLabel)}
+                  {cardGrid(stockCards)}
+
+                  {asOfText && (
+                    <p className="text-[11px] mb-4 mt-2" style={{ color: 'var(--text-muted)' }}>
+                      Closing stock reconstructed from the movement ledger as of {asOfText}.
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between mb-3 mt-4">
                     <div className="flex items-center gap-2">
                       <tab.icon size={14} style={{ color: tab.accent }} />
                       <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
                         {tab.label} Stock Activity
                       </span>
-                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>({tab.periodLabel()})</span>
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>({reportRangeLabel})</span>
                     </div>
                     <motion.button
                       whileHover={{ scale: 1.03, boxShadow: `0 4px 20px ${tab.accent}40` }}

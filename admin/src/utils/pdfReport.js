@@ -90,7 +90,7 @@ const MOVEMENT_LABELS = {
   deleted: 'Deleted'
 };
 
-export function exportInventoryPdf({ title, periodLabel, items, movements, snapshot, movementSummary }) {
+export function exportInventoryPdf({ title, periodLabel, items, movements, snapshot, movementSummary, asOfLabel }) {
   const doc = new jsPDF({ orientation: 'landscape' });
 
   const headerColor = [16, 185, 129];
@@ -128,25 +128,61 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
   };
 
   const snap = snapshot || {};
-  block('Items', String(snap.itemCount ?? items?.length ?? 0), 14, (pageWidth - 28) / 4, accentColor);
-  block('Stock Value (ETB)', Number(snap.totalValue ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 }), 14 + (pageWidth - 28) / 4, (pageWidth - 28) / 4, headerColor);
-  block('Total Units', String(snap.totalUnits ?? 0), 14 + ((pageWidth - 28) / 4) * 2, (pageWidth - 28) / 4, [245, 158, 11]);
-  block('Low Stock', String(snap.lowStockCount ?? 0), 14 + ((pageWidth - 28) / 4) * 3, (pageWidth - 28) / 4, [239, 68, 68]);
+  const asOfText = asOfLabel ? format(new Date(asOfLabel), 'MMM d, yyyy h:mm a') : null;
+  const money = (n) => `ETB ${Number(n ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const quarter = (pageWidth - 28) / 4;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...accentColor);
+  doc.text('TOTAL PRICE FOR THIS PERIOD', 14, y - 8);
+  y += 4;
+
+  const periodSummary = movementSummary || {};
+  block('Total Price', money(periodSummary.periodValue), 14, quarter, headerColor);
+  block('Value In', money(periodSummary.addedValue), 14 + quarter, quarter, [16, 185, 129]);
+  block('Value Out', money(periodSummary.consumedValue), 14 + quarter * 2, quarter, [239, 68, 68]);
+  block(
+    'Net Value',
+    `${(periodSummary.netValue ?? 0) >= 0 ? '+' : '-'} ${money(Math.abs(periodSummary.netValue ?? 0))}`,
+    14 + quarter * 3,
+    quarter,
+    (periodSummary.netValue ?? 0) >= 0 ? [16, 185, 129] : [239, 68, 68]
+  );
+
+  y += 28;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(...accentColor);
+  doc.text(asOfText ? `CLOSING STOCK — AS OF ${asOfText.toUpperCase()}` : 'CLOSING STOCK', 14, y - 8);
+  y += 4;
+
+  block('Items', String(snap.itemCount ?? items?.length ?? 0), 14, quarter, accentColor);
+  block('Stock Value (ETB)', Number(snap.totalValue ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 }), 14 + quarter, quarter, headerColor);
+  block('Closing Units', String(snap.totalUnits ?? 0), 14 + quarter * 2, quarter, [245, 158, 11]);
+  block('Low Stock', String(snap.lowStockCount ?? 0), 14 + quarter * 3, quarter, [239, 68, 68]);
 
   y += 28;
 
   if (movementSummary) {
     const m = movementSummary;
-    block('Restocked (units)', String(m.addedUnits ?? 0), 14, (pageWidth - 28) / 4, [16, 185, 129]);
-    block('Consumed (units)', String(m.consumedUnits ?? 0), 14 + (pageWidth - 28) / 4, (pageWidth - 28) / 4, [239, 68, 68]);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...accentColor);
+    doc.text(`ACTIVITY DURING ${String(periodLabel || '').toUpperCase()}`, 14, y - 8);
+    y += 4;
+
+    block('Restocked (units)', String(m.addedUnits ?? 0), 14, quarter, [16, 185, 129]);
+    block('Consumed (units)', String(m.consumedUnits ?? 0), 14 + quarter, quarter, [239, 68, 68]);
     block(
-      'Net Change',
+      'Net Change (units)',
       `${m.netChange >= 0 ? '+' : ''}${m.netChange ?? 0}`,
-      14 + ((pageWidth - 28) / 4) * 2,
-      (pageWidth - 28) / 4,
+      14 + quarter * 2,
+      quarter,
       (m.netChange ?? 0) >= 0 ? [16, 185, 129] : [239, 68, 68]
     );
-    block('Movements', String(m.count ?? 0), 14 + ((pageWidth - 28) / 4) * 3, (pageWidth - 28) / 4, [99, 102, 241]);
+    block('Movements', String(m.count ?? 0), 14 + quarter * 3, quarter, [99, 102, 241]);
 
     y += 28;
 
@@ -155,6 +191,7 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
       MOVEMENT_LABELS[mov.type] || mov.type || '-',
       `${mov.qtyBefore}  →  ${mov.qtyAfter}`,
       `${mov.change >= 0 ? '+' : ''}${mov.change}`,
+      money(mov.totalPrice),
       mov.reason || '-',
       mov.createdBy || 'System',
       format(new Date(mov.createdAt), 'MMM d, h:mm a')
@@ -163,7 +200,7 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
     if (movementRows.length > 0) {
       autoTable(doc, {
         startY: y,
-        head: [['Item', 'Type', 'Qty (Before → After)', 'Change', 'Reason', 'By', 'Date']],
+        head: [['Item', 'Type', 'Qty (Before → After)', 'Change', 'Total Price', 'Reason', 'By', 'Date']],
         body: movementRows,
         theme: 'grid',
         headStyles: { fillColor: headerColor, fontSize: 9, fontStyle: 'bold' },
@@ -172,7 +209,8 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
         styles: { cellPadding: 3, valign: 'middle' },
         columnStyles: {
           3: { halign: 'right', fontStyle: 'bold', textColor: [16, 185, 129] },
-          4: { fontStyle: 'italic' }
+          4: { halign: 'right', fontStyle: 'bold', textColor: accentColor },
+          5: { fontStyle: 'italic' }
         },
         margin: { left: 14, right: 14 }
       });
@@ -185,7 +223,7 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(15, 23, 42);
-  doc.text('Current Stock Levels', 14, y);
+  doc.text(asOfText ? `Stock Levels as of ${asOfText}` : 'Stock Levels', 14, y);
   y += 4;
 
   const itemRows = (items || []).map((i) => [
@@ -238,7 +276,13 @@ export function exportInventoryPdf({ title, periodLabel, items, movements, snaps
   doc.setTextColor(...headerColor);
   doc.text(`Total Items: ${items?.length || 0}`, 14, finalY);
   doc.text(
-    `Total Stock Value: ETB ${Number(snap.totalValue ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+    `Period Total Price: ${money((movementSummary || {}).periodValue)}`,
+    14 + (pageWidth - 28) / 2,
+    finalY,
+    { align: 'center' }
+  );
+  doc.text(
+    `${asOfText ? 'Closing' : 'Total'} Stock Value: ETB ${Number(snap.totalValue ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
     14 + (pageWidth - 28),
     finalY,
     { align: 'right' }

@@ -4,33 +4,17 @@ import NileInventoryMovement from '../models/NileInventoryMovement.js';
 import { apiResponse } from '../shared/utils.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { ROLES } from '../shared/constants.js';
+import {
+  resolveReportRange,
+  buildMovementQuery,
+  buildStockSnapshot,
+  summarizeMovements,
+  priceMovements
+} from '../shared/inventoryReport.js';
 
 const router = express.Router();
 
 const STAFF_ROLES = [ROLES.ADMIN, ROLES.SUPER_ADMIN, ROLES.KITCHEN_STAFF];
-
-const getPeriodStart = (period) => {
-  const now = new Date();
-  if (period === 'day') {
-    const d = new Date(now);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
-  if (period === 'week') {
-    const d = new Date(now);
-    const day = d.getDay();
-    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1));
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
-  if (period === 'month') {
-    return new Date(now.getFullYear(), now.getMonth(), 1);
-  }
-  if (period === 'year') {
-    return new Date(now.getFullYear(), 0, 1);
-  }
-  return null;
-};
 
 const recordMovement = async ({ item, type, qtyBefore, qtyAfter, reason, createdBy }) => {
   try {
@@ -76,15 +60,18 @@ router.get('/movements', authenticate, authorize(...STAFF_ROLES), async (req, re
   try {
     const { period, itemId } = req.query;
     const query = {};
-    if (period) {
-      const start = getPeriodStart(period);
-      if (start) query.createdAt = { $gte: start };
+    if (period || req.query.date || req.query.start || req.query.end) {
+      const { start, end } = resolveReportRange(period, req.query);
+      Object.assign(query, buildMovementQuery({ start, end }));
     }
     if (itemId) query.item = itemId;
-    const movements = await NileInventoryMovement.find(query)
-      .sort({ createdAt: -1 })
-      .limit(Math.min(Number(req.query.limit) || 500, 1000));
-    res.json(apiResponse(true, '', movements));
+    const limit = Math.min(Number(req.query.limit) || 500, 1000);
+    const [movements, pricedItems] = await Promise.all([
+      NileInventoryMovement.find(query).sort({ createdAt: -1 }).limit(limit),
+      NileInventory.find({}, 'pricePerUnit')
+    ]);
+    const priceByItem = new Map(pricedItems.map((i) => [String(i._id), i.pricePerUnit]));
+    res.json(apiResponse(true, '', priceMovements(movements, priceByItem)));
   } catch (error) {
     res.status(500).json(apiResponse(false, 'Failed to fetch Nile movements'));
   }
@@ -93,51 +80,29 @@ router.get('/movements', authenticate, authorize(...STAFF_ROLES), async (req, re
 router.get('/report', authenticate, authorize(...STAFF_ROLES), async (req, res) => {
   try {
     const { period } = req.query;
-    const start = getPeriodStart(period);
-    const query = start ? { createdAt: { $gte: start } } : {};
-    const [movements, items] = await Promise.all([
-      NileInventoryMovement.find(query).sort({ createdAt: 1 }),
-      NileInventory.find({ isActive: true }).sort({ category: 1, name: 1 })
+    const { start, end, periodEnd, anchor, asOf, source } = resolveReportRange(period, req.query);
+
+    const [movements, snapshot, pricedItems] = await Promise.all([
+      NileInventoryMovement.find(buildMovementQuery({ start, end })).sort({ createdAt: 1 }),
+      buildStockSnapshot({ Item: NileInventory, Movement: NileInventoryMovement, asOf }),
+      NileInventory.find({}, 'pricePerUnit')
     ]);
 
-    const addedUnits = movements
-      .filter((m) => m.change > 0)
-      .reduce((sum, m) => sum + m.change, 0);
-    const consumedUnits = Math.abs(
-      movements.filter((m) => m.change < 0).reduce((sum, m) => sum + m.change, 0)
-    );
-    const netChange = Math.round((addedUnits - consumedUnits) * 100) / 100;
-
-    const byCategory = items.reduce((acc, item) => {
-      const existing = acc.find((c) => c.name === item.category);
-      const value = (item.quantity || 0) * (item.pricePerUnit || 0);
-      if (existing) {
-        existing.count += 1;
-        existing.units += item.quantity || 0;
-        existing.value += value;
-      } else {
-        acc.push({ name: item.category, count: 1, units: item.quantity || 0, value });
-      }
-      return acc;
-    }, []);
+    const priceByItem = new Map(pricedItems.map((i) => [String(i._id), i.pricePerUnit]));
+    const stockMovements = movements.filter((m) => m.type !== 'deleted');
+    const summary = summarizeMovements(movements, priceByItem);
 
     res.json(apiResponse(true, '', {
-      period,
+      period: period || 'day',
+      range: { start, end, periodEnd, anchor, asOf, source },
       snapshot: {
-        itemCount: items.length,
-        totalUnits: items.reduce((s, i) => s + (i.quantity || 0), 0),
-        totalValue: Math.round(items.reduce((s, i) => s + (i.quantity || 0) * (i.pricePerUnit || 0), 0) * 100) / 100,
-        lowStockCount: items.filter((i) => i.quantity <= i.minStockLevel).length,
-        byCategory
+        ...snapshot.totals,
+        asOf,
+        items: snapshot.rows
       },
-      movements: {
-        count: movements.length,
-        addedUnits: Math.round(addedUnits * 100) / 100,
-        consumedUnits: Math.round(consumedUnits * 100) / 100,
-        netChange
-      },
-      added: movements.filter((m) => m.change > 0),
-      consumed: movements.filter((m) => m.change < 0)
+      movements: summary,
+      added: priceMovements(stockMovements.filter((m) => m.change > 0), priceByItem),
+      consumed: priceMovements(stockMovements.filter((m) => m.change < 0), priceByItem)
     }));
   } catch (error) {
     res.status(500).json(apiResponse(false, 'Failed to generate Nile inventory report'));
